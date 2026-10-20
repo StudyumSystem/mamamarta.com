@@ -15,6 +15,7 @@ export default function WhatIsSection() {
           <img
             src={'/assets/m-letter.png'}
             alt=""
+            data-parallax="-12"
             className="sm:h-screen scale-120 right-0 absolute sm:top-0 sm:right-0 transition-transform duration-300"
           />
           <img
@@ -26,12 +27,12 @@ export default function WhatIsSection() {
       </div>
 
       <div className="relative z-10 xs:max-w-2xl sm:max-w-3xl md:max-w-4xl sm:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl h-full flex flex-col justify-between h-full flex-1">
-        <img src={'/assets/whatIs.png'} alt="What is" className="mb-10 sm:w-[45vw] w-[80vw]" />
-        <div className="sm:max-w-lg max-w-[65vw]">
+        <img data-reveal src={'/assets/whatIs.png'} alt="What is" className="mb-10 sm:w-[45vw] w-[80vw]" />
+        <div data-reveal className="sm:max-w-lg max-w-[65vw]">
           <p className="text-[4vw] xs:text-xs sm:text-sm md:text-xl sm:text-2xl xl:text-[1.5rem] 2xl:text-2xl font-thin text-gray-200">An amazing experience is where proven design language is adapted to your product until it feels native, precise, and impossible to ignore.</p>
         </div>
 
-        <div className="sm:mt-8 mt-auto">
+        <div data-reveal className="sm:mt-8 mt-auto">
           <div className="w-22 h-[1px] bg-pink-500 opacity-60"></div>
           <p className="text-[2vw] mt-1 tracking-[0.2em] text-gray-500 font-medium xs:text-[0.3rem] sm:text-[0.35rem] md:text-[0.45rem] sm:text-[0.52rem] xl:text-[0.65rem] 2xl:text-[0.8rem]">Interaction layer</p>
         </div>

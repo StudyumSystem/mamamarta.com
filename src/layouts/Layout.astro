@@ -45,5 +45,8 @@ const canonical = new URL(Astro.url.pathname, site).href;
 	</head>
 	<body>
 		<slot />
+		<script>
+			import '../scripts/scroll-reveals.js';
+		</script>
 	</body>
 </html>

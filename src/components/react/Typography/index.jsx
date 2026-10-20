@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Counter from "./Counter.jsx";
 
 const cards = [
@@ -26,6 +26,57 @@ export default function TypographySection() {
   // State to track the scroll progress from 0.0 to 1.0
   const [scrollProgress, setScrollProgress] = useState(0);
 
+  // The card row slides by on its own while it's on screen: to the end, a pause, gently back to the start.
+  // A touch, the mouse over it or a scroll by hand pauses it for a few seconds. Off for reduced motion.
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const SPEED = 40; // pixels per second
+    let visible = false;
+    let pausedUntil = 0;
+    let holdUntil = 0;
+    let returning = false;
+    let pos = rail.scrollLeft;
+    let last = performance.now();
+    let frame;
+    const pause = (ms = 3500) => { pausedUntil = performance.now() + ms; returning = false; pos = rail.scrollLeft; };
+    const hover = () => pause(60_000);
+    const leave = () => pause(1500);
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0.3 });
+    io.observe(rail);
+    const tick = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      const max = rail.scrollWidth - rail.clientWidth;
+      if (visible && max > 0 && now > pausedUntil && now > holdUntil) {
+        if (returning) {
+          pos += (0 - pos) * Math.min(1, dt * 2.5);
+          if (pos < 1) { pos = 0; returning = false; holdUntil = now + 1200; }
+        } else {
+          pos += SPEED * dt;
+          if (pos >= max) { pos = max; returning = true; holdUntil = now + 1500; }
+        }
+        rail.scrollLeft = pos;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    rail.addEventListener("pointerdown", pause);
+    rail.addEventListener("touchstart", pause, { passive: true });
+    rail.addEventListener("wheel", pause, { passive: true });
+    rail.addEventListener("mouseenter", hover);
+    rail.addEventListener("mouseleave", leave);
+    return () => {
+      cancelAnimationFrame(frame);
+      io.disconnect();
+      rail.removeEventListener("pointerdown", pause);
+      rail.removeEventListener("touchstart", pause);
+      rail.removeEventListener("wheel", pause);
+      rail.removeEventListener("mouseenter", hover);
+      rail.removeEventListener("mouseleave", leave);
+    };
+  }, []);
+
   // Calculate exactly how far the user has scrolled
   const handleScroll = (e) => {
     const { scrollLeft, scrollWidth, clientWidth } = e.target;
@@ -44,7 +95,7 @@ export default function TypographySection() {
       <div className="mx-auto flex flex-col gap-8">
         
         {/* Header Section */}
-        <div className="w-full sm:px-[3rem] order-1">
+        <div className="w-full sm:px-[3rem] order-1" data-reveal>
           <div>
             <p className="mb-4 sm:mb-2 text-2xl tracking-tight xs:text-sm sm:text-base md:text-xl sm:text-2xl xl:text-3xl 2xl:text-4xl">Every digital product starts with structure.</p>
           </div>
@@ -56,7 +107,7 @@ export default function TypographySection() {
         </div>
 
         {/* Building Blocks & CUSTOM SCROLLBAR */}
-        <div className="order-3 sm:order-2 grid grid-cols-1 items-end gap-4 xs:gap-5 sm:gap-6 md:grid-cols-12 md:gap-8 sm:gap-10 2xl:gap-12 sm:px-[3rem]">
+        <div data-reveal className="order-3 sm:order-2 grid grid-cols-1 items-end gap-4 xs:gap-5 sm:gap-6 md:grid-cols-12 md:gap-8 sm:gap-10 2xl:gap-12 sm:px-[3rem]">
           <div className="md:col-span-4">
             <div className="max-w-[340px]">
               <h3 className="mb-3 sm:mb-1 text-lg font-medium xs:text-[0.35rem] sm:text-[0.4rem] md:text-[0.5rem] sm:text-[0.6rem] xl:text-[0.7rem] 2xl:text-[0.8rem]">The Building Blocks</h3>

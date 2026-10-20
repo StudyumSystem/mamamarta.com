@@ -12,13 +12,13 @@ export default function BrandSection() {
 
         <div className="relative z-10 w-full flex flex-col gap-8 sm:gap-6 md:grid md:grid-cols-2 md:gap-14 sm:gap-16 xl:gap-20 2xl:gap-24 md:items-center">
           <div className="flex flex-col self-start md:self-center shrink-0">
-            <h1 className="text-white leading-[0.75] select-none">
+            <h1 data-reveal-lines className="text-white leading-[0.75] select-none">
               <span className="block text-[28.5vw] sm:text-[10.5vw] font-bold">MAMA</span>
               <span className="block text-[28.5vw] sm:text-[10.5vw] font-light tracking-wide">MARTA</span>
             </h1>
           </div>
 
-          <div className="flex flex-1 flex-col items-between text-white self-start sm:self-center sm:pt-0 overflow-hidden sm:justify-between h-full w-[70vw]">
+          <div data-reveal className="flex flex-1 flex-col items-between text-white self-start sm:self-center sm:pt-0 overflow-hidden sm:justify-between h-full w-[70vw]">
             <div className="">
               <p className="text-lg sm:text-[1.35vw] font-light">Design house for digital products.</p>
               <p className="text-lg sm:text-[1.35vw] font-light line-clamp-2">Crafted to shape systems, interactions, and digital identity.</p>

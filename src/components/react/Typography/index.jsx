@@ -96,7 +96,7 @@ export default function TypographySection() {
   };
 
   return (
-    <section id="typography" className="px-3 py-6 min-h-screen max-h-screen bg-white text-black xs:px-4 sm:px-8 md:pt-4 sm:pt-6 xl:mt-6 2xl:mt-8 pb-8 font-sans overflow-hidden">
+    <section id="typography" className="px-3 py-6 min-h-screen sm:max-h-screen bg-white text-black xs:px-4 sm:px-8 md:pt-4 sm:pt-6 xl:mt-6 2xl:mt-8 pb-8 font-sans overflow-hidden">
       <div className="mx-auto flex flex-col gap-8">
         
         {/* Header Section */}

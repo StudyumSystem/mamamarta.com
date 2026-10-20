@@ -6,7 +6,7 @@ export default function WhatIsSection() {
   return (
     <section id="what-is" className="relative px-6 py-12 min-h-screen overflow-hidden bg-black xs:px-6 sm:px-8 md:px-16 sm:px-20 xl:px-24 2xl:px-32 xs:py-16 sm:py-20 md:py-20 sm:py-24 xl:py-28 2xl:py-32 text-white md:px-16 flex flex-col md:justify-center xl:justify-start" onPointerEnter={() => setIsHovering(true)} onPointerLeave={() => setIsHovering(false)}>
       <div
-        className="absolute inset-y-0 right-0 z-20 w-full max-w-[68rem] pointer-events-none select-none mix-blend-screen"
+        className="absolute top-[max(42%,340px)] bottom-0 sm:top-0 right-0 z-20 [mask-image:linear-gradient(to_bottom,transparent,black_22%)] sm:[mask-image:none] w-full max-w-[68rem] pointer-events-none select-none mix-blend-screen"
         aria-hidden="true"
       >
         {/* <div className="absolute right-0 sm:top-1/2 h-[50vw] sm:h-[88%] sm:w-[72%] -translate-y-1/2 bg-[radial-gradient(circle_at_35%_50%,rgba(255,255,255,0.24),rgba(255,255,255,0.08)_28%,rgba(255,255,255,0.02)_55%,transparent_76%)] blur-3xl opacity-90"></div> */}

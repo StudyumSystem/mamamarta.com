@@ -13,8 +13,8 @@ export default function BrandSection() {
         <div className="relative z-10 w-full flex flex-col gap-8 sm:gap-6 md:grid md:grid-cols-2 md:gap-14 sm:gap-16 xl:gap-20 2xl:gap-24 md:items-center">
           <div className="flex flex-col self-start md:self-center shrink-0">
             <h2 data-reveal-lines className="text-white leading-[0.75] select-none">
-              <span className="block text-[28.5vw] sm:text-[10.5vw] font-bold">MAMA</span>
-              <span className="block text-[28.5vw] sm:text-[10.5vw] font-light tracking-wide">MARTA</span>
+              <span className="block text-[25.5vw] sm:text-[10.5vw] font-bold">MAMA</span>
+              <span className="block text-[25.5vw] sm:text-[10.5vw] font-light tracking-wide">MARTA</span>
             </h2>
           </div>
 

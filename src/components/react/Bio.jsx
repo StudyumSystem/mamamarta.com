@@ -127,6 +127,8 @@ export default function Bio() {
             <div>
               <img
                 src="/assets/marta.webp"
+                width="1346"
+                height="2100"
                 alt="Marta with textured wall"
                 className="object-contain"
               />

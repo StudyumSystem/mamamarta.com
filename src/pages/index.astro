@@ -1,0 +1,21 @@
+---
+import CaseStudiesSection from '../components/react/CaseStudies/index.jsx';
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/react/Hero.jsx';
+import Library from '../components/react/Library.jsx';
+import TypographySection from '../components/react/Typography/index.jsx';
+import WhatIsSection from '../components/react/WhatIsSection.jsx';
+import PlatformSection from '../components/react/PlatformSection.jsx';
+import BrandSection from '../components/react/BrandSection.jsx';
+---
+
+<Layout>
+	<div id="site-shell" class="bg-white text-black">
+		<Hero client:load />
+		<TypographySection client:load />
+		<WhatIsSection />
+		<PlatformSection />
+		<BrandSection client:load/>
+	</div>
+</Layout>
+

@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+const site = 'https://mamamarta.com';
+const {
+	title = 'Mama Marta · Design house for digital products',
+	description = 'Mama Marta is a design house for digital products, crafted to shape systems, interactions, and digital identity. Book a discovery call.',
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, site).href;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: light)" />
+		<link rel="icon" type="image/svg+xml" href="/favicon-white.svg" media="(prefers-color-scheme: dark)" />
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Mama Marta" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta name="twitter:card" content="summary" />
+		<script type="application/ld+json" set:html={JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'Organization',
+			name: 'Mama Marta',
+			url: site,
+			description,
+			email: 'mymamamarta@icloud.com',
+			sameAs: ['https://www.linkedin.com/company/mamamarta/', 'https://www.instagram.com/mymamamarta/'],
+		})} />
+		<ClientRouter />
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>

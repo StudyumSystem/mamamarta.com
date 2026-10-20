@@ -1,0 +1,10 @@
+---
+import Bio from '../components/react/Bio.jsx';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="About Marta · Mama Marta" description="Marta, the designer behind Mama Marta, a design house for digital products: systems, interactions, and digital identity.">
+	<div id="bio-page" class="bg-white text-black min-h-screen">
+		<Bio client:load />
+	</div>
+</Layout>

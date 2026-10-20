@@ -26,20 +26,31 @@ export default function TypographySection() {
   // State to track the scroll progress from 0.0 to 1.0
   const [scrollProgress, setScrollProgress] = useState(0);
 
-  // The card row slides by on its own while it's on screen: to the end, a pause, gently back to the start.
-  // A touch, the mouse over it or a scroll by hand pauses it for a few seconds. Off for reduced motion.
+  // The card row loops forever: the cards are there twice, and whenever the row reaches the first card's
+  // copy it jumps back by exactly one set, which looks the same, so it never reaches an end. It slides on
+  // its own while on screen; a touch, the mouse over it or a scroll by hand pauses it. Off for reduced motion.
+  const loopWidth = () => {
+    const track = railRef.current?.firstElementChild;
+    const first = track?.children[0];
+    const copy = track?.children[cards.length];
+    return first && copy ? copy.offsetLeft - first.offsetLeft : 0;
+  };
+  const wrap = (rail) => {
+    const w = loopWidth();
+    if (w > 0 && rail.scrollLeft >= w) rail.scrollLeft -= w;
+    return w;
+  };
+
   useEffect(() => {
     const rail = railRef.current;
     if (!rail || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const SPEED = 40; // pixels per second
     let visible = false;
     let pausedUntil = 0;
-    let holdUntil = 0;
-    let returning = false;
     let pos = rail.scrollLeft;
     let last = performance.now();
     let frame;
-    const pause = (ms = 3500) => { pausedUntil = performance.now() + ms; returning = false; pos = rail.scrollLeft; };
+    const pause = (ms = 3500) => { pausedUntil = performance.now() + ms; };
     const hover = () => pause(60_000);
     const leave = () => pause(1500);
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0.3 });
@@ -47,16 +58,14 @@ export default function TypographySection() {
     const tick = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      const max = rail.scrollWidth - rail.clientWidth;
-      if (visible && max > 0 && now > pausedUntil && now > holdUntil) {
-        if (returning) {
-          pos += (0 - pos) * Math.min(1, dt * 2.5);
-          if (pos < 1) { pos = 0; returning = false; holdUntil = now + 1200; }
-        } else {
+      if (now <= pausedUntil) pos = rail.scrollLeft; // he scrolled by hand: carry on from there
+      else if (visible) {
+        const w = loopWidth();
+        if (w > 0) {
           pos += SPEED * dt;
-          if (pos >= max) { pos = max; returning = true; holdUntil = now + 1500; }
+          if (pos >= w) pos -= w;
+          rail.scrollLeft = pos;
         }
-        rail.scrollLeft = pos;
       }
       frame = requestAnimationFrame(tick);
     };
@@ -79,15 +88,9 @@ export default function TypographySection() {
 
   // Calculate exactly how far the user has scrolled
   const handleScroll = (e) => {
-    const { scrollLeft, scrollWidth, clientWidth } = e.target;
-    // maxScroll is the total scrollable distance
-    const maxScroll = scrollWidth - clientWidth; 
-    
-    if (maxScroll > 0) {
-      // Gives us a decimal between 0 and 1
-      const progress = scrollLeft / maxScroll; 
-      setScrollProgress(progress);
-    }
+    // Position within one set of cards (0 to 1); scrolling by hand past the copy wraps around too.
+    const w = wrap(e.target);
+    if (w > 0) setScrollProgress((e.target.scrollLeft % w) / w);
   };
 
   return (
@@ -137,7 +140,7 @@ export default function TypographySection() {
           className="order-2 scrollbar-hide overflow-x-auto bg-white"
         >
           <div className="marquee-track flex items-center gap-8">
-            {[...cards].map((card, idx) => {
+            {[...cards, ...cards].map((card, idx) => {
               const key = `${card.id}-${idx}`;
               
               if (card.id === "human-walking") {

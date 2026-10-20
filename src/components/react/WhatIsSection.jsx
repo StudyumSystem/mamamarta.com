@@ -11,7 +11,7 @@ export default function WhatIsSection() {
       >
         {/* <div className="absolute right-0 sm:top-1/2 h-[50vw] sm:h-[88%] sm:w-[72%] -translate-y-1/2 bg-[radial-gradient(circle_at_35%_50%,rgba(255,255,255,0.24),rgba(255,255,255,0.08)_28%,rgba(255,255,255,0.02)_55%,transparent_76%)] blur-3xl opacity-90"></div> */}
 
-        <div className="flex relative items-end h-full w-full overflow-auto">
+        <div className="flex relative items-end h-full w-full overflow-hidden">
           <img
             src={'/assets/m-letter.png'}
             alt=""

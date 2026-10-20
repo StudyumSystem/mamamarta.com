@@ -126,7 +126,7 @@ export default function Bio() {
             </div>
             <div>
               <img
-                src="/assets/marta.png"
+                src="/assets/marta.webp"
                 alt="Marta with textured wall"
                 className="object-contain"
               />
@@ -139,7 +139,7 @@ export default function Bio() {
           <div className="flex flex-row flex-1">
             <div>
               <img
-                src="/assets/bio-2.png"
+                src="/assets/bio-2.webp"
                 alt="Marta with textured wall"
                 className="object-contain"
               />
@@ -147,7 +147,7 @@ export default function Bio() {
             <div className="p-4"></div>
             <div>
               <img
-                src="/assets/bio-3.png"
+                src="/assets/bio-3.webp"
                 alt="Marta with textured wall"
                 className="object-contain"
               />

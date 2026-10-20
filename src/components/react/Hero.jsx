@@ -62,7 +62,8 @@ export default function Hero() {
         loop
         playsInline
         preload="auto"
-        src={'/assets/hero-bg.mp4'} alt="Hero background"
+        poster={'/assets/hero-bg-poster.webp'}
+        src={'/assets/hero-bg.mp4'}
       ></video>
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col">
@@ -98,11 +99,13 @@ export default function Hero() {
         <div className="flex flex-1 flex-col items-center text-center justify-center lg:justify-between rounded-lg lg:py-[5rem] max-h-screen py-[5em]">
 
           <div className="items-center justify-center flex flex-col">
-            <img
-              className="w-[80vw] lg:w-[80%] h-auto object-contain"
-              src={'/assets/mamamarta.png'}
-              alt="MAMA MARTA"
-            />
+            <h1 className="contents">
+              <img
+                className="w-[80vw] lg:w-[80%] h-auto object-contain"
+                src={'/assets/mamamarta.png'}
+                alt="MAMA MARTA"
+              />
+            </h1>
 
             <p className="lg:mt-[1.5rem] mt-6 text-[1.6rem] font-light tracking-wide lg:text-[1.75rem] text-white">
               Design house for digital products.

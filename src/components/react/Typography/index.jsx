@@ -53,6 +53,8 @@ export default function TypographySection() {
     const pause = (ms = 3500) => { pausedUntil = performance.now() + ms; };
     const hover = () => pause(60_000);
     const leave = () => pause(1500);
+    const copies = [...(rail.firstElementChild?.children ?? [])].slice(cards.length);
+    for (const el of copies) el.setAttribute("aria-hidden", "true");
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0.3 });
     io.observe(rail);
     const tick = (now) => {
@@ -104,7 +106,7 @@ export default function TypographySection() {
           </div>
 
           <div className="flex justify-between w-full flex-col sm:items-center md:flex-row xl:flex-row 2xl:flex-row">
-            <h1 className="mb-8 text-[17vw] sm:mb-4 text-7xl font-medium leading-[0.95] xs:text-3xl sm:text-4xl md:text-6xl sm:text-7xl xl:text-8xl 2xl:text-9xl">My Interface<br />Systems</h1>
+            <h2 className="mb-8 text-[17vw] sm:mb-4 text-7xl font-medium leading-[0.95] xs:text-3xl sm:text-4xl md:text-6xl sm:text-7xl xl:text-8xl 2xl:text-9xl">My Interface<br />Systems</h2>
             <p className="text-[3.7vw] max-w-[68vw] sm:max-w-[22vw] md:max-w-[22vw] lg:max-w-[22vw] leading-snug text-pink-500 sm:text-[1.6vw]">Interfaces begin as systems. Hierarchy, rhythm, and visual logic shape how products communicate and function.</p>
           </div>
         </div>
@@ -148,7 +150,7 @@ export default function TypographySection() {
                   <article key={key} className="w-[55vw] sm:max-w-[min(100%,200px)] h-[42.5vh] flex-shrink-0 rounded-[1rem] bg-black p-0 text-white">
                     <div className="flex h-full flex-col">
                       <div className="relative overflow-hidden rounded-[1rem] object-contain bg-neutral-200 w-full border-5 border-black bg-white/50">
-                        <video src={'/assets/human-walking.mp4'} autoPlay loop muted playsInline preload="auto" className="object-top object-cover transition-transform h-full w-full sm:max-w-[min(100%,200px)]" />
+                        <video data-lazy-video data-src={'/assets/human-walking.mp4'} poster={'/assets/human-walking-poster.webp'} loop muted playsInline preload="none" className="object-top object-cover transition-transform h-full w-full sm:max-w-[min(100%,200px)]" />
                       </div>
                       <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
                         <h2 className="font-thin text-[0.75rem] sm:text-[0.65rem] mt-2 leading-[1.05] tracking-tight text-white">{card.title}</h2>
@@ -167,11 +169,11 @@ export default function TypographySection() {
               }
 
               if (["apple", "x", "m"].includes(card.id)) {
-                return <video key={key} autoPlay muted loop playsInline preload="auto" src={`/assets/${card.id}.mp4`} className="h-[45vh] object-contain" />;
+                return <video key={key} data-lazy-video muted loop playsInline preload="none" data-src={`/assets/${card.id}.mp4`} poster={`/assets/${card.id}-poster.webp`} className="h-[45vh] object-contain" />;
               }
 
               if (card.id === "google") {
-                return <video key={key} autoPlay muted loop playsInline preload="auto" src={`/assets/${card.id}.mp4`} className="h-[45vh] object-contain" />;
+                return <video key={key} data-lazy-video muted loop playsInline preload="none" data-src={`/assets/${card.id}.mp4`} poster={`/assets/${card.id}-poster.webp`} className="h-[45vh] object-contain" />;
               }
 
               return (

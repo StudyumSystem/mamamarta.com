@@ -1,5 +1,9 @@
-@import "@fontsource/inter";
 @import "tailwindcss";
+
+/* Tailwind v4 ignores tailwind.config.mjs: the font is set here. */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
 
 html,
 body {

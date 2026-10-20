@@ -20,7 +20,7 @@ export default function PlatformSection() {
           </div>
         </div>
         <div className="order-2 md:order-1 xl:order-1 flex justify-start sm:justify-end px-6">
-          <img data-reveal src={'/assets/moving-objects-loop.gif'} alt="Moving Objects" className="relative aspect-square sm:w-[35vw] " />
+          <video data-reveal data-lazy-video data-src={'/assets/moving-objects-loop.mp4'} poster={'/assets/moving-objects-loop-poster.webp'} preload="none" muted loop playsInline aria-label="Moving objects" className="relative aspect-square sm:w-[35vw] " />
         </div>
         <div className="order-3 px-6 block sm:hidden">
             <div className="w-20 h-[1px] bg-pink-500 mb-1"></div>

@@ -85,10 +85,10 @@ export default function Hero() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex justify-center rounded-lg h-[10vh] items-end">
-          <ul className="flex flex-wrap justify-center font-light text-white gap-x-6">
+          <ul className="flex flex-wrap justify-center font-light lg:font-normal text-white gap-x-6 lg:gap-x-[clamp(24px,2.1vw,40px)]">
             {navLinks.map((link, index) => (
               <li key={index}>
-                <a className="sm:text-lg transition-all duration-300 hover:font-bold hover:text-white" href={link.href}>
+                <a className="sm:text-lg lg:text-[clamp(16px,1.146vw,22px)] transition-all duration-300 hover:font-bold hover:text-white" href={link.href}>
                   {link.label}
                 </a>
               </li>
@@ -107,20 +107,20 @@ export default function Hero() {
               />
             </h1>
 
-            <p className="lg:mt-[1.5rem] mt-6 text-[1.6rem] font-light tracking-wide lg:text-[1.75rem] text-white">
+            <p className="lg:mt-[1.5rem] mt-6 text-[1.6rem] font-light tracking-wide lg:font-normal lg:tracking-normal lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] text-white">
               Design house for digital products.
             </p>
           </div>
 
           <div className="w-full max-w-2xl p-[5em] lg:h-[40vh]">
-            <p className="font-light tracking-wide text-white mx-auto text-[4.5vw] lg:text-[1.35rem] lg:w-[50vw] lg:max-w-[320px]">
+            <p className="font-light tracking-wide text-white mx-auto text-[4.5vw] lg:font-normal lg:tracking-normal lg:text-[clamp(20px,1.67vw,32px)] lg:leading-[1.28] lg:w-[50vw] lg:max-w-[clamp(320px,34vw,660px)]">
               "Marta's method makes a whole lot of a difference" – ChatGPT
             </p>
 
             <div className="flex flex-wrap justify-center mt-10 lg:mt-[1.5rem]">
               <a
                 href="#book"
-                className="px-4 py-3 lg:px-4 lg:py-2 group flex items-center rounded-xs border border-white/20 font-medium backdrop-blur-md transition-all duration-300"
+                className="px-4 py-3 lg:px-6 lg:py-0 lg:justify-center lg:min-w-[clamp(220px,15.4vw,296px)] lg:min-h-[clamp(50px,3.54vw,68px)] lg:text-[clamp(16px,1.146vw,22px)] lg:font-semibold group flex items-center rounded-xs border border-white/20 font-medium backdrop-blur-md transition-all duration-300"
                 onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}
                 style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
@@ -134,7 +134,7 @@ export default function Hero() {
 
       <a
         href="https://wa.me/+380932630205"
-        className="whatsapp-button fixed bottom-[5vh] right-[2.5vw] z-20 grid h-12 w-12 place-items-center rounded-full border border-white/20 text-white shadow-lg shadow-black/30 backdrop-blur-md transition"
+        className="whatsapp-button fixed bottom-[5vh] right-[2.5vw] z-20 grid h-12 w-12 lg:h-[clamp(48px,3.54vw,68px)] lg:w-[clamp(48px,3.54vw,68px)] place-items-center rounded-full border border-white/20 text-white shadow-lg shadow-black/30 backdrop-blur-md transition"
         aria-label="WhatsApp"
         onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)'}
         onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}

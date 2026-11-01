@@ -1,178 +1,116 @@
-import React, { useState } from "react";
-import MenuEyeIcon from "./MenuEyeIcon";
+import React from "react";
+import InnerNav, { PhoneBack, BottomBack } from "./InnerNav";
+
+// Bio page, rebuilt from Marta's Figma frames "Bio" and "iPhone Bio" (26 Oct 2026): one centred column
+// (710px wide at 1920), photo, caption, title, story, two photos, closing lines.
+// Computer sizes are her 2x frame halved (1920 wide) and written in --u (global.css, .mm-u), so the whole
+// page shrinks with the screen: on a 1440 laptop it is 3/4 of the 1920 size, exactly like her frame
+// scaled to that screen (Marta, 28 Oct 16:45: "everything giant"). Phone sizes stay in px.
+
+const story = [
+  // Line breaks marked md:hidden are the ones in her phone frame (MM-BIO-02)
+  <>
+    A dark room. Her mother switches on an old projector,<br className="md:hidden" /> and a square<br className="hidden md:inline" /> of light appears on<br className="md:hidden" /> the wall. It felt like light itself could tell stories.
+  </>,
+  // Breaks with "hidden md:inline" are the ones in her computer frame (MM-BIO-01)
+  <>
+    She grew up in Lviv, in a family of artists. Painting, photography, composition, these were words she heard before she could read. Balance, proportion, color, these were never a course she took.<br className="hidden md:inline" /> They are the language she thinks in.
+  </>,
+  "Dyslexia shaped how she processes the world. Instead of long blocks of text, she learned to think in images, compress complexity into clarity, and find shape where others see chaos. What was long mistaken for a difficulty became one of her sharpest skills.",
+  "Today she pairs that artistic foundation with modern tools, AI included, moving fast without losing originality or strategy.",
+  <>
+    {/* On the phone this first sentence stands on its own line */}
+    <span className="block mb-[20px] md:inline md:mb-0">Her philosophy is simple. </span>
+    Design is not a deliverable, frozen the moment<br className="md:hidden" /> it ships. It's the projector that keeps running, casting new light as the company grows, a living system, not a single shot.
+  </>,
+];
+
+const partners = [
+  "The strongest brands in the world already think this way. Their design systems evolve while their identity stays intact. That's the thinking Marta brings into every partnership. She works best with ambitious startups, universities, investment funds, founders, and high-net-worth individuals who need more than something beautiful. They need clarity, trust, and a story people can follow.",
+  "She has a particular affinity for women founders and women-led ventures, builders reshaping their industries who need a visual language as bold as the work itself.",
+];
+
+// Measured side by side with her 2x frames (28 Oct): 20.5/34 at 1920 and 14/20 on the phone, both set
+// tighter than the font's own spacing, so every line breaks where hers does.
+const body = "text-[14px] leading-[20px] tracking-[-0.04em] text-[#4f4f4f] md:text-[length:calc(var(--u)*20.5)] md:leading-[calc(var(--u)*34)] md:tracking-[-0.01em] md:text-[#5c5c5c]";
+
+function Paragraphs({ items }) {
+  return (
+    <div className="flex flex-col gap-[20px] md:gap-[calc(var(--u)*34)] mr-[7px] md:ml-[calc(var(--u)*30)] md:mr-[calc(var(--u)*-2)]">
+      {items.map((text, i) => (
+        <p key={i} className={body}>{text}</p>
+      ))}
+    </div>
+  );
+}
 
 export default function Bio() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navLinks = [
-    { href: "/", label: "Library" },
-    { href: "/#typography", label: "My System" },
-    { href: "/#what-is", label: "What is" },
-    { href: "/#mindset", label: "The Mindset" },
-    { href: "/bio", label: "Bio" },
-    { href: "/#contact", label: "Contact" },
-  ];
   return (
-    <div>
-      <div className="sm:hidden">
-        <div className="flex flex-col items-center justify-center text-center pt-18">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <div
-              className="flex-col items-center justify-center text-center"
-            >
-              <MenuEyeIcon isMenuOpen={isMenuOpen} color={isMenuOpen ? "white" : "black"} />
-              <span className={`mt-1 text-sm ${isMenuOpen ? "text-white" : "text-black"}`}>Menu</span>
-            </div>
-          </button>
+    <div className="mm-u relative font-sans">
+      <div className="px-[21px] pt-[24px] md:hidden">
+        <PhoneBack />
+      </div>
+      <InnerNav active="Bio" />
+
+      <main className="mx-auto w-[calc(100%-42px)] max-w-[710px] md:max-w-[calc(var(--u)*710)] pt-[43px] md:pt-[calc(var(--u)*125)] pb-[40px] md:pb-[calc(var(--u)*150)]">
+        <img
+          src="/assets/brand/image 46.png"
+          width="710"
+          height="1011"
+          alt="Marta in front of a white wall with arched niches"
+          className="w-full aspect-[348/499] md:aspect-[709/1010] object-cover"
+        />
+
+        <p className="mt-[26px] md:mt-[calc(var(--u)*52)] text-center uppercase text-[12.5px] md:text-[length:calc(var(--u)*20.5)] tracking-[0.02em] text-[#555] md:text-[#7d7d7d]">
+          Mamamarta — The person behind
+        </p>
+
+        <h1 className="mt-[28px] md:mt-[calc(var(--u)*66)] text-center text-[30px] md:text-[length:calc(var(--u)*45)] leading-none font-normal text-black">
+          M’s Lens
+        </h1>
+        <p className="mt-[16px] md:mt-[calc(var(--u)*30)] text-center text-[11px] md:text-[length:calc(var(--u)*16.5)] text-[#555] md:text-[#444]">
+          A story shaped by light, art, and intuition.
+        </p>
+
+        <div className="mt-[32px] md:mt-[calc(var(--u)*50)]">
+          <Paragraphs items={story} />
         </div>
 
-        {isMenuOpen && (
-          <div
-            className="fixed inset-0 z-40 flex flex-col items-center backdrop-blur-xs  pt-18"
-            style={{
-              background: "linear-gradient(17.88deg, rgba(0, 0, 0, 0.375) 5.86%, rgba(0, 0, 0, 0.75) 73.1%)"
-            }}
-          >
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <div
-                className="flex-col items-center justify-center text-center"
-              >
-                <MenuEyeIcon isMenuOpen={isMenuOpen} color={isMenuOpen ? "white" : "black"} />
-                <span className={`mt-1 text-sm ${isMenuOpen ? "text-white" : "text-black"}`}>Menu</span>
-              </div>
-            </button>
-            <div>
-              <nav className="flex flex-col items-center gap-6 text-center mt-24">
-                {navLinks.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.href}
-                    className="text-3xl font-light text-white transition-all duration-300 hover:font-bold"
-                    style={{ fontWeight: link.label === 'Bio' ? 'bold' : 'normal' }}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </nav>
-            </div>
-          </div>
+        <div className="mt-[36px] md:mt-[calc(var(--u)*80)] grid grid-cols-2 gap-[22px] md:gap-[calc(var(--u)*28)]">
+          <img
+            src="/assets/brand/image 47.png"
+            width="341"
+            height="648"
+            alt="Marta behind a camera in the studio"
+            className="w-full aspect-[160/271] md:aspect-[341/648] object-cover"
+          />
+          <img
+            src="/assets/brand/image 48.png"
+            width="341"
+            height="648"
+            alt="Marta drawing a circle in a sketchbook"
+            className="w-full aspect-[160/271] md:aspect-[341/648] object-cover"
+          />
+        </div>
 
-        )}
-      </div>
+        <div className="mt-[25px] md:mt-[calc(var(--u)*82)]">
+          <Paragraphs items={partners} />
+        </div>
 
-      <div className="relative z-10 flex flex-col backdrop-blur-sm">
-        <nav className="hidden md:flex justify-center rounded-lg items-end relative z-10 py-12">
-          <div className="absolute left-28 sm:text-[1.5vw] transition-all duration-300 hover:font-bold hover:text-pink-500 font-light text-gray-400">
-            <a href="/">Back</a>
-          </div>
-          <ul className="flex flex-wrap justify-center font-extralight text-gray-400 gap-x-6 sm:text-[1.5vw]">
-            <div>
-              <a href="/" className="transition-all duration-300 hover:font-bold hover:text-pink-500">Library</a>
-            </div>
-            <div>
-              <a href="#typography" className="transition-all duration-300 hover:font-bold hover:text-pink-500">My System</a>
-            </div>
-            <div>
-              <a href="#what-is" className="transition-all duration-300 hover:font-bold hover:text-pink-500">What is</a>
-            </div>
-            <div>
-              <a href="#mindset" className="transition-all duration-300 hover:font-bold hover:text-pink-500">The Mindset</a>
-            </div>
-            <div>
-              <a href="/bio" className="transition-all duration-300 font-bold text-pink-500">Bio</a>
-            </div>
-            <div>
-              <a href="#contact" className="transition-all duration-300 hover:font-bold hover:text-pink-500">Contact</a>
-            </div>
-          </ul>
-        </nav>
+        <div className="mt-[34px] md:mt-[calc(var(--u)*70)] md:ml-[calc(var(--u)*30)]">
+          <p className="text-[15.5px] md:text-[length:calc(var(--u)*28)] leading-snug text-[#4f4f4f] md:text-[#222]">
+            {/* "Care." in italic on the computer only, as in her two frames */}
+            MAMAMARTA is built on one idea. <span className="md:italic">Care.</span>
+          </p>
+          <p className={`mt-[32px] md:mt-[calc(var(--u)*35)] ${body}`}>
+            A space where ideas are understood before they’re shaped, where<br className="hidden md:inline" /> the light goes on before anyone reaches for a pen.
+          </p>
+        </div>
 
-        {/* Main Content */}
-        <main>
-          <div className="flex flex-col sm:flex-row sm:pl-28 w-full justify-between p-6 sm:p-0 mt-8">
-            {/* Left Column */}
-            <div className="flex flex-2 flex-col mb-6 sm:mb-0">
-              <div className="sm:w-[50vw] sm:pr-28">
-                <h1 className="text-[14vw] sm:text-[7.5vw] font-semibold mb-4 ">M's Lens</h1>
-                <p className="text-[4vw] sm:text-[1.5vw]">
-                  A dark room. Her mother switches on an old projector, and a square of light appears on
-                  the wall. It felt like <span className="font-bold" >light </span>itself could tell <span className="font-bold">stories</span>.
-                </p>
-                <br />
-                <p className="text-[4vw] sm:text-[1.5vw]">
-                  She grew up in Lviv, in a family of artists. Painting, photography, composition, these were words she heard before she could read. Balance, proportion, color, these were never a course she took. They are the language she thinks in.
-                </p>
-                <br />
-
-                <p className="text-[4vw] sm:text-[1.5vw]">
-                  Dyslexia shaped how she processes the world. Instead of long blocks of text, she learned to think in images, compress complexity into clarity, and find shape where others see chaos. What was long mistaken for a difficulty became one of her sharpest skills.
-                </p>
-                <br />
-                <p className="text-[4vw] sm:text-[1.5vw]">
-                  Today she pairs that artistic foundation with modern tools, AI included, moving fast without losing originality or strategy.
-                </p>
-                <div className="py-18">
-                  <div className="text-[4vw] sm:text-[1.5vw]">Her <span className="font-bold">Philosophy is simple.</span></div>
-                  <br />
-                  <div className="text-[4vw] sm:text-[1.5vw]">Design is not a deliverable, frozen the moment it ships. It's the projector that keeps running, casting new light as the company grows, a living system, not a single shot.</div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <img
-                src="/assets/marta.webp"
-                width="1346"
-                height="2100"
-                alt="Marta with textured wall"
-                className="object-contain"
-              />
-            </div>
-          </div>
-        </main>
-      </div>
-      <main className="flex flex-col w-full justify-beween">
-        <div className="flex flex-col sm:flex-row justify-between sm:mt-8 items-start flex-1 sm:mb-24">
-          <div className="flex flex-row flex-1">
-            <div>
-              <img
-                src="/assets/bio-2.webp"
-                alt="Marta with textured wall"
-                className="object-contain"
-              />
-            </div>
-            <div className="p-4"></div>
-            <div>
-              <img
-                src="/assets/bio-3.webp"
-                alt="Marta with textured wall"
-                className="object-contain"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col sm:w-[50vw] p-6 sm:px-24 sm:p-0">
-            <p className="text-[4vw] sm:text-[1.5vw]">
-              The strongest brands in the world already think this way. Their design systems evolve while their identity stays intact. That's the thinking Marta brings into every partnership. She works best with ambitious startups, universities, investment funds, founders, and high-net-worth individuals who need more than something beautiful. They need clarity, trust, and a story people can follow.
-            </p>
-            <br />
-            <p className="text-[4vw] sm:text-[1.5vw]">
-              She has a particular affinity for women founders and women-led ventures, builders reshaping their industries who need a visual language as bold as the work itself.
-            </p>
-            <div className="flex flex-col w-full justify-beween h-auto sm:my-12 ">
-              <div className="text-[5vw] mb-4 sm:text-[1.5vw]">MAMAMARTA is built on one idea. <span className="font-bold" >Care.</span></div>
-              <div className="text-[4vw] sm:text-[1.5vw]">A space where ideas are understood before they're shaped, where the light goes on before anyone reaches for a pen.</div>
-            </div>
-          </div>
+        <div className="mt-[60px] md:mt-[calc(var(--u)*125)] text-center">
+          <BottomBack />
         </div>
       </main>
-      <div className="text-[4vw] sm:text-[1.5vw] w-full items-center justify-center flex underline text-gray-400 sm:hidden sm:mb-0 mb-32 mt-12">
-        <a href="/">Back</a>
-      </div>
     </div>
   );
 }

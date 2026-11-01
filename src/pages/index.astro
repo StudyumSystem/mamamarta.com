@@ -3,19 +3,25 @@ import CaseStudiesSection from '../components/react/CaseStudies/index.jsx';
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/react/Hero.jsx';
 import Library from '../components/react/Library.jsx';
-import TypographySection from '../components/react/Typography/index.jsx';
+import FoundersChallenge from '../components/react/FoundersChallenge.jsx';
 import WhatIsSection from '../components/react/WhatIsSection.jsx';
 import PlatformSection from '../components/react/PlatformSection.jsx';
 import BrandSection from '../components/react/BrandSection.jsx';
+import CollaborateForms from '../components/react/forms/CollaborateForms.jsx';
 ---
 
-<Layout>
+<Layout preload={[
+	{ href: '/assets/brand/footer-desktop.png', media: '(min-width: 768px)' },
+	{ href: '/assets/brand/footer-mobile.png', media: '(max-width: 767px)' },
+]}>
 	<div id="site-shell" class="bg-white text-black">
 		<Hero client:load />
-		<TypographySection client:load />
+		<FoundersChallenge client:load />
 		<WhatIsSection />
 		<PlatformSection />
 		<BrandSection client:load/>
 	</div>
+	<CollaborateForms client:load />
+
 </Layout>
 

@@ -1,0 +1,11 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CollaborateForms from '../../components/react/forms/CollaborateForms.jsx';
+---
+
+<!-- Test page: the Flow A success screen, to compare with Marta's frame. -->
+<Layout title="Thank you · Mamamarta" description="Your idea has landed.">
+	<main class="min-h-screen bg-white">
+		<CollaborateForms initialFlow="suggest" initialSent client:load />
+	</main>
+</Layout>

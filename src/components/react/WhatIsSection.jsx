@@ -1,40 +1,42 @@
-import React, { useState } from "react";
+import React from "react";
 
+// What is an amazing experience, to Marta's MM-HOME-001 / 002. Desktop (1920 frame): heading 173-924 px from
+// 156 px down, body 18/26 in two lines up to 821 px, then the pink gradient "Wanna dive deeper? →" (296x68)
+// that opens The method. The M on the right is dark grey, the wire runs across it.
 export default function WhatIsSection() {
-  const [isHovering, setIsHovering] = useState(false);
-
   return (
-    <section id="what-is" className="relative px-6 py-12 min-h-screen overflow-hidden bg-black xs:px-6 sm:px-8 md:px-16 sm:px-20 xl:px-24 2xl:px-32 xs:py-16 sm:py-20 md:py-20 sm:py-24 xl:py-28 2xl:py-32 text-white md:px-16 flex flex-col md:justify-center xl:justify-start" onPointerEnter={() => setIsHovering(true)} onPointerLeave={() => setIsHovering(false)}>
+    <section id="what-is" className="relative flex min-h-screen flex-col overflow-hidden bg-black px-6 py-12 text-white sm:px-[9vw] sm:pt-[8.1vw] sm:pb-[6vw]">
       <div
-        className="absolute top-[max(42%,340px)] bottom-0 sm:top-0 right-0 z-20 [mask-image:linear-gradient(to_bottom,transparent,black_22%)] sm:[mask-image:none] w-full max-w-[68rem] pointer-events-none select-none mix-blend-screen"
+        className="pointer-events-none absolute top-[max(42%,340px)] right-0 bottom-0 z-20 w-full max-w-[68rem] select-none [mask-image:linear-gradient(to_bottom,transparent,black_22%)] sm:top-0 sm:[mask-image:none]"
         aria-hidden="true"
       >
-        {/* <div className="absolute right-0 sm:top-1/2 h-[50vw] sm:h-[88%] sm:w-[72%] -translate-y-1/2 bg-[radial-gradient(circle_at_35%_50%,rgba(255,255,255,0.24),rgba(255,255,255,0.08)_28%,rgba(255,255,255,0.02)_55%,transparent_76%)] blur-3xl opacity-90"></div> */}
-
-        <div className="flex relative items-end h-full w-full overflow-hidden">
+        <div className="relative flex h-full w-full items-end overflow-hidden">
           <img
             src={'/assets/m-letter.webp'}
             alt=""
             data-parallax="-12"
-            className="sm:h-screen scale-120 right-0 absolute sm:top-0 sm:right-0 transition-transform duration-300"
+            className="absolute right-0 scale-120 brightness-[0.42] contrast-[1.15] transition-transform duration-300 sm:top-0 sm:right-0 sm:h-screen"
           />
           <img
             src={'/assets/wire.webp'}
             alt=""
-            className="bottom-[25vh] scale-[2] sm:scale-[1] sm:h-auto absolute sm:top-[10vh] sm:right-[-80px] transition-transform duration-300 sm:w-[55rem] rotate-130 sm:rotate-0"
+            className="absolute bottom-[25vh] scale-[2] rotate-130 transition-transform duration-300 sm:top-[10vh] sm:right-[-80px] sm:h-auto sm:w-[55rem] sm:scale-[1] sm:rotate-0"
           />
         </div>
       </div>
 
-      <div className="relative z-10 xs:max-w-2xl sm:max-w-3xl md:max-w-4xl sm:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl h-full flex flex-col justify-between h-full flex-1">
-        <img data-reveal src={'/assets/whatIs.webp'} alt="What is" className="mb-10 sm:w-[45vw] w-[80vw]" />
-        <div data-reveal className="sm:max-w-lg max-w-[65vw]">
-          <p className="text-[4vw] xs:text-xs sm:text-sm md:text-xl sm:text-2xl xl:text-[1.5rem] 2xl:text-2xl font-thin text-gray-200">An amazing experience is where proven design language is adapted to your product until it feels native, precise, and impossible to ignore.</p>
+      <div className="relative z-10 flex flex-col">
+        <img data-reveal src={'/assets/whatIs.webp'} alt="What is an amazing experience?" className="mb-8 w-[80vw] sm:mb-[2.9vw] sm:w-[39vw]" />
+        <div data-reveal className="max-w-[78vw] sm:max-w-[34.5vw]">
+          <p className="text-[15px] leading-[1.45] text-gray-200 sm:text-[clamp(13px,1.04vw,20px)] sm:leading-[1.55]">An amazing experience is where proven design language is adapted to your product until it feels native, precise, and impossible to ignore.</p>
         </div>
-
-        <div data-reveal className="sm:mt-8 mt-auto">
-          <div className="w-22 h-[1px] bg-pink-500 opacity-60"></div>
-          <p className="text-[2vw] mt-1 tracking-[0.2em] text-gray-500 font-medium xs:text-[0.3rem] sm:text-[0.35rem] md:text-[0.45rem] sm:text-[0.52rem] xl:text-[0.65rem] 2xl:text-[0.8rem]">Interaction layer</p>
+        <div data-reveal className="mt-8 sm:mt-[4.4vw]">
+          <a
+            href="/what-is"
+            className="mm-gradient group inline-flex w-fit items-center justify-center gap-1.5 px-5 py-3 text-[15px] font-semibold text-white sm:min-h-[clamp(44px,3.54vw,68px)] sm:min-w-[clamp(200px,15.4vw,296px)] sm:px-6 sm:py-0 sm:text-[clamp(14px,1.146vw,22px)]"
+          >
+            Wanna dive deeper? <span className="transition-transform group-hover:translate-x-1">→</span>
+          </a>
         </div>
       </div>
     </section>

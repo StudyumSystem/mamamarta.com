@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import GamePreview from '../../components/react/games/GamePreview.jsx';
+---
+
+<Layout title="Memory Match · Mamamarta" description="20 cards, 10 pairs. A short memory game by Mamamarta.">
+	<main class="min-h-screen bg-white">
+		<GamePreview game="memory-match" client:load />
+	</main>
+</Layout>

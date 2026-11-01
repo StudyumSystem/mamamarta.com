@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CollaborateForms from '../../components/react/forms/CollaborateForms.jsx';
+---
+
+<Layout title="Suggest a game · Mamamarta" description="Share your game idea with Mamamarta.">
+	<main class="min-h-screen bg-white">
+		<CollaborateForms initialFlow="suggest" client:load />
+	</main>
+</Layout>

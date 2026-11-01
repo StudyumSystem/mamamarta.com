@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import GamePreview from '../../components/react/games/GamePreview.jsx';
+---
+
+<Layout title="The Art of Moving · Mamamarta" description="Keep moving, jump between platforms and collect the pink coins. A short game by Mamamarta.">
+	<main class="min-h-screen bg-white">
+		<GamePreview game="art-of-moving" client:load />
+	</main>
+</Layout>

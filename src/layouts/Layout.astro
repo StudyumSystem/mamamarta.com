@@ -4,6 +4,7 @@ import '@fontsource/inter/100.css';
 import '@fontsource/inter/200.css';
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
+import '@fontsource/inter/400-italic.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
@@ -13,11 +14,14 @@ import { ClientRouter } from 'astro:transitions';
 interface Props {
 	title?: string;
 	description?: string;
+	// Heavy pictures to start loading at once (e.g. the footer fur), each for its screen size.
+	preload?: { href: string; media?: string }[];
 }
 const site = 'https://mamamarta.com';
 const {
 	title = 'Mama Marta · Design house for digital products',
 	description = 'Mama Marta is a design house for digital products, crafted to shape systems, interactions, and digital identity. Book a discovery call.',
+	preload = [],
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, site).href;
 ---
@@ -53,6 +57,7 @@ const canonical = new URL(Astro.url.pathname, site).href;
 			email: 'mymamamarta@icloud.com',
 			sameAs: ['https://www.linkedin.com/company/mamamarta/', 'https://www.instagram.com/mymamamarta/'],
 		})} />
+		{preload.map((p) => <link rel="preload" as="image" href={p.href} media={p.media} fetchpriority="high" />)}
 		<ClientRouter />
 	</head>
 	<body>
@@ -60,6 +65,7 @@ const canonical = new URL(Astro.url.pathname, site).href;
 		<script>
 			import '../scripts/scroll-reveals.js';
 			import '../scripts/lazy-videos.js';
+			import '../scripts/back-link.js';
 		</script>
 	</body>
 </html>

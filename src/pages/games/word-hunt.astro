@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import GamePreview from '../../components/react/games/GamePreview.jsx';
+---
+
+<Layout title="Word Hunt · Mamamarta" description="Find the 10 hidden art-inspired words. A short word game by Mamamarta.">
+	<main class="min-h-screen bg-white">
+		<GamePreview game="word-hunt" client:load />
+	</main>
+</Layout>

@@ -95,7 +95,10 @@ function Form({ flow, onDone }) {
     setErrors(e);
     setFailed(false);
     if (Object.keys(e).length) {
-      ev.currentTarget.querySelector('[aria-invalid="true"], [data-invalid="true"]')?.focus();
+      // Pick the field from the new errors (React hasn't marked the inputs yet).
+      const form = ev.currentTarget;
+      const k = ["name", "email", "company", "options"].find((x) => e[x]);
+      (k === "options" ? form.querySelector('input[type="checkbox"]') : form.querySelector(`#${flow}-${k}`))?.focus();
       return;
     }
     setSending(true);

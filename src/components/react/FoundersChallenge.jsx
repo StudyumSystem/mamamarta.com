@@ -56,7 +56,8 @@ const ENTRIES = [
     id: "collaborate",
     label: "WHAT IF YOUR BRAND HAD ITS OWN GAME?",
     text: "Turn your idea into something people can play with. Suggest a game for Mamamarta or create a custom interactive experience for your brand.",
-    visual: { kind: "image", src: "/assets/games/plus-key.png", alt: "Black key with a plus sign" },
+    // Her jelly key animation (Marta, 10 Nov); the still key is its poster until the video plays.
+    visual: { kind: "image", src: "/assets/games/plus-key.png", video: "/assets/games/plus-key.mp4", alt: "Black key with a plus sign" },
   },
 ];
 
@@ -181,8 +182,10 @@ function WalkingCard({ active, className = "" }) {
   );
 }
 
-function PlusKey({ className = "" }) {
+function PlusKey({ video, active, className = "" }) {
   const [ok, setOk] = useState(true);
+  if (video)
+    return <LoopVideo src={video} poster="/assets/games/plus-key.png" alt="Black key with a plus sign" active={active} className={`object-contain mix-blend-multiply brightness-[1.04] contrast-[1.08] ${className}`} />;
   if (!ok) return <div className={className} aria-hidden="true" />;
   return <img src="/assets/games/plus-key.png" alt="Black key with a plus sign" onError={() => setOk(false)} className={`object-contain ${className}`} />;
 }
@@ -195,7 +198,7 @@ function Visual({ entry, active }) {
     return <LoopVideo src={v.src} poster={v.poster} alt={v.alt} active={active} className="h-[34vw] w-[37vw] object-cover mix-blend-multiply brightness-[1.04] contrast-[1.08]" />;
   if (v.kind === "memory-card") return <MemoryCard className="h-[28vw] w-[21.75vw]" />;
   if (v.kind === "walking-card") return <WalkingCard active={active} className="h-[28vw] w-[16vw]" />;
-  return <PlusKey className="h-[29vw] w-[31vw]" />;
+  return <PlusKey video={v.video} active={active} className="h-[29vw] w-[31vw]" />;
 }
 
 // Phone pictures, measured on MM-HOME-002 (px of the 390 frame): each one shows through a window the size of
@@ -206,7 +209,8 @@ const PHONE_PICTURE = {
   "word-hunt": { w: 356, h: 342, y: -25 },
   "tic-tac-toe": { w: 466, h: 466, y: -15 },
   "connect-the-path": { w: 435, h: 389, y: -58 },
-  collaborate: { w: 308, h: 357, y: 36 },
+  // her key video has more white around the key than the still, so it is drawn narrower to keep the key's size
+  collaborate: { w: 275, h: 357, y: 36 },
 };
 
 function PhoneVisual({ entry }) {
@@ -217,8 +221,8 @@ function PhoneVisual({ entry }) {
   const style = { width: `calc(var(--q) * ${p.w})`, top: `calc(var(--q) * ${p.y})` };
   return (
     <div className="relative -mx-[calc(var(--q)*20)] overflow-hidden bg-white" style={{ height: `calc(var(--q) * ${p.h})` }}>
-      {v.kind === "video" ? (
-        <LoopVideo src={v.src} poster={v.poster} alt={v.alt} active={false} className="absolute left-1/2 max-w-none -translate-x-1/2 mix-blend-multiply brightness-[1.06] contrast-[1.1]" style={style} />
+      {v.kind === "video" || v.video ? (
+        <LoopVideo src={v.video || v.src} poster={v.video ? v.src : v.poster} alt={v.alt} active={false} className="absolute left-1/2 max-w-none -translate-x-1/2 mix-blend-multiply brightness-[1.06] contrast-[1.1]" style={style} />
       ) : (
         <img src={v.src} alt={v.alt} className="absolute left-1/2 h-auto max-w-none -translate-x-1/2" style={style} />
       )}

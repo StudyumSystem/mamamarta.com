@@ -1,0 +1,121 @@
+import React, { useRef, useState } from "react";
+import ArrowIcon from "./ArrowIcon";
+import { submitForm } from "./forms/submitForm";
+
+// "We are not for everyone." to Marta's new home frames of 9 Nov (Desktop (2) and Mobile (2)): the contact block
+// between Platform Mind_set and the footer. Desktop (1920 frame): the heading on the left from 165 px, the form on
+// the right 1011-1698 px (same edge as the footer logo); field sizes as the Collaborate forms. Phone (390 frame, --q):
+// heading 69/65 from 16 px, the form 350 px wide, button 46 px, 60 px to the footer.
+// The privacy line is the one Marta approved for the Collaborate forms (28 Oct); the sent state uses her Flow B line.
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const newId = () =>
+  typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+const labelCls = "block text-[11px] md:text-[clamp(11px,0.68vw,13px)] font-normal leading-[1.3] text-black/80";
+const inputCls =
+  "mt-[6px] md:mt-[4px] block w-full border border-black/20 bg-white px-[12px] md:px-[clamp(12px,1.1vw,21px)] " +
+  "text-[15px] md:text-[clamp(14px,1.1vw,21px)] font-light text-black placeholder:text-black/45 outline-none transition-colors focus:border-black";
+const errorCls = "mt-1 text-[12px] md:text-[clamp(12px,0.73vw,14px)] text-[#c2006f]";
+
+export default function ContactSection() {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [sent, setSent] = useState(false);
+  const submissionId = useRef(newId());
+
+  const onSubmit = async (ev) => {
+    ev.preventDefault();
+    if (sending) return;
+    const e = !email.trim() ? "Please enter your email." : !EMAIL_RE.test(email.trim()) ? "Please enter a valid email address." : "";
+    setError(e);
+    setFailed(false);
+    if (e) {
+      ev.currentTarget.querySelector("#contact-email")?.focus();
+      return;
+    }
+    setSending(true);
+    try {
+      await submitForm("contact", { email: email.trim(), message: message.trim() }, submissionId.current);
+      setSent(true);
+    } catch {
+      setFailed(true);
+      setSending(false);
+    }
+  };
+
+  return (
+    <section id="contact" className="mm-phone-w bg-white font-[Inter] text-black">
+      <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*18)] pb-[calc(var(--q)*60)] md:grid md:grid-cols-[44vw_35.8vw] md:items-start md:px-0 md:pl-[8.6vw] md:pt-[5.2vw] md:pb-[5.1vw]">
+        <h2 className="-ml-[calc(var(--q)*4)] text-[length:calc(var(--q)*69)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em] md:ml-0 md:text-[8vw] md:leading-[0.9] md:tracking-[-0.07em]">
+          We are
+          <br />
+          not for
+          <br />
+          everyone.
+        </h2>
+
+        <div className="mt-[calc(var(--q)*22)] md:mt-[0.3vw]">
+          <p className="w-[calc(var(--q)*300)] text-[length:calc(var(--q)*14.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-[#666] md:w-auto md:text-[clamp(13px,0.94vw,18px)] md:leading-[1.4] md:tracking-normal md:text-[#444]">
+            We work with people who value thoughtful design and bold decisions.
+          </p>
+
+          {sent ? (
+            <p className="mm-fade-in mt-[calc(var(--q)*36)] text-[22px] font-normal leading-[1.15] tracking-[-0.01em] md:mt-[1.6vw] md:text-[clamp(24px,1.9vw,36px)]" role="status">
+              Thank you for reaching out.
+            </p>
+          ) : (
+            <form noValidate onSubmit={onSubmit} className="mt-[calc(var(--q)*36)] md:mt-[1.6vw]">
+              <label htmlFor="contact-email" className={labelCls}>Email *</label>
+              <input
+                id="contact-email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="Your Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-invalid={!!error}
+                aria-describedby={error ? "contact-email-err" : undefined}
+                className={`${inputCls} h-[40px] md:h-[clamp(44px,2.7vw,52px)]`}
+              />
+              {error && <p id="contact-email-err" className={errorCls}>{error}</p>}
+
+              <label htmlFor="contact-message" className={`${labelCls} mt-[12px] md:mt-[0.9vw]`}>Your message</label>
+              <textarea
+                id="contact-message"
+                rows={5}
+                placeholder="What are you building?"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className={`${inputCls} h-[159px] resize-none py-[10px] leading-[1.3] md:h-[7.8vw] md:py-[clamp(10px,0.9vw,18px)]`}
+              />
+
+              <button
+                type="submit"
+                disabled={sending}
+                aria-busy={sending}
+                className="mm-gradient group mt-[12px] inline-flex h-[46px] w-full items-center justify-center gap-[0.3em] text-[18px] font-semibold text-white disabled:opacity-70 md:mt-[1.1vw] md:h-[3.5vw] md:min-h-[44px] md:text-[clamp(15px,1.1vw,21px)]"
+              >
+                {sending ? (
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-label="Sending" />
+                ) : (
+                  <>See if we click <ArrowIcon className="transition-transform group-hover:translate-x-1" /></>
+                )}
+              </button>
+
+              {failed && <p className={`${errorCls} mt-3`} role="alert">Something went wrong. Please try submitting again.</p>}
+              <p className="mt-[14px] text-[11px] font-light leading-[1.45] text-black/50 md:mt-[0.9vw] md:text-[clamp(10px,0.63vw,12px)]">
+                We use your details only to reply to you and keep them private. We never sell them. To have them deleted, write to{" "}
+                <a href="mailto:mymamamarta@icloud.com" className="underline underline-offset-2">mymamamarta@icloud.com</a>.
+              </p>
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}

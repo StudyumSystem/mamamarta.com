@@ -14,8 +14,8 @@ export default function PlatformSection() {
               <span className="relative">Mind<span className="inline-block translate-x-1 pr-[3px]"><span className="block h-3 w-12 bg-pink-500 sm:h-[0.6vw] sm:w-[2.9vw]"></span></span>set</span>
             </h2>
           </header>
-          <div data-reveal className="w-[78vw] sm:w-[29.4vw]">
-            <p className="text-[15px] leading-[1.41] text-gray-800 sm:text-[clamp(13px,1.04vw,20px)] sm:leading-[1.55]">From product to platform. As your product evolves through real use and continuous refinement, it sharpens its identity, earns trust, and naturally expands into a platform.</p>
+          <div data-reveal className="w-[78vw] sm:w-[31.5vw]">
+            <p className="text-[15px] leading-[1.41] text-gray-800 sm:text-[clamp(13px,1.04vw,20px)] sm:leading-[1.55]">A product is never truly finished. It evolves through real use, thoughtful decisions, and a system built to grow with it.</p>
           </div>
           <div className="mt-auto hidden sm:block">
             <div className="mb-[0.6vw] h-[1px] w-[9.8vw] bg-pink-500"></div>
@@ -29,7 +29,8 @@ export default function PlatformSection() {
         </div>
         <div className="order-3 block px-6 sm:hidden">
           <div className="mb-1 h-[1px] w-20 bg-pink-500"></div>
-          <p className="text-[11px] uppercase tracking-[0.06em] text-gray-400">Platform layer</p>
+          {/* Phone: sentence case in her phone frame (desktop keeps caps). */}
+          <p className="text-[13px] tracking-[-0.01em] text-gray-500">Platform layer</p>
         </div>
       </div>
     </section>

@@ -19,8 +19,8 @@ interface Props {
 }
 const site = 'https://mamamarta.com';
 const {
-	title = 'Mama Marta · Design house for digital products',
-	description = 'Mama Marta is a design house for digital products, crafted to shape systems, interactions, and digital identity. Book a discovery call.',
+	title = 'Mamamarta · Design house for digital products',
+	description = 'Mamamarta is a design house for digital products, crafted to shape systems, interactions, and digital identity. Book a discovery call.',
 	preload = [],
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, site).href;
@@ -39,7 +39,7 @@ const canonical = new URL(Astro.url.pathname, site).href;
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
 		<meta property="og:type" content="website" />
-		<meta property="og:site_name" content="Mama Marta" />
+		<meta property="og:site_name" content="Mamamarta" />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonical} />
@@ -51,7 +51,7 @@ const canonical = new URL(Astro.url.pathname, site).href;
 		<script type="application/ld+json" set:html={JSON.stringify({
 			'@context': 'https://schema.org',
 			'@type': 'Organization',
-			name: 'Mama Marta',
+			name: 'Mamamarta',
 			url: site,
 			description,
 			email: 'mymamamarta@icloud.com',

@@ -11,7 +11,7 @@ const FLOWS = {
     type: "suggest_game",
     label: "Suggest a game",
     title: "Your idea. Our playground.",
-    intro: "Have a game in mind? Share it with us. Selected ideas may come to life as part of the MamaMarta game collection.",
+    intro: "Have a game in mind? Share it with us. Selected ideas may come to life as part of the Mamamarta game collection.",
     question: "What kind of game do you imagine?*",
     options: ["Puzzle & problem-solving", "Memory & matching", "Words & discovery", "Strategy & logic", "Arcade & reflexes"],
     placeholder: "Describe your game idea, or tell us how you'd like it to work.",
@@ -162,7 +162,7 @@ function Form({ flow, onDone }) {
         <label className="flex cursor-pointer items-start gap-[14px] lg:items-center lg:gap-[clamp(8px,0.6vw,12px)]">
           <input type="checkbox" className={`${boxCls} rounded-full mt-[1px] lg:mt-0`} checked={values.marketing} onChange={set("marketing")} />
           <span className="text-[13px] lg:text-[clamp(12px,0.7vw,13.5px)] lg:whitespace-nowrap font-light leading-[1.35] text-black/80">
-            I'd like to receive occasional updates and creative insights from MamaMarta.
+            I'd like to receive occasional updates and creative insights from Mamamarta.
           </span>
         </label>
         <button

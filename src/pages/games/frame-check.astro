@@ -32,7 +32,17 @@
       const page = document.getElementById("page");
       page.src = q.get("p") || "/what-is";
       page.style.width = `${w}px`;
-      page.style.transform = `scale(${s}) translate(${-x}px, ${-(y + off)}px)`;
+      // ?h= a real screen height (e.g. 844): pages with full-screen blocks then keep their size, and the
+      // page is scrolled inside the frame instead of moved.
+      const h = n("h", 0);
+      if (h) {
+        page.style.height = `${h}px`;
+        page.style.transform = `scale(${s}) translate(${-x}px, 0)`;
+        const go = () => page.contentWindow.scrollTo(0, y + off);
+        page.addEventListener("load", () => { go(); setTimeout(go, 600); setTimeout(go, 1500); });
+      } else {
+        page.style.transform = `scale(${s}) translate(${-x}px, ${-(y + off)}px)`;
+      }
     </script>
   </body>
 </html>

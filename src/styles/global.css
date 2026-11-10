@@ -34,6 +34,14 @@ body {
 .mm-fit {
 	--u: min(calc(100vw / 390), calc(100dvh / 844));
 }
+/* --p = one pixel of her 390x844 phone frames (MM-HOME-002, her 2x export halved), fitted to the screen. */
+.mm-phone-u {
+	--p: min(calc(100vw / 390), calc(100dvh / 844));
+}
+/* --q = one pixel of her 390-wide phone frames, following the width only (long scrolling sections). */
+.mm-phone-w {
+	--q: calc(100vw / 390);
+}
 @media (min-width: 768px) {
 	.mm-fit {
 		--u: min(calc(100vw / 1920), calc(100dvh / 1080));
@@ -50,6 +58,11 @@ body {
 	background-position: 0% 50%;
 	animation: mm-flow 6s ease-in-out infinite alternate;
 	transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, filter 260ms ease;
+}
+/* The same flow the other way round: raspberry on the left, near black on the right ("Wanna dive deeper?"
+   on her phone frame MM-HOME-002). */
+.mm-gradient.mm-gradient-rev {
+	background-image: linear-gradient(90deg, #a1006c 0%, #7a0052 40%, #4a0032 75%, #2a001c 100%);
 }
 .mm-gradient > * {
 	transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);

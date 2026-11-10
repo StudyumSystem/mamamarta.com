@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 import MenuEyeIcon from "./MenuEyeIcon";
 import { WHATSAPP_URL } from "./games/shared";
+import ArrowIcon from "./ArrowIcon";
 
+// Marta's new home frames (9 Nov): three items only. The Method is the /what-is page; Contact scrolls to
+// "We are not for everyone.".
 const navLinks = [
-  { href: "/library", label: "Library" },
-  { href: "#my-system", label: "My System" },
-  { href: "#what-is", label: "What is" },
-  { href: "#mindset", label: "The Mindset" },
+  { href: "/what-is", label: "The Method" },
   { href: "/bio", label: "Bio" },
   { href: "#contact", label: "Contact" },
 ];
+
+const QUOTE = "\"Design is the silent ambassador of your brand.\" — Paul Rand";
 
 // The homepage section the visitor is looking at, so the menu shows it in bold (04 Mobile Navigation).
 function sectionInView() {
   let current = null;
   if (typeof document === "undefined") return current;
-  for (const id of ["my-system", "what-is", "mindset", "contact"]) {
+  for (const id of ["contact"]) {
     const el = document.getElementById(id);
     if (el && el.getBoundingClientRect().top <= window.innerHeight / 2) current = `#${id}`;
   }
@@ -92,17 +94,44 @@ export default function Hero({ initialMenuOpen = false }) {
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col">
 
-        <div className="z-50 flex flex-col items-center justify-center text-center pt-18 md:hidden">
+        {/* Phone: one full screen laid out as MM-HOME-002 (390x844, her 2x export halved). Every position and
+            size is in --p, one pixel of that frame, so the lines break and sit exactly where hers do on any phone
+            (Marta, 2 Nov: "the proportions are off, not identical to my mockup"). */}
+        <div className="mm-phone-u relative h-[100dvh] md:hidden">
           <button
             type="button"
             onClick={() => setIsMenuOpen(true)}
             aria-label="Open menu"
             aria-expanded={isMenuOpen}
-            className="flex flex-col items-center text-white"
+            className="absolute left-1/2 z-50 flex -translate-x-1/2 flex-col items-center text-white top-[calc(var(--p)*77)]"
           >
             <MenuEyeIcon isMenuOpen={false} color={"white"} />
             <span className="mt-1 text-[18px] font-medium">menu</span>
           </button>
+          <h1 className="contents">
+            <img
+              className="absolute left-1/2 h-auto max-w-none -translate-x-1/2 top-[calc(var(--p)*268)] w-[calc(var(--p)*304)]"
+              src={'/assets/brand/main-logo.png'}
+              width="832"
+              height="123"
+              alt="MAMA MARTA"
+            />
+          </h1>
+          <p className="absolute inset-x-0 text-center font-normal text-white leading-[1.2] tracking-[-0.01em] top-[calc(var(--p)*343)] text-[length:calc(var(--p)*19)]">
+            Design house for digital products.
+          </p>
+          <p className="absolute left-1/2 -translate-x-1/2 text-center font-light text-white top-[calc(var(--p)*459)] w-[calc(var(--p)*250)] text-[length:calc(var(--p)*13)] leading-[calc(var(--p)*20)]">
+            {QUOTE}
+          </p>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="absolute left-1/2 flex -translate-x-1/2 items-center justify-center gap-[0.3em] rounded-xs border border-white/20 font-semibold text-white backdrop-blur-md top-[calc(var(--p)*552)] h-[calc(var(--p)*46)] w-[calc(var(--p)*199)] whitespace-nowrap text-[length:calc(var(--p)*15.5)]"
+            style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
+          >
+            Book a Discovery Call <ArrowIcon />
+          </a>
         </div>
 
 
@@ -120,7 +149,7 @@ export default function Hero({ initialMenuOpen = false }) {
         </nav>
 
         {/* Desktop positions from MM-HOME-001 (1920x1080): logo top 307 px, tagline at 470, quote at 623, button at 804. */}
-        <div className="flex flex-1 flex-col items-center text-center justify-center lg:justify-start rounded-lg lg:py-0 lg:pt-[14.7vh] max-h-screen py-[5em]">
+        <div className="max-md:hidden flex flex-1 flex-col items-center text-center justify-center lg:justify-start rounded-lg lg:py-0 lg:pt-[14.7vh] max-h-screen py-[5em]">
 
           <div className="items-center justify-center flex flex-col">
             <h1 className="contents">
@@ -140,7 +169,7 @@ export default function Hero({ initialMenuOpen = false }) {
 
           <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[9vh] lg:max-w-none">
             <p className="font-light text-white mx-auto w-[56vw] text-[11.5px] leading-[1.4] lg:tracking-normal lg:text-[clamp(20px,1.67vw,32px)] lg:leading-[1.28] lg:w-[29.4vw] lg:max-w-[565px]">
-              "Don't think about making art, just get it done. Let everyone else decide if it's good or bad..." — Andy Warhol
+              {QUOTE}
             </p>
 
             <div className="flex flex-wrap justify-center mt-10 lg:mt-[5.5vh]">
@@ -153,7 +182,7 @@ export default function Hero({ initialMenuOpen = false }) {
                 onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}
                 style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
               >
-                Book a Discovery Call <span className="transition-transform group-hover:translate-x-1 ml-1">→</span>
+                Book a Discovery Call <ArrowIcon className="ml-[0.3em] transition-transform group-hover:translate-x-1" />
               </a>
             </div>
           </div>

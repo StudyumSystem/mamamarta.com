@@ -11,7 +11,7 @@ const ENDPOINT = "https://api.web3forms.com/submit";
 const SUBJECTS = {
   suggest_game: "Game idea",
   custom_brand_experience: "Brand request",
-  contact: "Message",
+  contact: "",
 };
 const FORM_NAMES = {
   suggest_game: "Suggest a game",
@@ -47,7 +47,8 @@ export async function submitForm(type, data, submissionId) {
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({
       access_key: WEB3FORMS_KEY,
-      subject: `${SUBJECTS[type] || SUBJECTS.contact}: ${who}${short ? ` · "${short}"` : ""}`,
+      // message first, then who (Marta, 10 Nov 15:28): "Can we talk on Friday?" — anna@studio.com
+      subject: `${SUBJECTS[type] ? `${SUBJECTS[type]}: ` : ""}${short ? `"${short}" — ` : ""}${who}`,
       from_name: who,
       replyto: data.email,
       ...Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined && v !== "")),

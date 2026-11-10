@@ -8,12 +8,15 @@ import ArrowIcon from "./ArrowIcon.jsx";
 import RollingCounter from "./RollingCounter.jsx";
 
 // MM-HOME "The founder's challenge" (Marta's spec 01-home.md, frames MM-G01-00 … MM-G05-00, MM-C06 _Entry).
-// Desktop: text left, carousel right with 6 entries; autoplay every 5 s in a loop (06 → 01), paused while the
+// Desktop: text left, carousel right with 6 entries; autoplay for each entry's reading time in a loop (06 → 01), paused while the
 // cursor is over it or a game modal is open ("mm-modal"). Each Play opens its game as a modal over the Homepage.
 // Mobile: the 6 entries stacked, no carousel, no autoplay.
 // Entry 06 opens the two forms (Flow A / Flow B) through the window event "mm-open-form" (forms: next part).
 
-const AUTOPLAY_MS = 5000;
+// Each entry stays as long as its text takes to read (Marta, 10 Nov: 5 s was too fast to read, "about 8 s"):
+// 3 s to take in the picture plus 0.3 s a word, between 7 and 10 s (01 is about 8.7 s, 04 7.2 s, 06 9.9 s).
+const wordsOf = (text) => [].concat(text).join(" ").split(/\s+/).filter(Boolean).length;
+const autoplayMs = (entry) => Math.min(10000, Math.max(7000, 3000 + 300 * wordsOf(entry.text)));
 // Width of what you actually see of each picture (vw at desktop), and the space between neighbours.
 const FOOT = { video: 26, "memory-card": 21.75, "walking-card": 16, image: 30 };
 const GAP_VW = 4;
@@ -303,11 +306,11 @@ export default function FoundersChallenge() {
     return () => io.disconnect();
   }, []);
 
-  // Autoplay: a fresh 5 s after every change; nothing runs while paused.
+  // Autoplay: a fresh reading time after every change; nothing runs while paused.
   const paused = !inView || hovering || modalOpen || game != null || reduced;
   useEffect(() => {
     if (paused) return;
-    const t = setTimeout(() => setActive((i) => (i + 1) % ENTRIES.length), AUTOPLAY_MS);
+    const t = setTimeout(() => setActive((i) => (i + 1) % ENTRIES.length), autoplayMs(ENTRIES[active]));
     return () => clearTimeout(t);
   }, [active, paused]);
 

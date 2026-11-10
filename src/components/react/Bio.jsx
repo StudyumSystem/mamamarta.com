@@ -54,7 +54,7 @@ export default function Bio() {
 
       <main className="mx-auto w-[calc(100%-42px)] max-w-[710px] md:max-w-[calc(var(--u)*710)] pt-[43px] md:pt-[calc(var(--u)*125)] pb-[40px] md:pb-[calc(var(--u)*150)]">
         <img
-          src="/assets/brand/image 46.png"
+          src="/assets/brand/image 46.webp"
           width="710"
           height="1011"
           alt="Marta in front of a white wall with arched niches"
@@ -78,14 +78,14 @@ export default function Bio() {
 
         <div className="mt-[36px] md:mt-[calc(var(--u)*80)] grid grid-cols-2 gap-[22px] md:gap-[calc(var(--u)*28)]">
           <img
-            src="/assets/brand/image 47.png"
+            src="/assets/brand/image 47.webp"
             width="341"
             height="648"
             alt="Marta behind a camera in the studio"
             className="w-full aspect-[160/271] md:aspect-[341/648] object-cover"
           />
           <img
-            src="/assets/brand/image 48.png"
+            src="/assets/brand/image 48.webp"
             width="341"
             height="648"
             alt="Marta drawing a circle in a sketchbook"

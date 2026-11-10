@@ -7,18 +7,20 @@ import FoundersChallenge from '../components/react/FoundersChallenge.jsx';
 import WhatIsSection from '../components/react/WhatIsSection.jsx';
 import PlatformSection from '../components/react/PlatformSection.jsx';
 import BrandSection from '../components/react/BrandSection.jsx';
+import ContactSection from '../components/react/ContactSection.jsx';
 import CollaborateForms from '../components/react/forms/CollaborateForms.jsx';
 ---
 
 <Layout preload={[
-	{ href: '/assets/brand/footer-desktop.png', media: '(min-width: 768px)' },
-	{ href: '/assets/brand/footer-mobile.png', media: '(max-width: 767px)' },
+	{ href: '/assets/brand/footer-desktop.webp', media: '(min-width: 768px)' },
+	{ href: '/assets/brand/footer-mobile.webp', media: '(max-width: 767px)' },
 ]}>
 	<div id="site-shell" class="bg-white text-black">
 		<Hero client:load />
 		<FoundersChallenge client:load />
 		<WhatIsSection />
 		<PlatformSection />
+		<ContactSection client:visible />
 		<BrandSection client:load/>
 	</div>
 	<CollaborateForms client:load />

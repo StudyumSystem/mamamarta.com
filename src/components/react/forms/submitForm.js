@@ -5,7 +5,7 @@
 // Until it is set the preview shows the success screen after a short wait, so the flow can be reviewed.
 // BEFORE LAUNCH: WEB3FORMS_KEY must be set, otherwise visitors would see "sent" while nothing is saved.
 
-export const WEB3FORMS_KEY = "e0d13738-2a61-49ae-bca2-b94d4970a5ea";
+export const WEB3FORMS_KEY = "ee2f7258-9626-488c-b98e-65b49b21d9eb";
 const ENDPOINT = "https://api.web3forms.com/submit";
 
 const SUBJECTS = {

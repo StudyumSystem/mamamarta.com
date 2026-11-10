@@ -103,6 +103,72 @@ function LoopVideo({ src, poster, alt, active, className, style }) {
   return <video ref={ref} data-lazy-video data-src={src} poster={poster} muted autoPlay loop playsInline preload="none" aria-label={alt} className={className} style={style} />;
 }
 
+// The Art of Moving card's figure (Marta, 10 Nov): her walk, her leap, the walk again, her stumble and rise,
+// one after another, all mirrored so the figure moves to the right. The two new clips have a light grey
+// background and a soft shadow: whitened and blended into the white card, edges pushed out of view.
+// Plays only while the card is on screen (and, on desktop, while it is the shown entry).
+const MOVES = [
+  { src: "/assets/human-walking.mp4", fix: "" },
+  { src: "/assets/games/jump.mp4", fix: "mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)]" },
+  { src: "/assets/games/stumble.mp4", fix: "mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)]" },
+];
+const MOVE_ORDER = [0, 1, 0, 2];
+
+function MovingFigure({ active = true, pos = "50% 0%", className = "" }) {
+  const box = useRef(null);
+  const vids = useRef([]);
+  const [step, setStep] = useState(0);
+  // On screen = intersecting; the hidden copy of the other screen size never is, so it never plays.
+  const [onScreen, setOnScreen] = useState(false);
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    setReduced(!!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+    const el = box.current;
+    if (!el || !("IntersectionObserver" in window)) { setOnScreen(true); return; }
+    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting), { threshold: 0.2 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const playing = active && onScreen && !reduced;
+  useEffect(() => {
+    const cur = MOVE_ORDER[step];
+    const nextIdx = MOVE_ORDER[(step + 1) % MOVE_ORDER.length];
+    vids.current.forEach((v, i) => {
+      if (!v) return;
+      if (playing && (i === cur || i === nextIdx) && !v.getAttribute("src")) { v.src = MOVES[i].src; v.preload = "auto"; }
+      if (i !== cur || !playing) { v.pause(); return; }
+      v.muted = true;
+      v.play().catch(() => {});
+    });
+  }, [step, playing]);
+  const onEnded = (i) => {
+    if (i !== MOVE_ORDER[step]) return;
+    const nextStep = (step + 1) % MOVE_ORDER.length;
+    const nv = vids.current[MOVE_ORDER[nextStep]];
+    if (nv) { try { nv.currentTime = 0; } catch { /* not loaded yet */ } }
+    setStep(nextStep);
+  };
+  return (
+    <div ref={box} className={`relative overflow-hidden bg-white ${className}`}>
+      {MOVES.map((m, i) => (
+        <video
+          key={m.src}
+          ref={(v) => (vids.current[i] = v)}
+          poster={i === 0 ? "/assets/human-walking-poster.webp" : undefined}
+          muted
+          playsInline
+          preload="none"
+          aria-label={i === 0 ? "Walking figure" : undefined}
+          aria-hidden={i === 0 ? undefined : "true"}
+          onEnded={() => onEnded(i)}
+          className={`absolute inset-0 h-full w-full object-cover ${m.fix} ${i === MOVE_ORDER[step] ? "" : "opacity-0"}`}
+          style={{ transform: m.fix ? "scale(-1.04, 1.04)" : "scaleX(-1)", objectPosition: pos }}
+        />
+      ))}
+    </div>
+  );
+}
+
 // Desktop memory card. The number rolls like the card on her live site (Marta, 2 Nov).
 function MemoryCard({ className = "" }) {
   return (
@@ -149,7 +215,7 @@ function WalkingCardPhone({ active }) {
   return (
     <div className="flex w-[calc(var(--q)*350)] flex-col overflow-hidden rounded-[calc(var(--q)*24)] bg-black p-[calc(var(--q)*12)] pb-[calc(var(--q)*18)] text-white">
       <div className="w-full overflow-hidden rounded-[calc(var(--q)*16)] bg-white">
-        <LoopVideo src="/assets/human-walking.mp4" poster="/assets/human-walking-poster.webp" alt="Walking figure" active={active} className="h-[calc(var(--q)*370)] w-full object-cover object-[50%_20%]" />
+        <MovingFigure pos="50% 20%" className="h-[calc(var(--q)*370)] w-full" />
       </div>
       <div className="mt-[calc(var(--q)*18)] flex items-center justify-between">
         <div>
@@ -166,7 +232,7 @@ function WalkingCard({ active, className = "" }) {
   return (
     <div className={`flex flex-col overflow-hidden rounded-[1.2vw] bg-black p-[0.5vw] text-white max-lg:rounded-[22px] max-lg:p-[8px] ${className}`}>
       <div className="overflow-hidden rounded-[0.9vw] bg-white max-lg:rounded-[16px]">
-        <LoopVideo src="/assets/human-walking.mp4" poster="/assets/human-walking-poster.webp" alt="Walking figure" active={active} className="aspect-[300/385] w-full object-cover object-top" />
+        <MovingFigure active={active} pos="50% 0%" className="aspect-[300/385] w-full" />
       </div>
       <div className="flex flex-1 flex-col items-center justify-center px-[1vw] text-center max-lg:py-5">
         <p className="text-[0.95vw] font-light max-lg:text-[17px]">Redefine Your Look</p>

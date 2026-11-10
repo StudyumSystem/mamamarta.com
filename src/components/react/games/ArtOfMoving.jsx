@@ -7,6 +7,10 @@ import { takeQuote } from "./shared.js";
 // → Result (~2.5 s, personal best in localStorage) → Completion with the quote rotation.
 // Her walking figure is the site's walk video, laid over the white frame with multiply so its white background disappears.
 // Jump = the current frame held on the arc; fall = a short drop and fade (Marta's OK, 28 Oct 12:42).
+// 10 Nov (Marta): the figure walks to the right (both videos mirrored), and a jump shows her leap video's
+// airborne moment (its middle frame, legs tucked, coat flying) on the arc instead of the held walking frame.
+// The leap video has a light grey background and a soft shadow: a stronger lift whitens both on multiply,
+// and its thin edge lines are cut off.
 
 const INSTRUCTIONS = "Keep moving. Jump between platforms and collect pink coins. One fall ends the run.";
 const PINK = "#e3009c";
@@ -18,6 +22,10 @@ const MIN_VIEW_W = 560; // on tall phone frames the world is scaled to show at l
 const FH = 400; // figure (video) height; the video is 2:3
 const FW = (FH * 2) / 3;
 const FOOT_Y = 0.95; // feet sit at 95% of the video height
+const JH = FH; // leap video height: its figure stands about as tall in its 3:4 frame as the walker in hers
+const JW = (JH * 3) / 4;
+const JFOOT_Y = 0.91; // the tucked feet of the airborne frame sit at 91% of its height
+const JCX = 0.45; // the leaping body's centre across the (mirrored) frame
 const FOOT_TOL = 34; // half width of the feet on a platform
 const BODY_W = 90;
 const BODY_H = 0.88 * FH;
@@ -120,6 +128,7 @@ export default function ArtOfMoving({ open, onClose }) {
   const frameRef = useRef(null);
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
+  const leapRef = useRef(null);
   const jumpRef = useRef(() => {});
   const timers = useRef([]);
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
@@ -162,7 +171,8 @@ export default function ArtOfMoving({ open, onClose }) {
     const canvas = canvasRef.current;
     const frame = frameRef.current;
     const video = videoRef.current;
-    if (!canvas || !frame || !video) return;
+    const leap = leapRef.current;
+    if (!canvas || !frame || !video || !leap) return;
     const ctx = canvas.getContext("2d");
     const g = newWorld();
     let s = 1, offY = 0, viewW = 660, dpr = 1;
@@ -178,6 +188,8 @@ export default function ArtOfMoving({ open, onClose }) {
       offY = (r.height - H0 * s) / 2;
       video.style.width = `${FW * s}px`;
       video.style.height = `${FH * s}px`;
+      leap.style.width = `${JW * s}px`;
+      leap.style.height = `${JH * s}px`;
       setLayout({ s, offY });
     };
     resize();
@@ -188,6 +200,14 @@ export default function ArtOfMoving({ open, onClose }) {
     video.muted = true;
     video.pause();
     try { video.currentTime = 0; } catch { /* not loaded yet */ }
+
+    // The airborne pose = the middle frame of her leap video, held still; until it is there, a jump keeps
+    // the walking frame as before.
+    leap.muted = true;
+    leap.pause();
+    const toMiddle = () => { if (leap.duration) leap.currentTime = leap.duration / 2; };
+    if (leap.readyState >= 1) toMiddle(); else leap.addEventListener("loadedmetadata", toMiddle, { once: true });
+    const leapReady = () => leap.readyState >= 2 && !leap.seeking && leap.currentTime > 0;
 
     const land = (plat) => {
       const p = g.p;
@@ -281,10 +301,15 @@ export default function ArtOfMoving({ open, onClose }) {
         ctx.fill();
       }
       ctx.globalAlpha = 1;
+      const air = g.p.jumped && !g.p.ground && leapReady();
       const fx = (g.p.x - camX - FW / 2) * s;
       const fy = offY + (g.p.y - FOOT_Y * FH) * s;
-      video.style.transform = `translate3d(${fx}px, ${fy}px, 0)`;
-      video.style.opacity = String(g.fade);
+      video.style.transform = `translate3d(${fx}px, ${fy}px, 0) scaleX(-1)`;
+      video.style.opacity = air ? "0" : String(g.fade);
+      const jx = (g.p.x - camX - JCX * JW) * s;
+      const jy = offY + (g.p.y - JFOOT_Y * JH) * s;
+      leap.style.transform = `translate3d(${jx}px, ${jy}px, 0) scaleX(-1)`;
+      leap.style.opacity = air ? String(g.fade) : "0";
     };
 
     // Countdown 3, 2, 1, GO (~1 s each); no input until GO.
@@ -369,6 +394,15 @@ export default function ArtOfMoving({ open, onClose }) {
               preload="auto"
               aria-hidden="true"
               className={`pointer-events-none absolute left-0 top-0 mix-blend-multiply [filter:brightness(1.07)_contrast(1.12)] ${running ? "" : "invisible"}`}
+            />
+            <video
+              ref={leapRef}
+              src="/assets/games/jump.mp4"
+              muted
+              playsInline
+              preload="auto"
+              aria-hidden="true"
+              className={`pointer-events-none absolute left-0 top-0 opacity-0 mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)] [clip-path:inset(0_1.5%)] ${running ? "" : "invisible"}`}
             />
 
             {count && (

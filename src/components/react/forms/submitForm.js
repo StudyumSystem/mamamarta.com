@@ -8,6 +8,10 @@
 export const WEB3FORMS_KEY = "ee2f7258-9626-488c-b98e-65b49b21d9eb";
 const ENDPOINT = "https://api.web3forms.com/submit";
 
+// EmailJS (Marta's account, 10 Nov): public ids, made to sit in website code.
+const EMAILJS = { service: "service_za6er8h", template: "template_wpz3ua3", publicKey: "89f8-P89SrmdrMwAL" };
+const EMAILJS_ENDPOINT = "https://api.emailjs.com/api/v1.0/email/send";
+
 const SUBJECTS = {
   suggest_game: "Game idea",
   custom_brand_experience: "Brand request",
@@ -42,13 +46,47 @@ export async function submitForm(type, data, submissionId) {
     interested_in: list(data.choices),
     marketing_emails: data.marketingOptIn === undefined ? undefined : data.marketingOptIn ? "yes" : "no",
   };
+  // message first, then who (Marta, 10 Nov 15:28): "Can we talk on Friday?" — anna@studio.com
+  const subject = `${SUBJECTS[type] ? `${SUBJECTS[type]}: ` : ""}${short ? `"${short}" — ` : ""}${who}`;
+
+  // Marta, 10 Nov 21:59: EmailJS first, so the whole email is hers (message on top, then who wrote, nothing
+  // else). Her template: Subject {{subject}}, Reply To {{email}}, body {{message}} — {{who}}, {{email}}.
+  // The other forms' extra fields go under the message. Web3Forms stays behind it, so nothing is lost if
+  // EmailJS refuses (e.g. its 200 a month are used up).
+  const extras = [
+    data.message && data.idea ? `Idea: ${data.idea}` : "",
+    data.company ? `Company: ${data.company}` : "",
+    fields.interested_in ? `Interested in: ${fields.interested_in}` : "",
+    fields.marketing_emails ? `Marketing emails: ${fields.marketing_emails}` : "",
+  ].filter(Boolean);
+  const text = String(data.message || data.idea || "").trim();
+  try {
+    const ej = await fetch(EMAILJS_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: EMAILJS.service,
+        template_id: EMAILJS.template,
+        user_id: EMAILJS.publicKey,
+        template_params: {
+          subject,
+          message: [text, ...(extras.length ? ["", ...extras] : [])].join("\n"),
+          who: data.name || data.email || "Someone",
+          email: data.email || "",
+        },
+      }),
+    });
+    if (ej.ok) return { ok: true };
+  } catch {
+    // falls through to Web3Forms
+  }
+
   const res = await fetch(ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({
       access_key: WEB3FORMS_KEY,
-      // message first, then who (Marta, 10 Nov 15:28): "Can we talk on Friday?" — anna@studio.com
-      subject: `${SUBJECTS[type] ? `${SUBJECTS[type]}: ` : ""}${short ? `"${short}" — ` : ""}${who}`,
+      subject,
       from_name: who,
       replyto: data.email,
       ...Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined && v !== "")),

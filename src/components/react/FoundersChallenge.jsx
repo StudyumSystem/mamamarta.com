@@ -434,7 +434,8 @@ export default function FoundersChallenge() {
           <p className="text-[0.9vw] font-normal text-[#333]">The founder’s challenge</p>
           <h2 className="relative z-20 mt-[1.7vw] whitespace-nowrap text-[4.9vw] font-normal leading-[0.98] tracking-[-0.07em]">Your product works.<br />Nobody remembers it.</h2>
           <p className="mt-[3.3vw] max-w-[33.2vw] text-[1.1vw] font-normal leading-[1.62] text-[#3d3d3d]">
-            We see design in the strangest places. In the way you notice, choose, remember or connect things. We turned some of those little moments into games. Play first. Talk later.
+            {/* Marta's advisor, 10 Nov 23:36: the payoff for a buyer first, the poetic line after it as personality */}
+            We design the moments your users remember. We see design in the strangest places. In the way you notice, choose, remember or connect things. We turned some of those little moments into games. Play first. Talk later.
           </p>
           {/* The description always takes exactly 2 lines, so the progress line and buttons never move. */}
           <div key={active} className="mm-slide-in mt-[3.6vw]">
@@ -507,7 +508,7 @@ export default function FoundersChallenge() {
         <p className="text-[length:calc(var(--q)*12.5)] font-normal leading-[calc(var(--q)*16)] tracking-[-0.02em] text-[#555]">The founder’s challenge</p>
         <h2 className="-ml-[calc(var(--q)*2)] mt-[calc(var(--q)*15)] whitespace-nowrap text-[length:calc(var(--q)*52)] font-normal leading-[calc(var(--q)*52)] tracking-[-0.07em]">Your product<br />works. Nobody<br />remembers it.</h2>
         <p className="mt-[calc(var(--q)*28.5)] w-[calc(var(--q)*302)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-[#666]">
-          We see design in the strangest places. In the way you notice, choose, remember or connect things. We turned some of those little moments into games. Play first. Talk later.
+          We design the moments your users remember. We see design in the strangest places. In the way you notice, choose, remember or connect things. We turned some of those little moments into games. Play first. Talk later.
         </p>
         {ENTRIES.map((e, i) => (
           <div key={e.id} className={i === 0 ? "mt-[calc(var(--q)*41)]" : "mt-[calc(var(--q)*57)]"}>

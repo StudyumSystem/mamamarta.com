@@ -51,17 +51,18 @@ export default function ContactSection() {
     <section id="contact" className="mm-phone-w bg-white font-[Inter] text-black">
       <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*18)] pb-[calc(var(--q)*60)] md:grid md:grid-cols-[44vw_35.8vw] md:items-start md:px-0 md:pl-[8.6vw] md:pt-[5.2vw] md:pb-[5.1vw]">
         <h2 className="-ml-[calc(var(--q)*4)] text-[length:calc(var(--q)*69)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em] md:ml-0 md:text-[8vw] md:leading-[0.9] md:tracking-[-0.07em]">
-          {/* Marta, 10 Nov 23:13 (her advisor): "We are not for everyone." turned people away before trust */}
-          Tell us
+          {/* Marta's advisor, 10 Nov 23:36 (replaces his 23:13 word): keep it, and follow it at once with who it is for */}
+          We are
           <br />
-          what you’re
+          not for
           <br />
-          building.
+          everyone.
         </h2>
 
         <div className="mt-[calc(var(--q)*22)] md:mt-[0.3vw]">
-          <p className="w-[calc(var(--q)*300)] text-[length:calc(var(--q)*14.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-[#666] md:w-auto md:text-[clamp(13px,0.94vw,18px)] md:leading-[1.4] md:tracking-normal md:text-[#444]">
-            We work with people who value thoughtful design and bold decisions.
+          {/* the door: who it is for, in black and larger than the old grey line */}
+          <p className="w-[calc(var(--q)*320)] text-[length:calc(var(--q)*19)] font-normal leading-[calc(var(--q)*24)] tracking-[-0.02em] text-black md:w-auto md:max-w-[30vw] md:text-[clamp(18px,1.46vw,28px)] md:leading-[1.25] md:tracking-[-0.01em]">
+            For founders with a product that works and the nerve to make it unforgettable.
           </p>
 
           {sent ? (
@@ -89,7 +90,7 @@ export default function ContactSection() {
               <textarea
                 id="contact-message"
                 rows={5}
-                placeholder="A few words about your product"
+                placeholder="What are you building?"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className={`${inputCls} h-[159px] resize-none py-[10px] leading-[1.3] md:h-[7.8vw] md:py-[clamp(10px,0.9vw,18px)]`}

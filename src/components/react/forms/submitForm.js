@@ -17,6 +17,38 @@ const SUBJECTS = {
   custom_brand_experience: "Brand request",
   contact: "",
 };
+// The letter the visitor gets back (EmailJS Auto-Reply, Marta's frame Email_Letter_Suggest a game, 10 Nov):
+// one template, the heading, the paragraphs and the subject come from here. The game letter is her text; the
+// other two are placeholders in her tone until she sends hers.
+const REPLIES = {
+  suggest_game: {
+    subject: "Good ideas deserve to be played with!",
+    heading: "Good ideas deserve<br>to be played with!",
+    body: [
+      "Every great experience starts with an idea. Sometimes, the most unexpected ones turn out to be the most interesting.",
+      "Your game suggestion has reached us. We'll give it a thoughtful look, and if we see an opportunity to bring it into our collection, you'll hear from us.",
+      "In the meantime, there's always another game to play.",
+    ],
+  },
+  custom_brand_experience: {
+    subject: "Your brand request reached Marta",
+    heading: "Your brand request<br>reached Marta.",
+    body: [
+      "Thank you for telling us about your brand. Marta reads every request herself.",
+      "We'll look at what you're building and come back to you with the next step.",
+      "In the meantime, there's always another game to play.",
+    ],
+  },
+  contact: {
+    subject: "Your message reached Marta",
+    heading: "Your message<br>reached Marta.",
+    body: [
+      "Thank you for writing. Marta reads every message herself, and you'll hear back from her soon.",
+      "In the meantime, there's always another game to play.",
+    ],
+  },
+};
+const P = 'style="margin:0 0 24px;font-size:17px;line-height:1.5;color:#555555;"';
 const FORM_NAMES = {
   suggest_game: "Suggest a game",
   custom_brand_experience: "Create for my brand",
@@ -73,6 +105,11 @@ export async function submitForm(type, data, submissionId) {
           message: [text, ...(extras.length ? ["", ...extras] : [])].join("\n"),
           who: data.name || data.email || "Someone",
           email: data.email || "",
+          // for the Auto-Reply letter
+          greeting: data.name ? `Hi ${String(data.name).trim().split(/\s+/)[0]}!` : "Hi!",
+          reply_subject: (REPLIES[type] || REPLIES.contact).subject,
+          reply_heading: (REPLIES[type] || REPLIES.contact).heading,
+          reply_body: (REPLIES[type] || REPLIES.contact).body.map((t) => `<p ${P}>${t}</p>`).join(""),
         },
       }),
     });

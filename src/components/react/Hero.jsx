@@ -11,11 +11,11 @@ const navLinks = [
   { href: "#contact", label: "Contact" },
 ];
 
-// Marta, 10 Nov 23:13 (her advisor's review): the hero says what Mamamarta does and who it is for in the
-// first three seconds. The footer line moves up under the tagline, and the line for founders takes the
-// Paul Rand quote's place.
-const CRAFTED = "Crafted to shape systems, interactions, and digital identity.";
-const FOR_WHOM = "For founders who want a product people remember.";
+// Marta's reworked home (her Desktop.jpg, 11 Nov): the tagline names the pain, the two lines under it say
+// for whom and what, then "Straight to Marta". The phone takes the same copy (her phone frame is older).
+const TAGLINE = "Your product works. Nobody remembers it.";
+const FOR_WHOM = "Design for funded startups.";
+const WHAT = "Brand, product, and the story investors remember.";
 
 // The homepage section the visitor is looking at, so the menu shows it in bold (04 Mobile Navigation).
 function sectionInView() {
@@ -121,14 +121,15 @@ export default function Hero({ initialMenuOpen = false }) {
               alt="MAMA MARTA"
             />
           </h1>
-          <p className="absolute inset-x-0 text-center font-normal text-white leading-[1.2] tracking-[-0.01em] top-[calc(var(--p)*343)] text-[length:calc(var(--p)*19)]">
-            Design house for digital products.
+          <p className="absolute inset-x-0 text-center font-normal text-white tracking-[-0.01em] top-[calc(var(--p)*343)] text-[length:calc(var(--p)*20)] leading-[calc(var(--p)*29)]">
+            Your product works.
+            <br />
+            Nobody remembers it.
           </p>
-          <p className="absolute left-1/2 -translate-x-1/2 text-center font-light text-white top-[calc(var(--p)*373)] w-[calc(var(--p)*270)] text-[length:calc(var(--p)*13.5)] leading-[calc(var(--p)*19)]">
-            {CRAFTED}
-          </p>
-          <p className="absolute left-1/2 -translate-x-1/2 text-center font-normal text-white top-[calc(var(--p)*466)] w-[calc(var(--p)*260)] text-[length:calc(var(--p)*15.5)] leading-[calc(var(--p)*21)]">
+          <p className="absolute inset-x-0 text-center font-normal text-white top-[calc(var(--p)*420)] text-[length:calc(var(--p)*14)] leading-[calc(var(--p)*20)]">
             {FOR_WHOM}
+            <br />
+            {WHAT}
           </p>
           <a
             href={WHATSAPP_URL}
@@ -137,7 +138,7 @@ export default function Hero({ initialMenuOpen = false }) {
             className="absolute left-1/2 flex -translate-x-1/2 items-center justify-center gap-[0.3em] rounded-xs border border-white/20 font-semibold text-white backdrop-blur-md top-[calc(var(--p)*552)] h-[calc(var(--p)*46)] w-[calc(var(--p)*199)] whitespace-nowrap text-[length:calc(var(--p)*15.5)]"
             style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
           >
-            Message Marta <ArrowIcon />
+            Straight to Marta <ArrowIcon />
           </a>
         </div>
 
@@ -155,7 +156,8 @@ export default function Hero({ initialMenuOpen = false }) {
           </ul>
         </nav>
 
-        {/* Desktop positions from MM-HOME-001 (1920x1080): logo top 307 px, tagline at 470, quote at 623, button at 804. */}
+        {/* Desktop positions from her Desktop.jpg (1920x1080): logo top 307 px, tagline 43/55 at 470, the two lines
+            22/30 at 541, button 312x68 at 709. */}
         <div className="max-md:hidden flex flex-1 flex-col items-center text-center justify-center lg:justify-start rounded-lg lg:py-0 lg:pt-[14.7vh] max-h-screen py-[5em]">
 
           <div className="items-center justify-center flex flex-col">
@@ -169,30 +171,28 @@ export default function Hero({ initialMenuOpen = false }) {
               />
             </h1>
 
-            <p className="lg:mt-[3vh] mt-4 text-[18px] font-light tracking-[-0.01em] lg:font-light lg:tracking-[-0.015em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] text-white">
-              Design house for digital products.
+            <p className="lg:mt-[3.7vh] mt-4 text-[18px] font-normal tracking-[-0.01em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] lg:tracking-[-0.03em] text-white">
+              {TAGLINE}
             </p>
-            <p className="mt-2 lg:mt-[1.2vh] text-[13px] font-light text-white/90 lg:text-[clamp(16px,1.15vw,22px)] lg:leading-[1.4]">
-              {CRAFTED}
+            <p className="mt-2 lg:mt-[1.5vh] text-[13px] font-normal text-white lg:text-[clamp(16px,1.146vw,22px)] lg:leading-[1.364] lg:tracking-[-0.015em]">
+              {FOR_WHOM}
+              <br />
+              {WHAT}
             </p>
           </div>
 
-          <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[7vh] lg:max-w-none">
-            <p className="font-normal text-white mx-auto w-[56vw] text-[11.5px] leading-[1.4] lg:tracking-normal lg:text-[clamp(20px,1.67vw,32px)] lg:leading-[1.28] lg:w-[29.4vw] lg:max-w-[565px]">
-              {FOR_WHOM}
-            </p>
-
-            <div className="flex flex-wrap justify-center mt-10 lg:mt-[5.5vh]">
+          <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[10vh] lg:max-w-none">
+            <div className="flex flex-wrap justify-center">
               <a
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="px-4 py-3 lg:px-6 lg:py-0 lg:justify-center lg:min-w-[clamp(220px,15.4vw,296px)] lg:min-h-[clamp(50px,3.54vw,68px)] lg:text-[clamp(16px,1.146vw,22px)] lg:font-semibold group flex items-center rounded-xs border border-white/20 font-medium backdrop-blur-md transition-all duration-300"
+                className="px-4 py-3 lg:px-6 lg:py-0 lg:justify-center lg:min-w-[clamp(220px,16.25vw,312px)] lg:min-h-[clamp(50px,3.54vw,68px)] lg:text-[clamp(16px,1.146vw,22px)] lg:font-semibold group flex items-center rounded-xs border border-white/20 font-medium backdrop-blur-md transition-all duration-300"
                 onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}
                 style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
               >
-                Message Marta <ArrowIcon className="ml-[0.3em] transition-transform group-hover:translate-x-1" />
+                Straight to Marta <ArrowIcon className="ml-[0.3em] transition-transform group-hover:translate-x-1" />
               </a>
             </div>
           </div>

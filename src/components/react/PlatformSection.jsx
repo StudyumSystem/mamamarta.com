@@ -9,17 +9,19 @@ export default function PlatformSection() {
       <div className="flex w-full flex-col gap-10 sm:flex-row sm:items-stretch sm:gap-[8.75vw] sm:pl-[9vw]">
         <div className="order-1 flex flex-col px-6 sm:order-2 sm:h-[34vw] sm:px-0">
           <header className="mb-8 sm:mb-[2.6vw]">
-            <h2 data-reveal-lines className="flex flex-col text-[10vh] font-medium leading-[0.8] tracking-tighter text-black sm:text-[7.4vw] sm:leading-[0.86]">
-              <span className="relative">P<span className="text-pink-500">l</span>atform</span>
-              <span className="relative">Mind<span className="inline-block translate-x-1 pr-[3px]"><span className="block h-3 w-12 bg-pink-500 sm:h-[0.6vw] sm:w-[2.9vw]"></span></span>set</span>
+            {/* her Desktop.jpg (11 Nov): regular weight, lines 140 px apart, the site's pink, a longer underscore */}
+            <h2 data-reveal-lines className="flex flex-col whitespace-nowrap text-[18vw] font-normal leading-[0.92] tracking-tighter text-black sm:text-[7.4vw] sm:leading-[7.3vw]">
+              <span className="relative">P<span className="text-[#e3009c]">l</span>atform</span>
+              <span className="relative">Mind<span className="inline-block translate-x-1 pr-[3px]"><span className="block h-3 w-12 bg-[#e3009c] sm:h-[0.63vw] sm:w-[3.65vw]"></span></span>set</span>
             </h2>
           </header>
-          <div data-reveal className="w-[78vw] sm:w-[31.5vw]">
-            <p className="text-[15px] leading-[1.41] text-gray-800 sm:text-[clamp(13px,1.04vw,20px)] sm:leading-[1.55]">A product is never truly finished. It evolves through real use, thoughtful decisions, and a system built to grow with it.</p>
+          <div data-reveal className="w-[78vw] sm:w-[30.5vw]">
+            {/* her Desktop.jpg (11 Nov): body 22/31 black 69%, PLATFORM LAYER 22 px black 50% */}
+            <p className="text-[15px] leading-[1.41] text-black/70 sm:text-[1.146vw] sm:leading-[1.615vw] sm:tracking-[-0.02em]">A product is never finished. It grows through real use, and a system built to hold it.</p>
           </div>
           <div className="mt-auto hidden sm:block">
-            <div className="mb-[0.6vw] h-[1px] w-[9.8vw] bg-pink-500"></div>
-            <p className="text-[clamp(11px,0.94vw,18px)] uppercase tracking-[0.04em] text-gray-500">Platform layer</p>
+            <div className="mb-[0.9vw] h-[2px] w-[9.8vw] bg-[#f48fcf]"></div>
+            <p className="text-[1.146vw] uppercase text-black/50">Platform layer</p>
           </div>
         </div>
         <div className="order-2 px-6 sm:order-1 sm:px-0">

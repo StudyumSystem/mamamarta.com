@@ -1,85 +1,130 @@
 import React from "react";
 import ArrowIcon from "./ArrowIcon";
 
-// What is an amazing experience, to Marta's MM-HOME-001 / 002. Desktop (1920 frame): heading 173-924 px from
-// 156 px down, body 18/26 in two lines up to 821 px, then the pink gradient "Wanna dive deeper?" (296x68)
-// that opens The method. The M on the right is dark grey, the wire runs across it.
-// Phone (MM-HOME-002, px of the 390 frame in --q, Marta 2 Nov: "the design fell apart, make it exactly as in
-// my Figma"): the block is 893 tall; the heading's three lines sit 65 px apart (the heading picture is cut
-// into its three lines to open them up), the body 252 wide in four lines from 265, the button 199x46 at 378,
-// the light M from 441 at the bottom left with the wire's loop over it.
-const HEADING = "/assets/whatIs.webp"; // 1200x633: lines 200 px apart in the picture
+// What is an amazing experience, on WHITE as in Marta's reworked home (her Desktop.jpg, 11 Nov): no black block.
+// Behind it her M, faded to pink, and her black cable running across. Desktop (1920 frame, px / 19.2 = vw):
+// heading 150/141 from 150 px down at 1012 px, "experience" in italic with her pink "?" lying on its side,
+// body 22/31 black 70% at 621 px, the gradient button 312x68 at 767 px (it still opens The Method).
+// The M and the cable are her own pictures (m-letter, wire): the M mirrored, its greys turned to her light pink
+// (the picture over a pink square with "lighten": black becomes the pink, white stays white); the cable twice,
+// laid over the page with "multiply" so its white disappears; the two cables meet behind the button.
+// Phone (390 frame, --q): the same copy and order on white, her phone type (heading in three lines, 65 px
+// apart), body 252 wide, button 46 tall, the pink M and the cable's loops below.
 
-// The three lines of the heading picture, each moved down 12 px more than the one before it. The "g" of
-// "amazing" hangs into the third line's band, so the cuts step around it.
-const LINES = [
-  { clip: "polygon(0 0, 100% 0, 100% 30.8%, 0 30.8%)", y: 0 },
-  { clip: "polygon(0 30.8%, 100% 30.8%, 100% 69.5%, 85% 69.5%, 85% 63.2%, 0 63.2%)", y: 12 },
-  { clip: "polygon(0 63.2%, 85% 63.2%, 85% 69.5%, 100% 69.5%, 100% 100%, 0 100%)", y: 24 },
-];
+const PINK = "#fcd2f0";
+
+// Her pink "?" on its side, taken from her heading picture (whatIs.webp, 1200x633, lines 200 px apart,
+// type about 213 px): only the corner where the "?" is, so nothing of the letters comes with it.
+// Its dot is drawn here (it sits too close to the "e" to cut cleanly), its hook comes from the picture.
+const Squiggle = () => (
+  <span aria-hidden="true" className="whitespace-nowrap">
+    <span
+      className="inline-block rounded-full"
+      style={{ width: "0.075em", height: "0.075em", marginLeft: "0.02em", verticalAlign: "0.185em", background: "#F600A9" }}
+    />
+    <span
+      className="inline-block"
+      style={{
+        width: `${74 / 213}em`,
+        height: `${95 / 213}em`,
+        marginLeft: `${8 / 213}em`,
+        verticalAlign: `${-10 / 213}em`,
+        backgroundImage: "url(/assets/whatIs.webp)",
+        backgroundSize: `${1200 / 213}em auto`,
+        backgroundPosition: `${-1126 / 213}em ${-500 / 213}em`,
+        backgroundRepeat: "no-repeat",
+      }}
+    />
+  </span>
+);
+
+const Heading = ({ className = "" }) => (
+  <h2 className={className}>
+    What is
+    <br />
+    an amazing
+    <br />
+    <em className="font-normal italic">experience</em>
+    <Squiggle />
+    <span className="sr-only">?</span>
+  </h2>
+);
+
+const BODY = "It is never accidental. It is the decisions people never notice, but always feel.";
+
+// The M, mirrored, in pink: her M picture's shape as a mask over a pink that fades to white towards the
+// text, as in her picture (strongest on the left).
+const PinkM = ({ className = "", style }) => (
+  <div className={`pointer-events-none absolute [transform:scaleX(-1)] ${className}`} aria-hidden="true" style={style}>
+    <div
+      className="h-full w-full"
+      style={{
+        background: `linear-gradient(to left, ${PINK} 0%, ${PINK} 30%, rgba(252,210,240,0.5) 62%, rgba(252,210,240,0) 88%)`,
+        WebkitMaskImage: "url(/assets/m-letter.webp)",
+        maskImage: "url(/assets/m-letter.webp)",
+        WebkitMaskSize: "100% 100%",
+        maskSize: "100% 100%",
+      }}
+    />
+  </div>
+);
 
 export default function WhatIsSection() {
   return (
-    <section id="what-is" className="mm-phone-w relative flex h-[calc(var(--q)*893)] flex-col overflow-hidden bg-black text-white sm:h-auto sm:min-h-screen sm:px-[9vw] sm:pt-[8.1vw] sm:pb-[6vw]">
-      <div
-        className="pointer-events-none absolute inset-0 z-20 w-full select-none sm:inset-auto sm:top-0 sm:right-0 sm:bottom-0 sm:max-w-[68rem]"
-        aria-hidden="true"
-      >
-        <div className="relative flex h-full w-full items-end overflow-hidden">
+    <section id="what-is" className="mm-phone-w relative overflow-hidden bg-white text-black">
+      {/* Computer */}
+      <div className="relative hidden h-[56.25vw] sm:block">
+        <PinkM style={{ left: "-2.08vw", top: "-2.08vw", width: "62.24vw", height: "57.29vw" }} />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          {/* the cable on the left: her loops, turned upside down and a little round, cut where it goes behind the button */}
           <img
-            src={'/assets/m-letter.webp'}
+            src="/assets/wire.webp"
             alt=""
-            data-parallax="-12"
-            className="absolute max-w-none brightness-[0.9] contrast-[1.05] [mask-image:linear-gradient(to_bottom,transparent_0%,black_18%)] left-[calc(var(--q)*-24)] top-[calc(var(--q)*441)] w-[calc(var(--q)*380)] transition-transform duration-300 sm:left-auto sm:top-0 sm:right-0 sm:h-screen sm:w-auto sm:max-w-full sm:scale-120 sm:brightness-[0.42] sm:contrast-[1.15] sm:[mask-image:none]"
+            className="absolute max-w-none mix-blend-multiply"
+            style={{ left: "-6.82vw", top: "8.96vw", width: "75vw", clipPath: "inset(0 6% 0 0)", transform: "translate(0.36vw, 3.05vw) rotate(7deg) scaleY(-1)" }}
           />
+          {/* the cable on the right: over the crest and down to the corner, its loop at the bottom */}
           <img
-            src={'/assets/wire.webp'}
+            src="/assets/wire.webp"
             alt=""
-            className="absolute bottom-[calc(var(--q)*186)] scale-[2] rotate-130 transition-transform duration-300 sm:top-[10vh] sm:bottom-auto sm:right-[-80px] sm:h-auto sm:w-[55rem] sm:scale-[1] sm:rotate-0"
+            className="absolute max-w-none mix-blend-multiply"
+            style={{ left: "0.42vw", top: "17.24vw", width: "100vw", clipPath: "inset(0 0 0 52.4%)" }}
           />
         </div>
-      </div>
 
-      {/* Phone */}
-      <div className="relative z-10 sm:hidden">
-        <div data-reveal className="absolute left-[calc(var(--q)*14)] top-[calc(var(--q)*47)] h-[calc(var(--q)*192)] w-[calc(var(--q)*318)]">
-          {LINES.map((l, i) => (
-            <img
-              key={i}
-              src={HEADING}
-              alt={i === 0 ? "What is an amazing experience?" : ""}
-              aria-hidden={i === 0 ? undefined : "true"}
-              className="absolute left-0 top-0 w-full max-w-none"
-              style={{ clipPath: l.clip, transform: `translateY(calc(var(--q) * ${l.y}))` }}
-            />
-          ))}
+        <div className="absolute left-[52.7vw] top-[7.81vw] z-10">
+          <Heading className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
         </div>
-        <p data-reveal className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] w-[calc(var(--q)*252)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-white">
-          An experience that feels effortless is rarely accidental. It's shaped by the decisions people never notice, but always feel.
-        </p>
+        <p className="absolute left-[52.7vw] top-[32.35vw] z-10 w-[30.5vw] text-[1.094vw] leading-[1.615vw] tracking-[-0.02em] text-black/70">{BODY}</p>
         <a
-          data-reveal
           href="/what-is"
-          className="mm-gradient mm-gradient-rev absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] flex h-[calc(var(--q)*46)] w-[calc(var(--q)*199)] items-center justify-center gap-[0.3em] border border-[#e3009c]/25 text-[length:calc(var(--q)*15.5)] font-semibold text-white"
+          className="mm-gradient group absolute left-[52.66vw] top-[39.95vw] z-10 inline-flex h-[3.54vw] w-[16.25vw] items-center justify-center gap-[0.3em] text-[1.146vw] font-semibold text-white"
         >
-          Wanna dive deeper? <ArrowIcon />
+          See what's underneath <ArrowIcon />
         </a>
       </div>
 
-      {/* Computer */}
-      <div className="relative z-10 hidden flex-col sm:flex">
-        <img data-reveal src={HEADING} alt="What is an amazing experience?" className="mb-[2.9vw] w-[39vw]" />
-        <div data-reveal className="max-w-[34.5vw]">
-          <p className="text-[clamp(13px,1.04vw,20px)] leading-[1.55] text-gray-200">An experience that feels effortless is rarely accidental. It's shaped by the decisions people never notice, but always feel.</p>
-        </div>
-        <div data-reveal className="mt-[4.4vw]">
-          <a
-            href="/what-is"
-            className="mm-gradient group inline-flex w-fit items-center justify-center gap-1.5 font-semibold text-white min-h-[clamp(44px,3.54vw,68px)] min-w-[clamp(200px,15.4vw,296px)] px-6 text-[clamp(14px,1.146vw,22px)]"
-          >
-            Wanna dive deeper? <ArrowIcon />
-          </a>
-        </div>
+      {/* Phone */}
+      <div className="relative h-[calc(var(--q)*893)] sm:hidden">
+        <PinkM
+          className="left-[calc(var(--q)*-24)] top-[calc(var(--q)*441)] h-[calc(var(--q)*455)] w-[calc(var(--q)*380)]"
+        />
+        <img
+          src="/assets/wire.webp"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute max-w-none mix-blend-multiply [transform:scaleY(-1)] left-[calc(var(--q)*-150)] top-[calc(var(--q)*520)] w-[calc(var(--q)*620)]"
+        />
+        <Heading className="absolute left-[calc(var(--q)*18)] top-[calc(var(--q)*47)] z-10 text-[length:calc(var(--q)*56)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
+        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] z-10 w-[calc(var(--q)*252)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-black/70">
+          {BODY}
+        </p>
+        <a
+          href="/what-is"
+          className="mm-gradient absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] z-10 flex h-[calc(var(--q)*46)] items-center justify-center gap-[0.3em] px-[calc(var(--q)*20)] text-[length:calc(var(--q)*15.5)] font-semibold text-white"
+        >
+          See what's underneath <ArrowIcon />
+        </a>
       </div>
     </section>
   );

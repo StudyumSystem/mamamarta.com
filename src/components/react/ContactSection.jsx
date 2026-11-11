@@ -60,9 +60,9 @@ export default function ContactSection() {
         </h2>
 
         <div className="mt-[calc(var(--q)*22)] md:mt-[0.3vw]">
-          {/* the door: who it is for, in black and larger than the old grey line */}
-          <p className="w-[calc(var(--q)*320)] text-[length:calc(var(--q)*19)] font-normal leading-[calc(var(--q)*24)] tracking-[-0.02em] text-black md:w-auto md:max-w-[30vw] md:text-[clamp(18px,1.46vw,28px)] md:leading-[1.25] md:tracking-[-0.01em]">
-            For founders with a product that works and the nerve to make it unforgettable.
+          {/* her Desktop.jpg (11 Nov): who it is for, 18/34 black 69% on the computer, 14/20 on the phone */}
+          <p className="w-[calc(var(--q)*330)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] text-black/70 md:w-auto md:text-[clamp(13px,0.9375vw,18px)] md:leading-[1.77vw]">
+            We work with funded founders who would rather be understood than liked.
           </p>
 
           {sent ? (
@@ -77,7 +77,7 @@ export default function ContactSection() {
                 type="email"
                 inputMode="email"
                 autoComplete="email"
-                placeholder="Your Email Address"
+                placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 aria-invalid={!!error}

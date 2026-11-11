@@ -8,6 +8,8 @@ import ArrowIcon from "./ArrowIcon";
 // Marta, 10 Nov 23:13 (her advisor): say what the call is before the button opens WhatsApp. 30 minutes is
 // the advisor's number, hers to confirm.
 const CALL_LINE = "30 minutes. We look at your product together. You leave knowing your next move.";
+// Her Desktop.jpg (11 Nov): one sentence pair, the button "Straight to Marta".
+const WHAT_WE_DO = "Design house for digital products. We shape systems, interactions and digital identity.";
 const buttonOff ="linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)";
 const buttonOn = "linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)";
 
@@ -31,12 +33,8 @@ export default function BrandSection() {
         <h2 className="select-none">
           <img src="/assets/brand/footer-logo-mobile.png" alt="MAMA MARTA" className="absolute left-[calc(var(--q)*19)] top-[calc(var(--q)*39)] h-auto w-[calc(var(--q)*357)] max-w-none" />
         </h2>
-        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*243)] text-[length:calc(var(--q)*14.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em]">
-          Design house for digital products.
-          <br />
-          Crafted to shape systems, interactions,
-          <br />
-          and digital identity.
+        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*243)] w-[calc(var(--q)*330)] text-[length:calc(var(--q)*14.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em]">
+          {WHAT_WE_DO}
         </p>
         <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*326)] w-[calc(var(--q)*330)] text-[length:calc(var(--q)*13)] font-light leading-[calc(var(--q)*18)] text-white/85">
           {CALL_LINE}
@@ -48,7 +46,7 @@ export default function BrandSection() {
           className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] flex h-[calc(var(--q)*41)] w-[calc(var(--q)*215)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*15.5)] font-semibold whitespace-nowrap backdrop-blur-md"
           style={{ background: buttonOff }}
         >
-          Book a Discovery Call <ArrowIcon />
+          Straight to Marta <ArrowIcon />
         </a>
         <div className="absolute bottom-[calc(var(--q)*95)] left-[calc(var(--q)*12.5)] flex gap-[calc(var(--q)*29)]">
           {icons.map((icon) => (
@@ -68,12 +66,10 @@ export default function BrandSection() {
         </h2>
 
         <div className="order-1 flex flex-col">
-          <p className="text-[15px] leading-[1.41] md:text-[clamp(14px,1.146vw,22px)]">
-            Design house for digital products.
-            <br />
-            Crafted to shape systems, interactions, and digital identity.
+          <p className="text-[15px] leading-[1.41] md:max-w-[30vw] md:text-[clamp(14px,1.094vw,21px)] md:leading-[1.615vw] md:tracking-[-0.02em]">
+            {WHAT_WE_DO}
           </p>
-          <p className="mt-5 text-[14px] font-light leading-[1.45] text-white/85 md:mt-[1.6vw] md:text-[clamp(13px,0.94vw,18px)]">
+          <p className="mt-5 text-[14px] font-normal leading-[1.45] text-white md:mt-[0.75vw] md:font-light md:text-[clamp(12px,0.729vw,14px)]">
             {CALL_LINE}
           </p>
 
@@ -81,15 +77,15 @@ export default function BrandSection() {
             href={WHATSAPP_URL}
             target="_blank"
             rel="noreferrer"
-            className="group mt-6 inline-flex w-fit items-center justify-center gap-1.5 rounded-xs border border-white/20 px-4 py-3 text-[15px] font-semibold backdrop-blur-md transition-all duration-300 md:mt-[2.3vw] md:min-h-[clamp(44px,3.54vw,68px)] md:min-w-[clamp(200px,15.4vw,296px)] md:px-6 md:py-0 md:text-[clamp(14px,1.146vw,22px)]"
+            className="group mt-6 inline-flex w-fit items-center justify-center gap-1.5 rounded-xs border border-white/20 px-4 py-3 text-[15px] font-semibold backdrop-blur-md transition-all duration-300 md:mt-[1.85vw] md:min-h-[clamp(44px,3.54vw,68px)] md:min-w-[clamp(200px,16.25vw,312px)] md:px-6 md:py-0 md:text-[clamp(14px,1.146vw,22px)]"
             onMouseEnter={(e) => (e.currentTarget.style.background = buttonOn)}
             onMouseLeave={(e) => (e.currentTarget.style.background = buttonOff)}
             style={{ background: buttonOff }}
           >
-            Book a Discovery Call <ArrowIcon className="transition-transform group-hover:translate-x-1" />
+            Straight to Marta <ArrowIcon className="transition-transform group-hover:translate-x-1" />
           </a>
 
-          <div className="mt-10 flex flex-col gap-6 md:mt-auto md:flex-row md:items-center md:justify-between">
+          <div className="mt-10 flex flex-col gap-6 md:mt-auto md:flex-row md:items-center md:gap-[2.9vw]">
             <div className="flex gap-4 md:gap-[1.35vw]">
               {icons.map((icon) => (
                 <a key={icon.alt} href={icon.href} target={icon.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="-m-2 inline-flex p-2 transition-opacity hover:opacity-70">

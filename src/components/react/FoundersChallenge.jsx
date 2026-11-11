@@ -24,31 +24,33 @@ const GAP_VW = 4;
 const ENTRIES = [
   {
     id: "word-hunt",
-    label: "01 / WORD HUNT · 60 SEC",
-    text: "Think you can spot what others miss? Hidden words are waiting in plain sight. How many can you uncover?",
+    label: "01 / 05 WORD HUNT",
+    // her Desktop.jpg (11 Nov); on the computer it breaks after "them" as in hers (textW)
+    text: "Some things are hiding in plain sight. You will find them fast, and then wonder how long they were there.",
+    textW: "30.5vw",
     visual: { kind: "video", src: "/assets/m.mp4", poster: "/assets/m-poster.webp", alt: "Letter M" },
   },
   {
     id: "memory-match",
-    label: "02 / MEMORY MATCH · 60 SEC",
+    label: "02 / 05 MEMORY MATCH",
     text: "20 cards, 10 pairs. A brand works the same way: people come back to what they recognise.",
     visual: { kind: "memory-card" },
   },
   {
     id: "tic-tac-toe",
-    label: "03 / TIC-TAC-TOE · 60 SEC",
+    label: "03 / 05 TIC-TAC-TOE",
     text: "Every move is a decision. Three in a row sounds easy. But can you outsmart your opponent? Your move.",
     visual: { kind: "video", src: "/assets/apple.mp4", poster: "/assets/apple-poster.webp", alt: "Black apple" },
   },
   {
     id: "art-of-moving",
-    label: "04 / THE ART OF MOVING · 60 SEC",
+    label: "04 / 05 THE ART OF MOVING",
     text: ["Momentum. Keep moving, collect the pink.", "Growth is a series of small, well-timed steps."],
     visual: { kind: "walking-card" },
   },
   {
     id: "connect-the-path",
-    label: "05 / CONNECT THE PATH · 60 SEC",
+    label: "05 / 05 CONNECT THE PATH",
     text: "Every point has a purpose. A good product leads people there without a map. Can you complete it?",
     visual: { kind: "video", src: "/assets/google.mp4", poster: "/assets/google-poster.webp", alt: "Glove in the shape of a G" },
   },
@@ -60,6 +62,10 @@ const ENTRIES = [
     visual: { kind: "image", src: "/assets/games/plus-key.png", video: "/assets/games/plus-key.mp4", alt: "Black key with a plus sign" },
   },
 ];
+
+// Her Desktop.jpg (11 Nov): the games block's heading and intro.
+const HEADING_LINES = ["Founder's", "blind spot"];
+const INTRO = "A game lets someone feel a complex product before they ever use it. Five of them, built from what founders stop seeing.";
 
 const GAME_COMPONENTS = {
   "word-hunt": WordHunt,
@@ -234,15 +240,13 @@ function WalkingCard({ active, className = "" }) {
       <div className="overflow-hidden rounded-[0.9vw] bg-white max-lg:rounded-[16px]">
         <MovingFigure active={active} pos="50% 0%" className="aspect-[300/385] w-full" />
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center px-[1vw] text-center max-lg:py-5">
-        <p className="text-[0.95vw] font-light max-lg:text-[17px]">Redefine Your Look</p>
-        <p className="mt-[0.4vw] text-[0.5vw] font-light leading-[1.5] text-white/55 max-lg:mt-2 max-lg:text-[9px]">
-          A sleek, modern trench coat blends bold elegance<br />with timeless sophistication for any occasion.
-        </p>
-        <span className="mt-[0.8vw] inline-flex items-center gap-[0.4vw] rounded-full border border-white/20 bg-gradient-to-r from-[#1a1a1f] to-[#3a3a40] py-[0.25vw] pl-[0.6vw] pr-[0.25vw] text-[0.5vw] font-light max-lg:mt-3 max-lg:gap-2 max-lg:py-1 max-lg:pl-3 max-lg:pr-1 max-lg:text-[10px]" aria-hidden="true">
-          Learn more
-          <span className="grid h-[1.1vw] w-[1.1vw] place-items-center rounded-full bg-[#e3009c] text-[0.55vw] max-lg:h-5 max-lg:w-5 max-lg:text-[10px]"><ArrowIcon dir="up-right" /></span>
-        </span>
+      {/* the same words as the phone card (WalkingCardPhone): title, line, the pink round arrow on the right */}
+      <div className="flex flex-1 items-center justify-between px-[0.5vw] max-lg:px-2 max-lg:py-5">
+        <div>
+          <p className="text-[0.94vw] font-light uppercase leading-none tracking-[-0.03em] max-lg:text-[17px]">The Art of Moving</p>
+          <p className="mt-[0.4vw] text-[0.52vw] font-light leading-[1.45] text-white/75 max-lg:mt-2 max-lg:text-[10px]">Keep moving. Collect the pink stars.</p>
+        </div>
+        <span className="grid h-[1.4vw] w-[1.4vw] shrink-0 place-items-center rounded-full bg-[#e3009c] text-[0.6vw] text-white max-lg:h-7 max-lg:w-7 max-lg:text-[11px]" aria-hidden="true"><ArrowIcon dir="up-right" /></span>
       </div>
     </div>
   );
@@ -344,7 +348,6 @@ const EntryText = ({ text }) =>
 
 export default function FoundersChallenge() {
   const [active, setActive] = useState(0);
-  const [hoverSeg, setHoverSeg] = useState(null);
   const [hovering, setHovering] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [game, setGame] = useState(null);
@@ -400,7 +403,9 @@ export default function FoundersChallenge() {
   };
   const place = (i) => {
     const rel = signedRel(i);
-    let c = 29.5;
+    // her Desktop.jpg (11 Nov): the shown entry centred at about 70.5vw (20.5vw into this column), the next one
+    // from about 87vw; nothing of the previous one shows to the left of the shown M
+    let c = 20.5;
     if (rel > 0) {
       let k = active;
       for (let s = 0; s < rel; s++) {
@@ -429,39 +434,41 @@ export default function FoundersChallenge() {
         <div className="pl-[8.85vw] py-[6vw]">
           {/* Type measured on her 2x frames (MM-C06 _Entry, 3840 px = 1920): label 17 px, heading 154 px tight,
               body and entry text 21/34 regular dark grey, entry label 21 px caps grey. */}
-          {/* Marta, 10 Nov 23:13 (her advisor's review): the heading names the founder's pain; "The founder's
-              challenge" becomes the small label above it. */}
-          <p className="text-[0.9vw] font-normal text-[#333]">The founder’s challenge</p>
-          <h2 className="relative z-20 mt-[1.7vw] whitespace-nowrap text-[4.9vw] font-normal leading-[0.98] tracking-[-0.07em]">Your product works.<br />Nobody remembers it.</h2>
-          <p className="mt-[3.3vw] max-w-[33.2vw] text-[1.1vw] font-normal leading-[1.62] text-[#3d3d3d]">
-            {/* Marta's advisor, 10 Nov 23:36: the payoff for a buyer first, the poetic line after it as personality */}
-            We design the moments your users remember. We see design in the strangest places. In the way you notice, choose, remember or connect things. We turned some of those little moments into games. Play first. Talk later.
-          </p>
+          {/* Marta's reworked home (her Desktop.jpg, 11 Nov): heading 150/141, intro 22/34 black 69%. */}
+          <h2 className="relative z-20 mt-[1.9vw] -ml-[0.5vw] whitespace-nowrap text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.07em]">{HEADING_LINES[0]}<br />{HEADING_LINES[1]}</h2>
+          <p className="mt-[2.9vw] max-w-[33.5vw] text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.02em] text-black/70">{INTRO}</p>
           {/* The description always takes exactly 2 lines, so the progress line and buttons never move. */}
-          <div key={active} className="mm-slide-in mt-[3.6vw]">
-            <p className="text-[1.1vw] font-normal uppercase text-[#7a7a7a]">{entry.label}</p>
-            <p className="mt-[1vw] h-[calc(1.1vw*1.62*2)] max-w-[37vw] overflow-hidden text-[1.1vw] font-normal leading-[1.62] text-[#3d3d3d] line-clamp-2"><EntryText text={entry.text} /></p>
+          <div key={active} className="mm-slide-in mt-[3.2vw]">
+            <p className="text-[1.146vw] font-normal uppercase tracking-[-0.01em] text-black/50">{entry.label}</p>
+            <p className="mt-[0.9vw] h-[3.54vw] max-w-[37vw] overflow-hidden text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.02em] text-black/70 line-clamp-2" style={entry.textW ? { maxWidth: entry.textW } : undefined}><EntryText text={entry.text} /></p>
           </div>
-          <div className="relative mt-[1.6vw] flex w-[32.2vw]" role="tablist" aria-label="The founder's challenge">
-            {ENTRIES.map((e, i) => (
-              <button
-                key={e.id}
-                type="button"
-                role="tab"
-                aria-selected={i === active}
-                aria-label={e.label}
-                onClick={() => setActive(i)}
-                onMouseEnter={() => setHoverSeg(i)}
-                onMouseLeave={() => setHoverSeg(null)}
-                className="group flex h-[1.4vw] flex-1 items-center"
-              >
+          {/* her Desktop.jpg (11 Nov): two lines, back (grey, arrow left) and next (light pink, arrow right);
+              the next line fills with pink over the entry's reading time, so it shows when the slider moves on */}
+          <div className="relative mt-[0.7vw] flex w-[26.7vw] gap-[1.3vw]">
+            <button
+              type="button"
+              aria-label="Previous game"
+              onClick={() => setActive((i) => (i - 1 + ENTRIES.length) % ENTRIES.length)}
+              className="group relative flex h-[1.4vw] flex-1 items-center"
+            >
+              <span className="block h-[2px] w-full bg-black/10 transition-colors duration-300 group-hover:bg-black/35" />
+              <span className="absolute left-0 top-1/2 h-0 w-0 -translate-y-1/2 border-y-[0.22vw] border-r-[0.42vw] border-y-transparent border-r-black/15 transition-colors duration-300 group-hover:border-r-black/40" />
+            </button>
+            <button
+              type="button"
+              aria-label="Next game"
+              onClick={() => setActive((i) => (i + 1) % ENTRIES.length)}
+              className="group relative flex h-[1.4vw] flex-1 items-center"
+            >
+              <span className="relative block h-[2px] w-full overflow-hidden bg-[#f9c4e8]">
                 <span
-                  className={`block h-[2px] w-full transition-colors duration-300 ${
-                    i === active ? "bg-[#e3009c]" : hoverSeg === i ? "bg-black/35" : "bg-black/10"
-                  }`}
+                  key={active}
+                  className="absolute inset-y-0 left-0 bg-[#e3009c]"
+                  style={reduced ? { width: `${((active + 1) / ENTRIES.length) * 100}%` } : { animation: `mm-entry-timer ${autoplayMs(entry)}ms linear forwards`, animationPlayState: paused ? "paused" : "running" }}
                 />
-              </button>
-            ))}
+              </span>
+              <span className="absolute right-0 top-1/2 h-0 w-0 -translate-y-1/2 border-y-[0.22vw] border-l-[0.42vw] border-y-transparent border-l-[#f48fcf] transition-colors duration-300 group-hover:border-l-[#e3009c]" />
+            </button>
           </div>
           <div className="mt-[1.6vw]">
             <Ctas entry={entry} onPlay={onPlay} />
@@ -496,7 +503,7 @@ export default function FoundersChallenge() {
             );
           })}
           {/* the soft left edge: the blurred previous entry is cut at about 56.5vw of the page, as in her frames */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[15%] bg-[linear-gradient(to_right,#fff_0%,#fff_74%,rgba(255,255,255,0)_100%)]" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[10%] bg-[linear-gradient(to_right,#fff_0%,#fff_74%,rgba(255,255,255,0)_100%)]" />
         </div>
       </div>
 
@@ -505,11 +512,9 @@ export default function FoundersChallenge() {
           than plain Inter (Marta, 2 Nov: wider letter spacing and other weights on the site), and every text
           box is her width, so each paragraph breaks into the same lines as hers. */}
       <div className="mm-phone-w px-[calc(var(--q)*20)] pt-[calc(var(--q)*42)] pb-[calc(var(--q)*60)] lg:hidden">
-        <p className="text-[length:calc(var(--q)*12.5)] font-normal leading-[calc(var(--q)*16)] tracking-[-0.02em] text-[#555]">The founder’s challenge</p>
-        <h2 className="-ml-[calc(var(--q)*2)] mt-[calc(var(--q)*15)] whitespace-nowrap text-[length:calc(var(--q)*52)] font-normal leading-[calc(var(--q)*52)] tracking-[-0.07em]">Your product<br />works. Nobody<br />remembers it.</h2>
-        <p className="mt-[calc(var(--q)*28.5)] w-[calc(var(--q)*302)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-[#666]">
-          We design the moments your users remember. We see design in the strangest places. In the way you notice, choose, remember or connect things. We turned some of those little moments into games. Play first. Talk later.
-        </p>
+        {/* the computer's copy, at her phone heading size (62/65) */}
+        <h2 className="-ml-[calc(var(--q)*2)] whitespace-nowrap text-[length:calc(var(--q)*62)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.07em]">{HEADING_LINES[0]}<br />{HEADING_LINES[1]}</h2>
+        <p className="mt-[calc(var(--q)*24)] w-[calc(var(--q)*302)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-[#666]">{INTRO}</p>
         {ENTRIES.map((e, i) => (
           <div key={e.id} className={i === 0 ? "mt-[calc(var(--q)*41)]" : "mt-[calc(var(--q)*57)]"}>
             <p className="text-[length:calc(var(--q)*13)] font-normal uppercase leading-[calc(var(--q)*18)] tracking-[-0.01em] text-[#707070]">{e.label}</p>

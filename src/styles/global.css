@@ -181,7 +181,34 @@ body {
 	to { stroke-dashoffset: 0; }
 }
 
+/* Marta's cable in What is (11 Nov 17:51, "a light animation for the cord"): it floats a few px, slowly,
+   always; where the browser can tie an animation to scrolling, it also draws itself in from the left as the
+   block comes into view. Small enough that its joint stays behind the button. */
+.mm-wire-float {
+	animation: mm-wire-float 9s ease-in-out infinite;
+	will-change: transform;
+}
+@keyframes mm-wire-float {
+	0%, 100% { transform: translate(0, 0) rotate(0deg); }
+	50% { transform: translate(6px, -5px) rotate(0.35deg); }
+}
+@supports (animation-timeline: view()) {
+	.mm-wire-draw {
+		animation: mm-wire-draw linear both;
+		animation-timeline: view();
+		animation-range: entry 5% cover 40%;
+	}
+}
+@keyframes mm-wire-draw {
+	from { clip-path: inset(0 100% 0 0); }
+	to { clip-path: inset(0 0 0 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+	.mm-wire-float,
+	.mm-wire-draw {
+		animation: none;
+	}
 	.mm-fly,
 	.mm-spark {
 		animation: none;

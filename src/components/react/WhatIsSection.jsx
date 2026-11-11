@@ -75,22 +75,14 @@ export default function WhatIsSection() {
       {/* Computer */}
       <div className="relative hidden h-[56.25vw] sm:block">
         <PinkM style={{ left: "-2.08vw", top: "-2.08vw", width: "62.24vw", height: "57.29vw" }} />
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-          {/* the cable on the left: her loops, turned upside down and a little round, cut where it goes behind the button */}
-          <img
-            src="/assets/wire.webp"
-            alt=""
-            className="absolute max-w-none mix-blend-multiply"
-            style={{ left: "-6.82vw", top: "8.96vw", width: "75vw", clipPath: "inset(0 6% 0 0)", transform: "translate(0.36vw, 3.05vw) rotate(7deg) scaleY(-1)" }}
-          />
-          {/* the cable on the right: over the crest and down to the corner, its loop at the bottom */}
-          <img
-            src="/assets/wire.webp"
-            alt=""
-            className="absolute max-w-none mix-blend-multiply"
-            style={{ left: "0.42vw", top: "17.24vw", width: "100vw", clipPath: "inset(0 0 0 52.4%)" }}
-          />
-        </div>
+        {/* Her cable layer (Line.png, 11 Nov 17:44): the whole 1920x1080 frame at 2x, cable and its grey slabs on
+            transparent, so it lies over the frame exactly as in her design */}
+        <img
+          src="/assets/what-is-line.webp"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 top-0 h-[56.25vw] w-[100vw] max-w-none"
+        />
 
         <div className="absolute left-[52.7vw] top-[7.81vw] z-10">
           <Heading className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
@@ -110,10 +102,10 @@ export default function WhatIsSection() {
           className="left-[calc(var(--q)*-24)] top-[calc(var(--q)*441)] h-[calc(var(--q)*455)] w-[calc(var(--q)*380)]"
         />
         <img
-          src="/assets/wire.webp"
+          src="/assets/what-is-line.webp"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute max-w-none mix-blend-multiply [transform:scaleY(-1)] left-[calc(var(--q)*-150)] top-[calc(var(--q)*520)] w-[calc(var(--q)*620)]"
+          className="pointer-events-none absolute max-w-none left-[calc(var(--q)*-40)] top-[calc(var(--q)*430)] w-[calc(var(--q)*820)]"
         />
         <Heading className="absolute left-[calc(var(--q)*18)] top-[calc(var(--q)*47)] z-10 text-[length:calc(var(--q)*56)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
         <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] z-10 w-[calc(var(--q)*252)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-black/70">

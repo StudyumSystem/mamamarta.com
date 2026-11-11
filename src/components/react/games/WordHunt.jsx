@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import GameModal, { Completion } from "./GameModal.jsx";
-import { pad2, shuffle, takeQuote } from "./shared.js";
+import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
+import { pad2, shuffle, takeQuote, recordStars, ROUND_STARS } from "./shared.js";
+import { play } from "./sound.js";
 
 // MM-GAME-01 Word Hunt (Marta's spec): 10x10 grid, 10 of the 20 pool words per round,
 // placed across or down; swipe a row or column in either direction. No timer, counter 0/10.
@@ -12,7 +13,8 @@ const POOL = [
 ];
 const LETTERS = "ABCDEFGHIJKLMNOPRSTUVWY";
 const INSTRUCTIONS =
-  "Find the hidden art-inspired words.  Swipe across letters horizontally or vertically.  Find them all to complete the game."; // double spaces as in MM-G01-01
+  "Find the 10 hidden art-inspired words. Swipe across letters horizontally or vertically. Find them all to complete the game."; // MM-G01-03 (11 Nov)
+const WORD_STARS = 10; // her MM-G01-03: one word found = "10 MM✦"
 
 // Every row and column read both ways, to count how often a word can be found.
 function lines(grid) {
@@ -85,6 +87,7 @@ export default function WordHunt({ open, onClose }) {
   const [sel, setSel] = useState([]);
   const [pop, setPop] = useState(null);
   const [quote, setQuote] = useState(null);
+  const [phase, setPhase] = useState("play"); // play | score | done
   const drag = useRef(null);
   const selRef = useRef([]);
   const gridRef = useRef(null);
@@ -100,6 +103,7 @@ export default function WordHunt({ open, onClose }) {
     setSel([]);
     setPop(null);
     setQuote(null);
+    setPhase("play");
   }, []);
 
   // Closing or reopening always starts a fresh grid at 0/10.
@@ -142,13 +146,19 @@ export default function WordHunt({ open, onClose }) {
     const back = [...word].reverse().join("");
     const hit = round.placed.find((p) => !found.includes(p.word) && sel.length === p.word.length && (p.word === word || p.word === back));
     setSel([]); // a wrong selection simply fades back (colour transition on the cells)
-    if (!hit) return;
+    if (!hit) { if (sel.length > 1) play("back"); return; }
     const next = [...found, hit.word];
     setFound(next);
     setPop(hit.word);
     later(() => setPop(null), 450);
-    if (next.length === COUNT) later(() => setQuote(takeQuote("word-hunt")), 1300);
+    if (next.length === COUNT) {
+      play("win");
+      recordStars("word-hunt", ROUND_STARS);
+      later(() => setPhase("score"), 1100);
+    } else play("flip");
   };
+
+  const toQuote = useCallback(() => { setQuote(takeQuote("word-hunt")); setPhase("done"); }, []);
 
   const foundCells = new Set();
   const popCells = new Set();
@@ -158,12 +168,25 @@ export default function WordHunt({ open, onClose }) {
   });
   const selCells = new Set(sel);
 
-  const counter = quote ? null : found.length === 0 ? `0 / ${COUNT}` : `${pad2(found.length)} / ${COUNT}`;
+  const ended = phase !== "play";
+  const counter = ended ? null : found.length === 0 ? `0 / ${COUNT}` : `${pad2(found.length)} / ${COUNT}`;
 
   return (
-    <GameModal open={open} onClose={onClose} label="Word Hunt" instructions={quote ? null : INSTRUCTIONS} counter={counter} phoneCounter="mt-[94px]">
-      {quote ? (
+    <GameModal
+      open={open}
+      onClose={onClose}
+      label="Word Hunt"
+      game
+      instructions={ended ? null : INSTRUCTIONS}
+      counter={counter}
+      stars={ended ? null : found.length * WORD_STARS}
+      hud={!ended}
+      confirm={ended ? "completed" : found.length ? "game" : null}
+    >
+      {phase === "done" && quote ? (
         <Completion quote={quote} onPlayAgain={reset} />
+      ) : phase === "score" ? (
+        <ScoreScreen badge="Perfect find" label="All words discovered" value={`${COUNT} / ${COUNT}`} stars={ROUND_STARS} onDone={toQuote} />
       ) : (
         <div className="flex flex-1 items-start justify-center px-[15px] pt-[19px] pb-8 lg:pb-[2.4vw] lg:pt-[2.9vw]">
           <div
@@ -174,7 +197,7 @@ export default function WordHunt({ open, onClose }) {
             onPointerCancel={onUp}
             role="grid"
             aria-label={`Word Hunt letter grid, ${found.length} of ${COUNT} words found${found.length ? `: ${found.join(", ")}` : ""}`}
-            className="grid w-full max-w-[640px] select-none grid-cols-10 gap-px border border-[#dedede] bg-[#dedede] [container-type:inline-size] [touch-action:none] lg:w-[min(38.5vw,calc(100vh_-_200px))] lg:max-w-none"
+            className="grid w-full max-w-[640px] select-none grid-cols-10 gap-px border border-[#d4d4d4] bg-[#d4d4d4] [container-type:inline-size] [touch-action:none] lg:w-[min(38.5vw,calc(100vh_-_200px))] lg:max-w-none"
           >
             {round?.grid.map((ch, i) => {
               const on = selCells.has(i) || foundCells.has(i);
@@ -182,8 +205,8 @@ export default function WordHunt({ open, onClose }) {
                 <span
                   key={i}
                   role="gridcell"
-                  className={`flex aspect-square items-center justify-center text-[7.2cqw] lg:text-[6.2cqw] font-normal leading-none transition-colors duration-300 motion-reduce:transition-none ${
-                    on ? "bg-[#fdf0f8] text-[#e3009c]" : "bg-white text-black"
+                  className={`flex aspect-square items-center justify-center text-[7.2cqw] lg:text-[6.7cqw] font-normal leading-none transition-colors duration-300 motion-reduce:transition-none ${
+                    on ? "bg-[#fef7fc] text-[#F600A9]" : "bg-white text-black"
                   } ${popCells.has(i) ? "mm-match" : ""}`}
                 >
                   {ch}

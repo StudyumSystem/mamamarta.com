@@ -1,30 +1,68 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import GameModal, { Completion } from "./GameModal.jsx";
-import { pad2, shuffle, takeQuote } from "./shared.js";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
+import { pad2, shuffle, takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
+import { play } from "./sound.js";
 
-// MM-GAME-02 Memory Match (Marta's spec): 20 cards, 10 pairs, no timer, counter 0/10,
-// mismatch flips back after ~900 ms, max two cards up, quote rotation on completion.
+// MM-GAME-02 Memory Match (Marta's spec + her 11 Nov frames MM-G02-01…06): 20 cards, 10 pairs, no timer,
+// counter 0/10, 10 MM✦ a pair, mismatch flips back after ~900 ms, max two cards up.
+// All pairs found: the cards fly apart and a pink firework opens (skipped with reduced motion),
+// then the score screen (timer line), then the quote screen.
 const IMAGES = [
   ["1", "Chess queen"], ["2", "Ice cream"], ["3", "Balloon dog"], ["4", "Heart"], ["5", "Lipstick"],
   ["6", "Lollipop"], ["7", "Asterisk-shaped object"], ["8", "Cherries"], ["9", "Dice"], ["10", "Knotted bag"],
 ];
 const CARD_BACK = "/assets/games/card-back.png";
 const cardSrc = (n) => `/assets/games/cards/${n}.png`;
+const PAIR_STARS = 10;
 
 const INSTRUCTIONS =
-  "Find the matching pairs.  Flip two cards at a time and remember what you see.  Match all 10 pairs to complete the game."; // double spaces as in MM-G02-01
+  "Find the matching pairs. Flip two cards at a time and remember what you see. Match all 10 pairs to complete the game."; // MM-G02-01 (11 Nov)
 
 const newDeck = () => shuffle(IMAGES.flatMap(([n, alt]) => [{ n, alt }, { n, alt }])).map((c, i) => ({ ...c, key: `${c.n}-${i}` }));
+
+// A pink firework: two rings of sparks from the middle of the board.
+function Firework() {
+  const sparks = useMemo(() => {
+    const out = [];
+    const colors = ["#F600A9", "#F600A9", "#ff4fc4", "#ffa3dd", "#c4007f"];
+    [0, 260].forEach((delay, ring) => {
+      const n = ring ? 18 : 26;
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2 + Math.random() * 0.2;
+        const r = (ring ? 0.55 : 1) * (150 + Math.random() * 120);
+        out.push({
+          dx: `${Math.cos(a) * r}px`,
+          dy: `${Math.sin(a) * r}px`,
+          s: `${(ring ? 6 : 8) + Math.random() * 6}px`,
+          c: colors[Math.floor(Math.random() * colors.length)],
+          delay: `${delay + Math.random() * 90}ms`,
+        });
+      }
+    });
+    return out;
+  }, []);
+  return (
+    <span className="pointer-events-none absolute left-1/2 top-1/2 z-10 block h-0 w-0" aria-hidden="true">
+      {sparks.map((p, i) => (
+        <span key={i} className="mm-spark" style={{ "--dx": p.dx, "--dy": p.dy, "--s": p.s, "--c": p.c, "--delay": p.delay }} />
+      ))}
+    </span>
+  );
+}
 
 export default function MemoryMatch({ open, onClose }) {
   const [deck, setDeck] = useState(newDeck);
   const [up, setUp] = useState([]); // indices currently face up (unmatched)
   const [matched, setMatched] = useState(() => new Set());
   const [pulse, setPulse] = useState(null);
+  const [phase, setPhase] = useState("play"); // play | burst | score | done
+  const [fly, setFly] = useState(null); // per-card flight vectors during the burst
   const [quote, setQuote] = useState(null);
-  const [showAll, setShowAll] = useState(false);
+  const [moved, setMoved] = useState(false);
   const lock = useRef(false);
   const timers = useRef([]);
+  const gridRef = useRef(null);
+  const cardRefs = useRef([]);
 
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
   const clearTimers = () => { timers.current.forEach(clearTimeout); timers.current = []; };
@@ -35,8 +73,10 @@ export default function MemoryMatch({ open, onClose }) {
     setDeck(newDeck());
     setUp([]);
     setMatched(new Set());
+    setPhase("play");
+    setFly(null);
     setQuote(null);
-    setShowAll(false);
+    setMoved(false);
   }, []);
 
   // Closing or reopening always starts a fresh round at 0/10.
@@ -44,8 +84,36 @@ export default function MemoryMatch({ open, onClose }) {
 
   const pairs = matched.size / 2;
 
+  // Every card flies outward from the middle of the board, a little turned.
+  const burst = () => {
+    const g = gridRef.current?.getBoundingClientRect();
+    if (!g) return;
+    const cx = g.left + g.width / 2, cy = g.top + g.height / 2;
+    const far = Math.max(window.innerWidth, window.innerHeight) * 0.75;
+    setFly(cardRefs.current.map((el) => {
+      const r = el?.getBoundingClientRect();
+      if (!r) return null;
+      let dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      dx /= len; dy /= len;
+      const d = far * (0.8 + Math.random() * 0.4);
+      return { dx: `${dx * d}px`, dy: `${dy * d}px`, rot: `${(Math.random() - 0.5) * 140}deg`, delay: `${Math.random() * 120}ms` };
+    }));
+  };
+
+  const finish = () => {
+    lock.current = true;
+    play("win");
+    recordStars("memory-match", ROUND_STARS);
+    if (prefersReducedMotion()) { later(() => setPhase("score"), 500); return; }
+    later(() => { setPhase("burst"); burst(); }, 450);
+    later(() => setPhase("score"), 450 + 1450);
+  };
+
   const flip = (i) => {
-    if (lock.current || quote || matched.has(i) || up.includes(i)) return;
+    if (lock.current || phase !== "play" || matched.has(i) || up.includes(i)) return;
+    play("flip");
+    setMoved(true);
     const next = [...up, i];
     if (next.length < 2) { setUp(next); return; }
     const [a, b] = next;
@@ -55,43 +123,57 @@ export default function MemoryMatch({ open, onClose }) {
       setUp([]);
       setPulse(deck[a].n);
       later(() => setPulse(null), 450);
-      if (m.size === deck.length) {
-        lock.current = true;
-        setShowAll(true);
-        later(() => setQuote(takeQuote("memory-match")), 1100);
-      }
+      if (m.size === deck.length) finish();
     } else {
       setUp(next);
       lock.current = true;
-      later(() => { setUp([]); lock.current = false; }, 900);
+      later(() => { setUp([]); lock.current = false; play("back"); }, 900);
     }
   };
 
-  const counter = quote ? null : pairs === 0 ? "0 / 10" : `${pad2(pairs)} / 10`;
+  const toQuote = useCallback(() => { setQuote(takeQuote("memory-match")); setPhase("done"); }, []);
+
+  const counter = pairs === 0 ? "0 / 10" : `${pad2(pairs)} / 10`;
+  const ended = phase === "score" || phase === "done";
 
   return (
-    <GameModal open={open} onClose={onClose} label="Memory Match" instructions={quote ? null : INSTRUCTIONS} counter={counter} phoneCounter={false}>
-      {quote ? (
+    <GameModal
+      open={open}
+      onClose={onClose}
+      label="Memory Match"
+      game
+      instructions={ended ? null : INSTRUCTIONS}
+      counter={ended ? null : counter}
+      stars={ended ? null : pairs * PAIR_STARS}
+      hud={!ended}
+      confirm={ended ? "completed" : moved && phase === "play" ? "game" : null}
+    >
+      {phase === "done" && quote ? (
         <Completion quote={quote} onPlayAgain={reset} />
+      ) : phase === "score" ? (
+        <ScoreScreen badge="Perfect find" label="All pairs found" value="10 / 10" stars={ROUND_STARS} onDone={toQuote} />
       ) : (
-        <div className={`flex flex-1 items-start justify-center px-[15px] pb-8 pt-[56px] lg:pb-[3vw] lg:pt-[3.96vw] transition-opacity duration-500 ${showAll ? "opacity-90" : ""}`}>
-          <div className="grid w-full max-w-[640px] grid-cols-4 gap-[6px] lg:w-[36vw] lg:max-w-none lg:grid-cols-5 lg:gap-x-[0.9vw] lg:gap-y-[1.15vw]">
+        <div className="flex flex-1 items-start justify-center overflow-hidden px-[15px] pb-8 pt-[18px] lg:pb-[3vw] lg:pt-[3.96vw]">
+          <div ref={gridRef} className="relative grid w-full max-w-[640px] grid-cols-4 gap-[6px] lg:w-[36vw] lg:max-w-none lg:grid-cols-5 lg:gap-x-[0.85vw] lg:gap-y-[1.1vw]">
             {deck.map((card, i) => {
-              const faceUp = showAll || matched.has(i) || up.includes(i);
+              const faceUp = phase !== "play" || matched.has(i) || up.includes(i);
+              const f = phase === "burst" && fly?.[i];
               return (
                 <button
                   key={card.key}
+                  ref={(el) => { cardRefs.current[i] = el; }}
                   type="button"
                   onClick={() => flip(i)}
                   aria-label={faceUp ? card.alt : "Hidden card"}
-                  className={`relative aspect-[130/165] w-full [perspective:900px] focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 ${pulse === card.n && matched.has(i) ? "mm-match" : ""}`}
+                  className={`relative aspect-[125/160] w-full [perspective:900px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F600A9] ${pulse === card.n && matched.has(i) ? "mm-match" : ""} ${f ? "mm-fly" : ""}`}
+                  style={f ? { "--dx": f.dx, "--dy": f.dy, "--rot": f.rot, animationDelay: f.delay } : undefined}
                 >
                   <span
                     className="absolute inset-0 block transition-transform duration-300 ease-out [transform-style:preserve-3d] motion-reduce:transition-none"
                     style={{ transform: faceUp ? "rotateY(180deg)" : "none" }}
                   >
                     <span
-                      className="absolute inset-0 block overflow-hidden rounded-[10px] bg-pink-400 bg-cover bg-center [backface-visibility:hidden]"
+                      className="absolute inset-0 block overflow-hidden rounded-[10px] bg-[#F600A9] bg-cover bg-center [backface-visibility:hidden]"
                       style={{ backgroundImage: `url(${CARD_BACK})` }}
                     />
                     {/* Marta's card fronts already include the white face and the thin rounded frame */}
@@ -102,6 +184,7 @@ export default function MemoryMatch({ open, onClose }) {
                 </button>
               );
             })}
+            {phase === "burst" && <Firework />}
           </div>
         </div>
       )}

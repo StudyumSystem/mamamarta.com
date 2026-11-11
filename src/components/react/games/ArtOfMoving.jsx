@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import GameModal, { Completion } from "./GameModal.jsx";
-import { takeQuote } from "./shared.js";
+import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
+import { takeQuote, recordStars, ROUND_STARS } from "./shared.js";
+import { play as sound } from "./sound.js";
 
 // MM-GAME-04 The Art of Moving (Marta's spec + frames MM-G04-01…05): endless runner.
 // Default → Start → countdown 3, 2, 1, GO → automatic run, one input = one fixed jump → one fall ends the run
-// → Result (~2.5 s, personal best in localStorage) → Completion with the quote rotation.
+// → score screen (coins, personal best in localStorage, MM✦STARS, timer line) → Completion with the quote rotation.
 // Her walking figure is the site's walk video, laid over the white frame with multiply so its white background disappears.
 // Jump = the current frame held on the arc; fall = a short drop and fade (Marta's OK, 28 Oct 12:42).
 // 10 Nov (Marta): the figure walks to the right (both videos mirrored), and a jump shows her leap video's
@@ -13,8 +14,11 @@ import { takeQuote } from "./shared.js";
 // and its thin edge lines are cut off.
 
 const INSTRUCTIONS = "Keep moving. Jump between platforms and collect pink coins. One fall ends the run.";
-const PINK = "#e3009c";
+const PINK = "#F600A9";
 const BEST_KEY = "mm-art-of-moving-best";
+// 11 Nov (her MM-G04-04 Desktop_Score: 23 coins, 150 MM✦STARS): 10 MM✦ a coin, at most 150 a run (question for Marta).
+const COIN_STARS = 10;
+const runStars = (n) => Math.min(ROUND_STARS, n * COIN_STARS);
 
 // World in Figma units: the desktop frame is 660 x 755 (MM-G04-03 at 2000 px wide).
 const H0 = 755;
@@ -107,13 +111,6 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-const TrophyIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-    <path d="M8 4h8v5a4 4 0 0 1-8 0z" /><path d="M8 6H5a3 3 0 0 0 3 4" /><path d="M16 6h3a3 3 0 0 1-3 4" />
-    <path d="M12 13v4" /><path d="M8.5 20h7" /><path d="M10 17h4v3h-4z" />
-  </svg>
-);
-
 const coinLabel = (n) => `${n} ${n > 1 ? "coins" : "coin"}`; // Figma: "0 coin", "3 coins"
 
 export default function ArtOfMoving({ open, onClose }) {
@@ -161,9 +158,12 @@ export default function ArtOfMoving({ open, onClose }) {
     const isBest = n > best;
     if (isBest) writeBest(n);
     setResult({ coins: n, isBest });
-    setPhase("result");
-    later(() => { setQuote(takeQuote("art-of-moving")); setPhase("done"); }, 2500);
+    recordStars("art-of-moving", runStars(n));
+    sound("win");
+    setPhase("score");
   }, []);
+
+  const toQuote = useCallback(() => { setQuote(takeQuote("art-of-moving")); setPhase("done"); }, []);
 
   // The run itself: one requestAnimationFrame loop per Start.
   useEffect(() => {
@@ -258,6 +258,7 @@ export default function ArtOfMoving({ open, onClose }) {
             c.taken = g.clock;
             g.coinsTaken += 1;
             setCoins(g.coinsTaken);
+            sound("flip");
           }
         }
         const camX = p.x - g.anchor * viewW;
@@ -367,23 +368,36 @@ export default function ArtOfMoving({ open, onClose }) {
   };
 
   const running = phase === "countdown" || phase === "play";
+  const ended = phase === "score" || phase === "done";
   const counter = running ? coinLabel(coins) : null;
 
   return (
-    <GameModal open={open} onClose={onClose} label="The Art of Moving" instructions={quote ? null : INSTRUCTIONS} counter={counter}>
-      {quote ? (
+    <GameModal
+      open={open}
+      onClose={onClose}
+      label="The Art of Moving"
+      game
+      instructions={ended ? null : INSTRUCTIONS}
+      counter={counter}
+      stars={ended ? null : runStars(coins)}
+      hud={!ended}
+      confirm={ended ? "completed" : running ? "game" : null}
+    >
+      {phase === "done" && quote ? (
         <Completion quote={quote} onPlayAgain={reset} />
+      ) : phase === "score" && result ? (
+        <ScoreScreen badge={result.isBest ? "New personal best" : null} label="Coins" value={String(result.coins)} stars={runStars(result.coins)} onDone={toQuote} />
       ) : (
         <div
           onPointerDown={onAreaDown}
-          className="flex flex-1 select-none items-start justify-center px-[19px] pt-[52px] lg:items-start lg:px-0 lg:pb-[2.4vw] lg:pt-[4.95vw] [touch-action:manipulation]"
+          className="flex flex-1 select-none items-start justify-center px-[19px] pt-[16px] lg:items-start lg:px-0 lg:pb-[2.4vw] lg:pt-[4.95vw] [touch-action:manipulation]"
           style={running ? { touchAction: "none" } : undefined}
         >
           <div
             ref={frameRef}
             className="relative isolate w-full aspect-[311/584] overflow-hidden rounded-[30px] border border-black bg-white lg:min-h-0 lg:w-auto lg:rounded-[2vw] lg:h-[min(37.75vw,calc(100vh_-_260px))] lg:aspect-[660/755]"
           >
-            <canvas ref={canvasRef} className={`absolute inset-0 h-full w-full ${running || phase === "result" ? "" : "invisible"}`} aria-hidden="true" />
+            <canvas ref={canvasRef} className={`absolute inset-0 h-full w-full ${running ? "" : "invisible"}`} aria-hidden="true" />
             <video
               ref={videoRef}
               src="/assets/human-walking.mp4"
@@ -418,9 +432,8 @@ export default function ArtOfMoving({ open, onClose }) {
             {phase === "default" && (
               <div className="mm-fade-in absolute inset-0 flex flex-col items-center justify-center px-6 pt-[18%] text-center">
                 <p className="text-[17px] leading-[1.45] lg:leading-[1.5] lg:text-[clamp(15px,1.07vw,21px)] font-normal text-black/70">
-                  Find your rhythm.
-                  <br />
-                  {touch ? "Tap anywhere to jump." : "Press Space to jump."}
+                  {/* her MM-G04-01 (11 Nov): "Press Space to jump. Ready?" */}
+                  {touch ? "Tap anywhere to jump. Ready?" : "Press Space to jump. Ready?"}
                 </p>
                 <button
                   type="button"
@@ -432,18 +445,6 @@ export default function ArtOfMoving({ open, onClose }) {
               </div>
             )}
 
-            {phase === "result" && result && (
-              <div className="mm-fade-in absolute inset-0 flex flex-col items-center justify-center bg-white text-center" role="status">
-                <p className="text-[18px] lg:text-[clamp(16px,1.15vw,22px)] font-light uppercase text-black/80">Your run</p>
-                <p className="mt-3 text-[72px] leading-none lg:mt-[clamp(14px,1.6vw,30px)] lg:text-[clamp(60px,4.7vw,90px)] font-normal text-black">{result.coins}</p>
-                <p className="mt-3 text-[14px] lg:mt-[clamp(10px,1vw,18px)] lg:text-[clamp(13px,0.85vw,16px)] font-light uppercase text-black/80">Coins</p>
-                {result.isBest && (
-                  <p className="mt-6 inline-flex items-center gap-2 text-[15px] lg:mt-[clamp(18px,1.6vw,30px)] lg:text-[clamp(14px,0.95vw,18px)] font-light text-black/70">
-                    <TrophyIcon /> New personal best
-                  </p>
-                )}
-              </div>
-            )}
           </div>
         </div>
       )}

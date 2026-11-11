@@ -71,3 +71,38 @@ export const prefersReducedMotion = () =>
 
 // Two-digit counter style used in the Figma frames ("01 / 10").
 export const pad2 = (n) => String(n).padStart(2, "0");
+
+// MM✦STARS (her 11 Nov frames): "Play all 5 games to earn MM✦STARS. Save them with your email and unlock a design discount."
+// A round is worth at most 150 (every score frame shows 150). Each game keeps its best round, so the total
+// grows by playing all five, not by replaying one. Kept on this device until saved with an email.
+export const ROUND_STARS = 150;
+const STARS_KEY = "mm-stars";
+const SAVED_KEY = "mm-stars-saved";
+const read = (key, fallback) => {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+};
+const write = (key, value) => {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode: lasts this visit */ }
+};
+
+export function recordStars(gameId, n) {
+  const all = read(STARS_KEY, {});
+  if (!(all[gameId] >= n)) all[gameId] = n;
+  write(STARS_KEY, all);
+  return totalStars();
+}
+export function totalStars() {
+  return Object.values(read(STARS_KEY, {})).reduce((a, b) => a + (Number(b) || 0), 0);
+}
+export function savedStars() {
+  return read(SAVED_KEY, null);
+}
+export function markStarsSaved(email, total) {
+  write(SAVED_KEY, { email, total });
+}
+// Stars that would be lost on leaving: some earned and not yet saved (or more than last saved).
+export function unsavedStars() {
+  const total = totalStars();
+  const saved = savedStars();
+  return total > 0 && (!saved || total > saved.total);
+}

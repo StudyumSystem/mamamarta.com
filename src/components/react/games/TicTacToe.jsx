@@ -1,6 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import GameModal, { Completion } from "./GameModal.jsx";
-import { takeQuote } from "./shared.js";
+import GameModal, { Completion, ScoreScreen, PINK } from "./GameModal.jsx";
+import { takeQuote, recordStars, ROUND_STARS } from "./shared.js";
+import { play as sound } from "./sound.js";
+
+// 11 Nov (her MM-G03-02 / -04 frames): grey #969696 lines on the light grey panel, a played square turns white,
+// a three-in-a-row gets a thin pink line across it; the round ends on the score screen ("Well played",
+// "Round completed", "YOU WON"). Her frames only show the win: the loss and draw wording and Stars are
+// placeholders until Marta answers (questions in the progress log, 11 Nov part 2).
+const RESULT = {
+  X: { value: "YOU WON", stars: ROUND_STARS },
+  O: { value: "APPLE WON", stars: 50 },
+  draw: { value: "DRAW", stars: 100 },
+};
 
 // MM-GAME-03 Tic-Tac-Toe (Marta's spec): player is the fur X and always starts, the computer is the black Apple.
 // Balanced opponent: takes a win, usually blocks, sometimes plays loosely. Same completion screen for win, loss and draw.
@@ -55,11 +66,23 @@ const Symbol = ({ who }) => (
   />
 );
 
+// The pink line across a three-in-a-row, in board units (each square 1 x 1), a little past the outer centres.
+function lineEnds(line) {
+  const at = (i) => [(i % 3) + 0.5, Math.floor(i / 3) + 0.5];
+  const [a, b] = [at(line[0]), at(line[2])];
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const len = Math.hypot(dx, dy);
+  const k = 0.32 / len;
+  return [a[0] - dx * k, a[1] - dy * k, b[0] + dx * k, b[1] + dy * k];
+}
+
 export default function TicTacToe({ open, onClose }) {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [line, setLine] = useState(null);
   const [quote, setQuote] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState("play"); // play | score | done
+  const [outcome, setOutcome] = useState(null); // X | O | draw
   const timers = useRef([]);
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
   const clearTimers = () => { timers.current.forEach(clearTimeout); timers.current = []; };
@@ -70,41 +93,67 @@ export default function TicTacToe({ open, onClose }) {
     setLine(null);
     setQuote(null);
     setBusy(false);
+    setPhase("play");
+    setOutcome(null);
   }, []);
 
   // Back or close resets an unfinished round; reopening starts with an empty board.
   useEffect(() => { if (open) reset(); return clearTimers; }, [open, reset]);
 
+  const end = (who, ms) => {
+    setBusy(true);
+    setOutcome(who);
+    recordStars("tic-tac-toe", RESULT[who].stars);
+    if (who === "X") sound("win"); else sound("back");
+    later(() => setPhase("score"), ms);
+  };
+
   const finish = (b) => {
     const w = winner(b);
-    if (w) { setLine(w.line); setBusy(true); later(() => setQuote(takeQuote("tic-tac-toe")), 1100); return true; }
-    if (b.every(Boolean)) { setBusy(true); later(() => setQuote(takeQuote("tic-tac-toe")), 700); return true; }
+    if (w) { setLine(w.line); end(w.who, 1300); return true; }
+    if (b.every(Boolean)) { end("draw", 800); return true; }
     return false;
   };
 
   const play = (i) => {
-    if (busy || board[i] || quote) return;
+    if (busy || board[i] || phase !== "play") return;
     const b = board.slice();
     b[i] = "X";
     setBoard(b);
+    sound("flip");
     if (finish(b)) return;
     setBusy(true); // board locked while the computer "thinks"
     later(() => {
       const c = b.slice();
       c[computerMove(c)] = "O";
       setBoard(c);
-      if (!finish(c)) setBusy(false);
+      if (!finish(c)) { setBusy(false); sound("flip"); }
     }, 550 + Math.random() * 300);
   };
 
+  const toQuote = useCallback(() => { setQuote(takeQuote("tic-tac-toe")); setPhase("done"); }, []);
+  const ended = phase !== "play";
+  const ends = line && lineEnds(line);
+
   return (
-    <GameModal open={open} onClose={onClose} label="Tic-Tac-Toe" instructions={quote ? null : INSTRUCTIONS}>
-      {quote ? (
+    <GameModal
+      open={open}
+      onClose={onClose}
+      label="Tic-Tac-Toe"
+      game
+      instructions={ended ? null : INSTRUCTIONS}
+      stars={ended ? null : outcome ? RESULT[outcome].stars : 0}
+      hud={!ended}
+      confirm={ended ? "completed" : board.some(Boolean) && !outcome ? "game" : null}
+    >
+      {phase === "done" && quote ? (
         <Completion quote={quote} onPlayAgain={reset} />
+      ) : phase === "score" ? (
+        <ScoreScreen badge="Well played" label="Round completed" value={RESULT[outcome].value} stars={RESULT[outcome].stars} onDone={toQuote} />
       ) : (
-        <div className="flex flex-1 items-center justify-center px-[15px] py-8 lg:items-start lg:pb-[3vw] lg:pt-[6.5vw]">
-          {/* MM-G03-01: single 1 px grey lines */}
-          <div className="grid w-[92.8%] max-w-[420px] grid-cols-3 gap-px border border-[#9b9b9b] bg-[#9b9b9b] lg:w-[27.4vw] lg:max-w-none" role="grid" aria-label="Tic-Tac-Toe board">
+        <div className="flex flex-1 items-center justify-center px-[15px] py-8 lg:items-start lg:pb-[3vw] lg:pt-[4.6vw]">
+          {/* MM-G03-02 (11 Nov): 175 px squares at 1920, 1 px #969696 lines, played squares white */}
+          <div className="relative grid w-[92.8%] max-w-[420px] grid-cols-3 gap-px border border-[#969696] bg-[#969696] lg:w-[27.4vw] lg:max-w-none" role="grid" aria-label="Tic-Tac-Toe board">
             {board.map((v, i) => (
               <button
                 key={i}
@@ -112,13 +161,22 @@ export default function TicTacToe({ open, onClose }) {
                 onClick={() => play(i)}
                 disabled={!!v || busy}
                 aria-label={v ? (v === "X" ? "X" : "Apple") : `Empty square ${i + 1}`}
-                className={`flex aspect-square items-center justify-center transition-colors duration-300 ${
-                  line?.includes(i) ? "bg-pink-50" : "bg-white"
-                } ${!v && !busy ? "cursor-pointer hover:bg-black/[0.02]" : "cursor-default"}`}
+                className={`flex aspect-square items-center justify-center transition-colors duration-300 ${v ? "bg-white" : "bg-[#F0F0F0]"} ${
+                  !v && !busy ? "cursor-pointer hover:bg-white/60" : "cursor-default"
+                }`}
               >
                 {v && <Symbol who={v} />}
               </button>
             ))}
+            {ends && (
+              <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 3 3" aria-hidden="true">
+                <line
+                  x1={ends[0]} y1={ends[1]} x2={ends[2]} y2={ends[3]}
+                  stroke={PINK} strokeWidth="3" vectorEffect="non-scaling-stroke" strokeLinecap="round"
+                  className="mm-draw-line" pathLength="1"
+                />
+              </svg>
+            )}
           </div>
         </div>
       )}

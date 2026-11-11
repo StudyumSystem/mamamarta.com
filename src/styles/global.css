@@ -142,7 +142,54 @@ body {
 	to { width: 100%; }
 }
 
+/* Memory Match win (11 Nov plan): the cards fly apart and a pink firework opens where they were.
+   Each card / spark gets its own --dx, --dy, --rot from the script. */
+.mm-fly {
+	animation: mm-fly 1000ms cubic-bezier(0.55, 0, 0.85, 0.35) forwards;
+}
+@keyframes mm-fly {
+	0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+	15% { transform: translate(calc(var(--dx) * -0.04), calc(var(--dy) * -0.04)) rotate(0); opacity: 1; }
+	100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+}
+.mm-spark {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: var(--s, 8px);
+	height: var(--s, 8px);
+	margin: calc(var(--s, 8px) / -2) 0 0 calc(var(--s, 8px) / -2);
+	border-radius: 9999px;
+	background: var(--c, #f600a9);
+	opacity: 0;
+	animation: mm-spark 1100ms cubic-bezier(0.15, 0.7, 0.3, 1) var(--delay, 0ms) forwards;
+}
+@keyframes mm-spark {
+	0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+	8% { opacity: 1; }
+	70% { opacity: 1; }
+	100% { transform: translate(var(--dx), calc(var(--dy) + 40px)) scale(0.2); opacity: 0; }
+}
+
+/* Tic-Tac-Toe: the pink line draws itself across the three in a row */
+.mm-draw-line {
+	stroke-dasharray: 1;
+	stroke-dashoffset: 1;
+	animation: mm-draw 450ms ease-out 80ms forwards;
+}
+@keyframes mm-draw {
+	to { stroke-dashoffset: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+	.mm-fly,
+	.mm-spark {
+		animation: none;
+	}
+	.mm-draw-line {
+		animation: none;
+		stroke-dashoffset: 0;
+	}
 	.mm-count,
 	.mm-slide-in {
 		animation: none;

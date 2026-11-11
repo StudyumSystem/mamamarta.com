@@ -55,6 +55,32 @@ const FORM_NAMES = {
   contact: "Contact form",
 };
 
+// "Save my Stars" (games' end screen, 11 Nov): the visitor's email and their MM✦STARS reach Marta's inbox
+// through Web3Forms only, so no auto-reply letter goes out (none is written for Stars yet).
+export async function sendStars(email, total, games) {
+  if (!WEB3FORMS_KEY) {
+    await new Promise((r) => setTimeout(r, 700));
+    return { ok: true, preview: true };
+  }
+  const res = await fetch(ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      access_key: WEB3FORMS_KEY,
+      subject: `MM Stars saved: ${total} — ${email}`,
+      from_name: email,
+      replyto: email,
+      email,
+      stars: String(total),
+      games: games || "",
+      form: "Save my Stars",
+    }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok || !body.success) throw new Error(body.message || `HTTP ${res.status}`);
+  return { ok: true };
+}
+
 // type: "suggest_game" | "custom_brand_experience" | "contact"
 // Resolves only when Web3Forms confirms it took the submission; throws otherwise.
 export async function submitForm(type, data, submissionId) {

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import GameModal, { Completion } from "./GameModal.jsx";
-import { takeQuote } from "./shared.js";
+import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
+import { pad2, takeQuote, recordStars, ROUND_STARS } from "./shared.js";
+import { play } from "./sound.js";
 
 // MM-GAME-05 Connect the Path (Marta's spec): 15 dots on an invisible grid, one pink start.
 // Each round is a random self-avoiding path of 15 cells (so it always has a solution); only the dots are shown.
@@ -9,7 +10,12 @@ const DOTS = 15;
 const BOARD = 6; // the path is drawn inside a 6x6 field, then cropped to its own size
 const UNIT = 100; // SVG units between two neighbouring dots
 const R = 19.5; // dot radius (Figma: 45px dots, 115px apart at 1920)
-const PINK = "#e3009c";
+const PINK = "#F600A9";
+// 11 Nov (her MM-G05-02 / -04): a counter "03 / 15" while playing, Stars only for the finished shape, and the
+// score screen says "New personal best" — read here as the fastest finish on this device (question for Marta).
+const BEST_KEY = "mm-connect-the-path-best";
+const readBest = () => { try { return Number(localStorage.getItem(BEST_KEY) || 0); } catch { return 0; } };
+const writeBest = (ms) => { try { localStorage.setItem(BEST_KEY, String(ms)); } catch { /* this visit only */ } };
 const DARK = "#1a0010";
 const mix = (a, b, t) => {
   const ch = (h, i) => parseInt(h.slice(1 + 2 * i, 3 + 2 * i), 16);
@@ -68,6 +74,9 @@ export default function ConnectPath({ open, onClose }) {
   const [layout, setLayout] = useState(null);
   const [path, setPath] = useState([]); // dot indices in order, path[0] = pink start
   const [quote, setQuote] = useState(null);
+  const [phase, setPhase] = useState("play"); // play | score | done
+  const [best, setBest] = useState(false);
+  const startedAt = useRef(0);
   const pathRef = useRef([]);
   const dragging = useRef(false);
   const lastPoint = useRef(null);
@@ -86,6 +95,9 @@ export default function ConnectPath({ open, onClose }) {
     pathRef.current = [l.start];
     setPath([l.start]);
     setQuote(null);
+    setPhase("play");
+    setBest(false);
+    startedAt.current = 0;
   }, []);
 
   // Back or close discards the path; reopening starts a fresh layout.
@@ -107,14 +119,22 @@ export default function ConnectPath({ open, onClose }) {
     if (i < 0 || p.length === DOTS) return false;
     const end = p[p.length - 1];
     if (i === end) return true;
-    if (p.length > 1 && i === p[p.length - 2]) { commit(p.slice(0, -1)); return true; }
+    if (p.length > 1 && i === p[p.length - 2]) { commit(p.slice(0, -1)); play("back"); return true; }
     if (!p.includes(i) && adjacent(layout.dots[end], layout.dots[i])) {
       const next = [...p, i];
+      if (!startedAt.current) startedAt.current = performance.now();
       commit(next);
       if (next.length === DOTS) {
         dragging.current = false;
-        later(() => setQuote(takeQuote("connect-the-path")), 800);
-      }
+        const ms = performance.now() - startedAt.current;
+        const prev = readBest();
+        const isBest = !prev || ms < prev;
+        if (isBest) writeBest(Math.round(ms));
+        setBest(isBest);
+        recordStars("connect-the-path", ROUND_STARS);
+        play("win");
+        later(() => setPhase("score"), 900);
+      } else play("flip");
       return true;
     }
     return false;
@@ -156,16 +176,30 @@ export default function ConnectPath({ open, onClose }) {
 
   const onUp = () => { dragging.current = false; };
 
-  // MM-G05-01/02 show no counter, so none here.
   const pos = (i) => [(layout.dots[i].c + 0.5) * UNIT, (layout.dots[i].r + 0.5) * UNIT];
   // MM-G05-02: the path fades from the pink start to near-black at the dot you're on; complete = all pink.
   const shade = (k) => (done || path.length < 2 ? PINK : mix(PINK, DARK, k / (path.length - 1)));
   const at = new Map(path.map((d, k) => [d, k]));
 
+  const toQuote = useCallback(() => { setQuote(takeQuote("connect-the-path")); setPhase("done"); }, []);
+  const ended = phase !== "play";
+
   return (
-    <GameModal open={open} onClose={onClose} label="Connect the Path" instructions={quote ? null : INSTRUCTIONS}>
-      {quote ? (
+    <GameModal
+      open={open}
+      onClose={onClose}
+      label="Connect the Path"
+      game
+      instructions={ended ? null : INSTRUCTIONS}
+      counter={ended ? null : `${pad2(path.length)} / ${DOTS}`}
+      stars={ended ? null : done ? ROUND_STARS : 0}
+      hud={!ended}
+      confirm={ended ? "completed" : path.length > 1 ? "game" : null}
+    >
+      {phase === "done" && quote ? (
         <Completion quote={quote} onPlayAgain={reset} />
+      ) : phase === "score" ? (
+        <ScoreScreen badge={best ? "New personal best" : "Well played"} label="All dots connected" value={`${DOTS} / ${DOTS}`} stars={ROUND_STARS} onDone={toQuote} />
       ) : (
         <div className="flex flex-1 items-center justify-center px-[15px] py-8 lg:pb-[3.5vw] lg:pt-[2vw]">
           {layout && (

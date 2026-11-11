@@ -105,6 +105,9 @@ export async function submitForm(type, data, submissionId) {
           message: [text, ...(extras.length ? ["", ...extras] : [])].join("\n"),
           who: data.name || data.email || "Someone",
           email: data.email || "",
+          // the names EmailJS's own Contact Us template uses (Marta kept it, 10 Nov 22:52: "A message by has been received")
+          name: data.name || data.email || "Someone",
+          title: short || SUBJECTS[type] || "New message",
           // for the Auto-Reply letter
           greeting: data.name ? `Hi ${String(data.name).trim().split(/\s+/)[0]}!` : "Hi!",
           reply_subject: (REPLIES[type] || REPLIES.contact).subject,

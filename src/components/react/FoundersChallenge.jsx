@@ -429,8 +429,10 @@ export default function FoundersChallenge() {
         <div className="pl-[8.85vw] py-[6vw]">
           {/* Type measured on her 2x frames (MM-C06 _Entry, 3840 px = 1920): label 17 px, heading 154 px tight,
               body and entry text 21/34 regular dark grey, entry label 21 px caps grey. */}
-          <p className="text-[0.9vw] font-normal text-[#333]">M's Interface System</p>
-          <h2 className="relative z-20 mt-[1.7vw] whitespace-nowrap text-[8vw] font-normal leading-[0.91] tracking-[-0.08em]">The founder’s<br />challenge</h2>
+          {/* Marta, 10 Nov 23:13 (her advisor's review): the heading names the founder's pain; "The founder's
+              challenge" becomes the small label above it. */}
+          <p className="text-[0.9vw] font-normal text-[#333]">The founder’s challenge</p>
+          <h2 className="relative z-20 mt-[1.7vw] whitespace-nowrap text-[4.9vw] font-normal leading-[0.98] tracking-[-0.07em]">Your product works.<br />Nobody remembers it.</h2>
           <p className="mt-[3.3vw] max-w-[33.2vw] text-[1.1vw] font-normal leading-[1.62] text-[#3d3d3d]">
             We see design in the strangest places. In the way you notice, choose, remember or connect things. We turned some of those little moments into games. Play first. Talk later.
           </p>
@@ -502,8 +504,8 @@ export default function FoundersChallenge() {
           than plain Inter (Marta, 2 Nov: wider letter spacing and other weights on the site), and every text
           box is her width, so each paragraph breaks into the same lines as hers. */}
       <div className="mm-phone-w px-[calc(var(--q)*20)] pt-[calc(var(--q)*42)] pb-[calc(var(--q)*60)] lg:hidden">
-        <p className="text-[length:calc(var(--q)*12.5)] font-normal leading-[calc(var(--q)*16)] tracking-[-0.02em] text-[#555]">M's Interface System</p>
-        <h2 className="-ml-[calc(var(--q)*2)] mt-[calc(var(--q)*15)] whitespace-nowrap text-[length:calc(var(--q)*64.5)] font-normal leading-[calc(var(--q)*66)] tracking-[-0.08em]">The founder’s<br />challenge</h2>
+        <p className="text-[length:calc(var(--q)*12.5)] font-normal leading-[calc(var(--q)*16)] tracking-[-0.02em] text-[#555]">The founder’s challenge</p>
+        <h2 className="-ml-[calc(var(--q)*2)] mt-[calc(var(--q)*15)] whitespace-nowrap text-[length:calc(var(--q)*52)] font-normal leading-[calc(var(--q)*52)] tracking-[-0.07em]">Your product<br />works. Nobody<br />remembers it.</h2>
         <p className="mt-[calc(var(--q)*28.5)] w-[calc(var(--q)*302)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-[#666]">
           We see design in the strangest places. In the way you notice, choose, remember or connect things. We turned some of those little moments into games. Play first. Talk later.
         </p>

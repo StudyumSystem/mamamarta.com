@@ -11,7 +11,11 @@ const navLinks = [
   { href: "#contact", label: "Contact" },
 ];
 
-const QUOTE = "\"Design is the silent ambassador of your brand.\" — Paul Rand";
+// Marta, 10 Nov 23:13 (her advisor's review): the hero says what Mamamarta does and who it is for in the
+// first three seconds. The footer line moves up under the tagline, and the line for founders takes the
+// Paul Rand quote's place.
+const CRAFTED = "Crafted to shape systems, interactions, and digital identity.";
+const FOR_WHOM = "For founders who want a product people remember.";
 
 // The homepage section the visitor is looking at, so the menu shows it in bold (04 Mobile Navigation).
 function sectionInView() {
@@ -120,8 +124,11 @@ export default function Hero({ initialMenuOpen = false }) {
           <p className="absolute inset-x-0 text-center font-normal text-white leading-[1.2] tracking-[-0.01em] top-[calc(var(--p)*343)] text-[length:calc(var(--p)*19)]">
             Design house for digital products.
           </p>
-          <p className="absolute left-1/2 -translate-x-1/2 text-center font-light text-white top-[calc(var(--p)*459)] w-[calc(var(--p)*250)] text-[length:calc(var(--p)*13)] leading-[calc(var(--p)*20)]">
-            {QUOTE}
+          <p className="absolute left-1/2 -translate-x-1/2 text-center font-light text-white top-[calc(var(--p)*373)] w-[calc(var(--p)*270)] text-[length:calc(var(--p)*13.5)] leading-[calc(var(--p)*19)]">
+            {CRAFTED}
+          </p>
+          <p className="absolute left-1/2 -translate-x-1/2 text-center font-normal text-white top-[calc(var(--p)*466)] w-[calc(var(--p)*260)] text-[length:calc(var(--p)*15.5)] leading-[calc(var(--p)*21)]">
+            {FOR_WHOM}
           </p>
           <a
             href={WHATSAPP_URL}
@@ -130,7 +137,7 @@ export default function Hero({ initialMenuOpen = false }) {
             className="absolute left-1/2 flex -translate-x-1/2 items-center justify-center gap-[0.3em] rounded-xs border border-white/20 font-semibold text-white backdrop-blur-md top-[calc(var(--p)*552)] h-[calc(var(--p)*46)] w-[calc(var(--p)*199)] whitespace-nowrap text-[length:calc(var(--p)*15.5)]"
             style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
           >
-            Book a Discovery Call <ArrowIcon />
+            Message Marta <ArrowIcon />
           </a>
         </div>
 
@@ -165,11 +172,14 @@ export default function Hero({ initialMenuOpen = false }) {
             <p className="lg:mt-[3vh] mt-4 text-[18px] font-light tracking-[-0.01em] lg:font-light lg:tracking-[-0.015em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] text-white">
               Design house for digital products.
             </p>
+            <p className="mt-2 lg:mt-[1.2vh] text-[13px] font-light text-white/90 lg:text-[clamp(16px,1.15vw,22px)] lg:leading-[1.4]">
+              {CRAFTED}
+            </p>
           </div>
 
-          <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[9vh] lg:max-w-none">
-            <p className="font-light text-white mx-auto w-[56vw] text-[11.5px] leading-[1.4] lg:tracking-normal lg:text-[clamp(20px,1.67vw,32px)] lg:leading-[1.28] lg:w-[29.4vw] lg:max-w-[565px]">
-              {QUOTE}
+          <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[7vh] lg:max-w-none">
+            <p className="font-normal text-white mx-auto w-[56vw] text-[11.5px] leading-[1.4] lg:tracking-normal lg:text-[clamp(20px,1.67vw,32px)] lg:leading-[1.28] lg:w-[29.4vw] lg:max-w-[565px]">
+              {FOR_WHOM}
             </p>
 
             <div className="flex flex-wrap justify-center mt-10 lg:mt-[5.5vh]">
@@ -182,7 +192,7 @@ export default function Hero({ initialMenuOpen = false }) {
                 onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}
                 style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
               >
-                Book a Discovery Call <ArrowIcon className="ml-[0.3em] transition-transform group-hover:translate-x-1" />
+                Message Marta <ArrowIcon className="ml-[0.3em] transition-transform group-hover:translate-x-1" />
               </a>
             </div>
           </div>

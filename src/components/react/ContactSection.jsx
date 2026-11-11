@@ -51,11 +51,12 @@ export default function ContactSection() {
     <section id="contact" className="mm-phone-w bg-white font-[Inter] text-black">
       <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*18)] pb-[calc(var(--q)*60)] md:grid md:grid-cols-[44vw_35.8vw] md:items-start md:px-0 md:pl-[8.6vw] md:pt-[5.2vw] md:pb-[5.1vw]">
         <h2 className="-ml-[calc(var(--q)*4)] text-[length:calc(var(--q)*69)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em] md:ml-0 md:text-[8vw] md:leading-[0.9] md:tracking-[-0.07em]">
-          We are
+          {/* Marta, 10 Nov 23:13 (her advisor): "We are not for everyone." turned people away before trust */}
+          Tell us
           <br />
-          not for
+          what you’re
           <br />
-          everyone.
+          building.
         </h2>
 
         <div className="mt-[calc(var(--q)*22)] md:mt-[0.3vw]">
@@ -88,7 +89,7 @@ export default function ContactSection() {
               <textarea
                 id="contact-message"
                 rows={5}
-                placeholder="What are you building?"
+                placeholder="A few words about your product"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className={`${inputCls} h-[159px] resize-none py-[10px] leading-[1.3] md:h-[7.8vw] md:py-[clamp(10px,0.9vw,18px)]`}

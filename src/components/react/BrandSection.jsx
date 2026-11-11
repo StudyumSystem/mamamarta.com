@@ -5,7 +5,10 @@ import ArrowIcon from "./ArrowIcon";
 // Footer to Marta's MM-HOME-001 / 002 (Desktop - 38, 1920x540): her darkened fur, the big white MAMA / MARTA
 // logo on the left, copy + Book a Discovery Call on the right, icons and © Mamamarta 2026 on the bottom row.
 // Desktop sizes in vw from the 1920 frame: logo 180-852 px, right column 1010-1634 px, 108 px top, 106 px bottom.
-const buttonOff = "linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)";
+// Marta, 10 Nov 23:13 (her advisor): say what the call is before the button opens WhatsApp. 30 minutes is
+// the advisor's number, hers to confirm.
+const CALL_LINE = "30 minutes. We look at your product together. You leave knowing your next move.";
+const buttonOff ="linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)";
 const buttonOn = "linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)";
 
 const icons = [
@@ -35,11 +38,14 @@ export default function BrandSection() {
           <br />
           and digital identity.
         </p>
+        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*326)] w-[calc(var(--q)*330)] text-[length:calc(var(--q)*13)] font-light leading-[calc(var(--q)*18)] text-white/85">
+          {CALL_LINE}
+        </p>
         <a
           href={WHATSAPP_URL}
           target="_blank"
           rel="noreferrer"
-          className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*342)] flex h-[calc(var(--q)*41)] w-[calc(var(--q)*215)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*15.5)] font-semibold whitespace-nowrap backdrop-blur-md"
+          className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] flex h-[calc(var(--q)*41)] w-[calc(var(--q)*215)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*15.5)] font-semibold whitespace-nowrap backdrop-blur-md"
           style={{ background: buttonOff }}
         >
           Book a Discovery Call <ArrowIcon />
@@ -66,6 +72,9 @@ export default function BrandSection() {
             Design house for digital products.
             <br />
             Crafted to shape systems, interactions, and digital identity.
+          </p>
+          <p className="mt-5 text-[14px] font-light leading-[1.45] text-white/85 md:mt-[1.6vw] md:text-[clamp(13px,0.94vw,18px)]">
+            {CALL_LINE}
           </p>
 
           <a

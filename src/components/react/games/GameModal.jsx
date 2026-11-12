@@ -310,6 +310,22 @@ export default function GameModal({
 
   useEffect(() => { if (!open) setAsking(null); }, [open]);
 
+  // No game may scroll (Marta, 11 Nov 19:36: "they fit the screen perfectly"). Her frames are 1920 x 1019
+  // and the panel is drawn in vw, so on a wide, short screen (a laptop with the browser's bars) it grew taller
+  // than the screen. On the computer the panel's content is zoomed down by how much shorter the screen is than
+  // her frame's shape (1060 tall leaves a little air), so the whole game always fits; phones are unchanged.
+  const [fit, setFit] = useState(1);
+  useEffect(() => {
+    if (!open) return;
+    const measure = () => {
+      const w = window.innerWidth, h = window.innerHeight;
+      setFit(w >= 1024 ? Math.min(1, (h / 1060) / (w / 1920)) : 1);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     returnFocus.current = document.activeElement;
@@ -361,7 +377,7 @@ export default function GameModal({
         className={`absolute inset-x-[20px] top-[28px] bottom-[28px] flex flex-col overflow-y-auto outline-none lg:inset-x-[13.5%] lg:top-0 lg:bottom-0 ${game ? "bg-[#F0F0F0]" : "bg-white"}`}
       >
         {/* top row: Back (desktop), instructions, counter */}
-        <div className="relative flex items-start gap-6 px-[15px] pt-[22px] lg:px-[3.2vw] lg:pt-[3.1vw]">
+        <div className="relative flex items-start gap-6 px-[15px] pt-[22px] lg:px-[3.2vw] lg:pt-[3.1vw]" style={fit < 1 ? { zoom: fit } : undefined}>
           {/* measured on the 2x frames (MM-G01…G05 Default): text from 615 px, Inter 400 ~20.5/31 px, lines break as in the frames */}
           <BackLink onClick={requestClose} className={`hidden lg:block ${game ? "lg:w-[12.9vw]" : "lg:w-[14.1vw]"} shrink-0 text-left`} />
           <p className={`flex-1 ${game ? "text-[14px] text-black/60 lg:max-w-[33.6vw] lg:text-[clamp(15px,1.146vw,22px)] lg:leading-[1.41] lg:text-black/[0.69]" : "text-[15px] text-black/70 lg:max-w-[35.8vw] lg:text-[clamp(15px,1.06vw,21px)] lg:leading-[1.5] lg:text-black/70"} leading-[20px] tracking-[-0.02em] lg:tracking-normal lg:whitespace-pre-wrap font-normal`}>
@@ -396,7 +412,7 @@ export default function GameModal({
             <span className={`${phoneCounter} self-end px-[15px] text-[16px] leading-[20px] font-normal text-black/70 lg:hidden`} aria-live="polite">{counter}</span>
           )
         )}
-        <div className="flex flex-1 flex-col">{children}</div>
+        <div className="flex flex-1 flex-col" style={fit < 1 ? { zoom: fit } : undefined}>{children}</div>
         <div className="flex justify-center pb-[20px] pt-6 lg:hidden">
           <BackLink onClick={requestClose} game={game} />
         </div>

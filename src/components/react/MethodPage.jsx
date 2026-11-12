@@ -22,7 +22,7 @@ const stages = [
     // drawn 613 px wide (her 703 x 1054 image box shows it at 87%), pushed up so its tip sits right on the label
     // at 557 px, its top cut by the page edge (computer only).
     img: { src: "/assets/charcoal.png", w: 1406, h: 1802, size: [320, 613], alt: "A stick of black MAMAMARTA charcoal" },
-    gap: [0, -228.7, 29, 0],
+    gap: [0, -228.7, 27, 0],
     label: "01 — CHARCOAL / DISCOVERY",
     title: "The First Spark",
     subtitle: "Raw potential. Light and shadow. The beginning of form.",
@@ -33,7 +33,7 @@ const stages = [
   },
   {
     img: { src: "/assets/palette-knife.png", w: 1406, h: 1772, size: [319, 703], alt: "A MAMAMARTA palette knife" },
-    gap: [82.4, 112.5, 6, 0],
+    gap: [58, 112.5, 8, 0],
     label: "02 — PALETTE KNIFE / STRUCTURE",
     title: "Shaping the Form",
     subtitle: "From possibility to intention.",
@@ -44,7 +44,7 @@ const stages = [
   },
   {
     img: { src: "/assets/brush.png", w: 1254, h: 1488, size: [361, 627], alt: "A black MAMAMARTA paint brush" },
-    gap: [73.7, 112.5, 30.4, 33],
+    gap: [98, 112.5, 24, 33],
     label: "03 — BRUSH / REFINEMENT",
     title: "The Paint Is Almost Dry",
     subtitle: "The art of knowing what matters.",
@@ -55,7 +55,7 @@ const stages = [
   },
   {
     img: { src: "/assets/sphere.png", w: 1176, h: 1492, size: [351, 588], alt: "A pink sphere inside a glass cube" },
-    gap: [71.7, 113, 16.5, 21],
+    gap: [45, 113, 21, 21],
     label: "04 — THE REVEAL / RELEASE & EVOLUTION",
     title: "A Form of Its Own",
     subtitle: "From creation to presence.",
@@ -88,18 +88,21 @@ function Stage({ img, gap: g, label, title, subtitle, paragraphs }) {
         className={`mx-auto block h-auto max-w-none w-[var(--w)] md:w-[var(--wd)] ${gapClass}`}
         style={{ ...gap(g[0], g[1]), "--w": `${img.size[0]}px`, "--wd": du(img.size[1]) }}
       />
-      <p className={`uppercase leading-none text-[14px] md:text-[length:calc(var(--u)*22)] md:tracking-[-0.02em] text-[#5e5e5e] md:text-[#7f7f7f] ${gapClass}`} style={gap(g[2], g[3])}>
+      {/* Phone, her MM-METHOD / Mobile (kept copy, 13 Nov): label 14/20 black 60%, title 32/39, subtitle 12/20
+          black 60%, text 14/20 black 70% in a 293 column, all at -0.04em; label to title 44, title to subtitle 8,
+          subtitle to text 26 (her boxes, now in her line heights; the computer keeps its own) */}
+      <p className={`uppercase leading-[20px] md:leading-none text-[14px] md:text-[length:calc(var(--u)*22)] md:tracking-[-0.02em] text-black/60 md:text-[#7f7f7f] ${gapClass}`} style={gap(g[2], g[3])}>
         {label}
       </p>
-      <h2 className={`font-normal leading-none text-black text-[32px] tracking-[-0.05em] md:tracking-[-0.04em] md:text-[length:calc(var(--u)*50)] ${gapClass}`} style={gap(50.5, 70.7)}>
+      <h2 className={`font-normal leading-[39px] md:leading-none text-black text-[32px] tracking-[-0.04em] md:text-[length:calc(var(--u)*50)] ${gapClass}`} style={gap(44, 70.7)}>
         {title}
       </h2>
-      <p className={`leading-none text-[#6b6b6b] md:text-[#4f4f4f] text-[12px] tracking-[-0.03em] md:tracking-[-0.04em] md:text-[length:calc(var(--u)*18)] ${gapClass}`} style={gap(15.8, 26.85)}>
+      <p className={`leading-[20px] md:leading-none text-black/60 md:text-[#4f4f4f] text-[12px] tracking-[-0.04em] md:text-[length:calc(var(--u)*18)] ${gapClass}`} style={gap(8, 26.85)}>
         {subtitle}
       </p>
       <div
-        className={`mx-auto flex max-w-[296px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#4f4f4f] md:max-w-[calc(var(--u)*541.44)] md:gap-[calc(var(--u)*34)] md:text-[length:calc(var(--u)*22)] md:leading-[calc(var(--u)*34)] ${gapClass}`}
-        style={gap(30.2, 57.95)}
+        className={`mx-auto flex max-w-[293px] flex-col gap-[20px] text-[14px] leading-[20px] text-black/70 md:text-[#4f4f4f] md:max-w-[calc(var(--u)*541.44)] md:gap-[calc(var(--u)*34)] md:text-[length:calc(var(--u)*22)] md:leading-[calc(var(--u)*34)] ${gapClass}`}
+        style={gap(26, 57.95)}
       >
         {paragraphs.map((text, i) => (
           <p key={i}>{text}</p>
@@ -136,12 +139,14 @@ export default function MethodPage() {
             <br />
             foundation.
           </h2>
-          <div className="mx-auto mt-[28.4px] flex max-w-[296px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#cfcfcf] md:mt-[calc(var(--u)*80)] md:max-w-[calc(var(--u)*547)] md:gap-[calc(var(--u)*34)] md:text-[length:calc(var(--u)*22)] md:leading-[calc(var(--u)*34)] md:text-[#b0b0b0]">
+          {/* phone: her 293 column, white 81% (#cfcfcf), 27 under the heading; the closing line Inter Semi Bold 600
+              20/28 as her MM-METHOD / Mobile (the computer keeps bold 700) */}
+          <div className="mx-auto mt-[27px] flex max-w-[293px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#cfcfcf] md:mt-[calc(var(--u)*80)] md:max-w-[calc(var(--u)*547)] md:gap-[calc(var(--u)*34)] md:text-[length:calc(var(--u)*22)] md:leading-[calc(var(--u)*34)] md:text-[#b0b0b0]">
             {foundation.map((text, i) => (
               <p key={i}>{text}</p>
             ))}
           </div>
-          <p className="mt-[39.7px] font-bold text-white text-[20px] leading-[28px] md:mt-[calc(var(--u)*59)] md:text-[length:calc(var(--u)*30)] md:leading-[calc(var(--u)*44)]">
+          <p className="mt-[40px] font-semibold md:font-bold text-white text-[20px] leading-[28px] md:mt-[calc(var(--u)*59)] md:text-[length:calc(var(--u)*30)] md:leading-[calc(var(--u)*44)]">
             Everything that follows stands <br className="md:hidden" />
             on four.
           </p>

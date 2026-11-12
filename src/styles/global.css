@@ -279,6 +279,30 @@ body {
 	100% { background-position: 0% 0; opacity: 0; }
 }
 
+/* 12 Nov (Marta: "it may only sway, the right and the left part; the ends stay fixed"): the left part of the
+   cable turns a little around its left end (0, 43.6% of her frame), the right part around its right end (the
+   bottom-right corner); the parts are cut at the joint behind the button (64.5% across) with a soft seam. */
+.mm-wire-left {
+	-webkit-mask-image: linear-gradient(90deg, #000 62.5%, transparent 66.5%);
+	mask-image: linear-gradient(90deg, #000 62.5%, transparent 66.5%);
+	transform-origin: 0% 43.6%;
+	animation: mm-wire-sway-left 7s ease-in-out infinite alternate;
+}
+.mm-wire-right {
+	-webkit-mask-image: linear-gradient(90deg, transparent 62.5%, #000 66.5%);
+	mask-image: linear-gradient(90deg, transparent 62.5%, #000 66.5%);
+	transform-origin: 100% 100%;
+	animation: mm-wire-sway-right 5.6s ease-in-out infinite alternate;
+}
+@keyframes mm-wire-sway-left {
+	from { transform: rotate(-0.45deg); }
+	to { transform: rotate(0.45deg); }
+}
+@keyframes mm-wire-sway-right {
+	from { transform: rotate(0.6deg); }
+	to { transform: rotate(-0.6deg); }
+}
+
 /* The memory card's number (Marta, 11 Nov 19:23): the old number fades up and away, the new one fades in from
    just below, softly blurred; it never travels more than a few px, so it stays clear of the pink line. */
 .mm-num-in {
@@ -299,6 +323,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
 	.mm-num-in,
 	.mm-num-out,
+	.mm-wire-part,
 	.mm-wire-sheen {
 		animation: none !important;
 	}

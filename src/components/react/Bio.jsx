@@ -37,7 +37,7 @@ const body = "text-[14px] leading-[20px] tracking-[-0.04em] text-[#4f4f4f] md:te
 
 function Paragraphs({ items }) {
   return (
-    <div className="flex flex-col gap-[20px] md:gap-[calc(var(--u)*34)] mr-[7px] md:ml-[calc(var(--u)*30)] md:mr-[calc(var(--u)*-2)]">
+    <div className="flex flex-col gap-[20px] md:gap-[calc(var(--u)*34)] mr-[8px] md:ml-[calc(var(--u)*30)] md:mr-[calc(var(--u)*-2)]">
       {items.map((text, i) => (
         <p key={i} className={body}>{text}</p>
       ))}
@@ -51,38 +51,41 @@ export default function Bio() {
       {/* The same Back as The Method, same place (12 Nov) */}
       <TopBack />
 
-      {/* phone: 88 px = the photo where it was under the Back that used to sit in the flow (24 + 21 + 43) */}
-      <main className="mx-auto w-[calc(100%-42px)] max-w-[710px] md:max-w-[calc(var(--u)*710)] pt-[88px] md:pt-[calc(var(--u)*125)] pb-[40px] md:pb-[calc(var(--u)*150)]">
+      {/* Phone, her MM-BIO-02 | Mobile (917:274, kept copy, 13 Nov): a 350 column 20 px in; photo 350 x 500 at 86;
+          label 14/20 black 60% 23 below it; title 32/39 30 below; subtitle 12/20 black 60% 8 below; story 26 below,
+          342 wide; photos 168 and 160 x 271 with 22 between, 34 below; then 34 / 34 / 34 to the partner text, the
+          Care line and the last text; every line at -0.04em. The computer keeps its own. */}
+      <main className="mx-auto w-[calc(100%-40px)] max-w-[710px] md:max-w-[calc(var(--u)*710)] pt-[86px] md:pt-[calc(var(--u)*125)] pb-[40px] md:pb-[calc(var(--u)*150)]">
         <img
           src="/assets/brand/image 46.webp"
           width="710"
           height="1011"
           alt="Marta in front of a white wall with arched niches"
-          className="w-full aspect-[348/499] md:aspect-[709/1010] object-cover"
+          className="w-full aspect-[350/500] md:aspect-[709/1010] object-cover"
         />
 
-        <p className="mt-[26px] md:mt-[calc(var(--u)*52)] text-center uppercase text-[14px] md:text-[length:calc(var(--u)*22)] tracking-[0.02em] text-[#666] md:text-[#808080]">
+        <p className="mt-[23px] md:mt-[calc(var(--u)*52)] text-center uppercase text-[14px] max-md:leading-[20px] md:text-[length:calc(var(--u)*22)] tracking-[-0.04em] md:tracking-[0.02em] text-[#666] md:text-[#808080]">
           Mamamarta — The person behind
         </p>
 
-        <h1 className="mt-[28px] md:mt-[calc(var(--u)*66)] text-center text-[32px] md:text-[length:calc(var(--u)*50)] leading-none font-normal text-black">
+        <h1 className="mt-[30px] md:mt-[calc(var(--u)*66)] text-center text-[32px] md:text-[length:calc(var(--u)*50)] leading-[39px] md:leading-none max-md:tracking-[-0.04em] font-normal text-black">
           M’s Lens
         </h1>
-        <p className="mt-[16px] md:mt-[calc(var(--u)*30)] text-center text-[12px] md:text-[length:calc(var(--u)*18)] text-[#666] md:text-[#4f4f4f]">
+        <p className="mt-[8px] md:mt-[calc(var(--u)*30)] text-center text-[12px] max-md:leading-[20px] max-md:tracking-[-0.04em] md:text-[length:calc(var(--u)*18)] text-[#666] md:text-[#4f4f4f]">
           A story shaped by light, art, and intuition.
         </p>
 
-        <div className="mt-[32px] md:mt-[calc(var(--u)*50)]">
+        <div className="mt-[26px] md:mt-[calc(var(--u)*50)]">
           <Paragraphs items={story} />
         </div>
 
-        <div className="mt-[36px] md:mt-[calc(var(--u)*80)] grid grid-cols-2 gap-[22px] md:gap-[calc(var(--u)*28)]">
+        <div className="mt-[34px] md:mt-[calc(var(--u)*80)] grid grid-cols-[168fr_160fr] md:grid-cols-2 gap-[22px] md:gap-[calc(var(--u)*28)]">
           <img
             src="/assets/brand/image 47.webp"
             width="341"
             height="648"
             alt="Marta behind a camera in the studio"
-            className="w-full aspect-[160/271] md:aspect-[341/648] object-cover"
+            className="w-full aspect-[168/271] md:aspect-[341/648] object-cover"
           />
           <img
             src="/assets/brand/image 48.webp"
@@ -93,7 +96,7 @@ export default function Bio() {
           />
         </div>
 
-        <div className="mt-[25px] md:mt-[calc(var(--u)*82)]">
+        <div className="mt-[34px] md:mt-[calc(var(--u)*82)]">
           <Paragraphs items={partners} />
         </div>
 
@@ -103,7 +106,7 @@ export default function Bio() {
             {/* "Care." in italic on the computer only, as in her two frames */}
             MAMAMARTA is built on one idea. <span className="md:italic">Care.</span>
           </p>
-          <p className={`mt-[32px] md:mt-[calc(var(--u)*35)] ${body}`}>
+          <p className={`mt-[34px] md:mt-[calc(var(--u)*35)] ${body}`}>
             A space where ideas are understood before they’re shaped. Where the light goes on before anyone reaches for a pen.
           </p>
         </div>

@@ -245,6 +245,7 @@ export default function WordHunt({ open, onClose }) {
       game
       stage={phase !== "done"}
       textBox={[333, 608]}
+      phoneTextW={320}
       instructions={ended ? null : INSTRUCTIONS}
       counter={counter}
       stars={ended ? null : found.length * WORD_STARS}

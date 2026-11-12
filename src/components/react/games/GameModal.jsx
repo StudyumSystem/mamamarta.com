@@ -329,7 +329,7 @@ export const STAGE_UNIT = "min(100vh / 1019, 100vw / 1280)";
 export default function GameModal({
   open, onClose, instructions, counter, label, children, phoneCounter = "mt-3",
   game = false, stars = null, hud = true, confirm = null, onBack = null, stage = false,
-  textBox = [356, 608],
+  textBox = [356, 608], phoneTextW = 305,
 }) {
   const panelRef = useRef(null);
   const returnFocus = useRef(null);
@@ -450,8 +450,14 @@ export default function GameModal({
               lines. It was 333 px in (her two older frames) and only capped at its width, not set to it. */}
           {/* her Back: 22 px type in a 21 px line from 63 px down (her line is tighter than ours, so the word sat 6 px low) */}
           <BackLink onClick={requestClose} className={`hidden lg:block ${game ? "lg:w-[15.31vw] lg:leading-[0.955]" : "lg:w-[14.1vw]"} shrink-0 text-left`} />
-          {/* on the computer a game's text is drawn below, against the board (textBox) */}
-          <p className={`flex-1 ${game ? "text-[14px] text-black/60 lg:hidden" : "text-[15px] text-black/70 lg:max-w-[35.8vw] lg:text-[clamp(15px,1.06vw,21px)] lg:leading-[1.5] lg:text-black/70 lg:tracking-normal"} leading-[20px] tracking-[-0.02em] lg:whitespace-pre-wrap font-normal`}>
+          {/* on the computer a game's text is drawn below, against the board (textBox).
+              Phone (13 Nov, her MM-G01…G05 Mobile frames): the text box is 15 px in and 22 px down in the 350 panel,
+              Inter 14/20, -0.56 px (-0.04em), black 60%, 305 wide (Word Hunt 320); we had -0.02em across the whole
+              320, so lines broke later than hers. With her spacing and widths the lines break as in her frames. */}
+          <p
+            className={`${game ? "w-[var(--pw)] max-w-full text-[14px] tracking-[-0.04em] text-black/60 lg:hidden" : "flex-1 text-[15px] tracking-[-0.02em] text-black/70 lg:max-w-[35.8vw] lg:text-[clamp(15px,1.06vw,21px)] lg:leading-[1.5] lg:text-black/70 lg:tracking-normal"} leading-[20px] lg:whitespace-pre-wrap font-normal`}
+            style={game ? { "--pw": `${phoneTextW}px` } : undefined}
+          >
             {instructions}
           </p>
           {showHud ? (
@@ -472,11 +478,12 @@ export default function GameModal({
           )}
         </div>
         {showHud ? (
-          /* phone (her MM-G0x Mobile): music button left, MM✦ in the middle, counter right */
+          /* phone (her MM-G0x Mobile): music button left, MM✦ in the middle, counter right; 13 Nov from her
+             MM-G01 Mobile frame: the button 36 x 36, MM✦ Inter 18/22 pink, the counter 14/20 black 60% */
           <div className="mt-[18px] flex items-center justify-between px-[15px] lg:hidden">
-            <SoundButton />
-            <span className="text-[16px] leading-[22px]" style={{ color: PINK }}>{starsText}</span>
-            <span className="min-w-[38px] text-right text-[16px] leading-[20px] text-black/60" aria-live="polite">{counter}</span>
+            <SoundButton className="max-lg:h-[36px] max-lg:w-[36px]" />
+            <span className="text-[18px] leading-[22px]" style={{ color: PINK }}>{starsText}</span>
+            <span className="min-w-[36px] text-right text-[14px] leading-[20px] text-black/60" aria-live="polite">{counter}</span>
           </div>
         ) : (
           counter != null && phoneCounter && (

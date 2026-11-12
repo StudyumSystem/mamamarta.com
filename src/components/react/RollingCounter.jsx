@@ -22,12 +22,15 @@ export default function RollingCounter({ start = 1, end = 99, speed = 1000, clas
     return () => clearInterval(id);
   }, [start, end, speed]);
   const pad = (n) => String(n).padStart(2, "0");
+  // 12 Nov (Marta: "it twitches, floats, isn't sharp; with every number it blinks and jumps"): every digit now
+  // has the same width (tabular figures), so the number never shifts sideways; the old and the new number sit
+  // in exactly the same place and only cross-fade, quickly, with no blur and no movement.
   return (
-    <span className={`relative inline-block whitespace-nowrap leading-none ${className}`} aria-label={pad(value)}>
+    <span className={`inline-grid whitespace-nowrap leading-none tabular-nums ${className}`} aria-label={pad(value)}>
       {prev.current !== null && (
-        <span key={`out-${prev.current}`} className="mm-num-out absolute inset-0" aria-hidden="true">{pad(prev.current)}</span>
+        <span key={`out-${prev.current}`} className="mm-num-out [grid-area:1/1]" aria-hidden="true">{pad(prev.current)}</span>
       )}
-      <span key={`in-${value}`} className="mm-num-in inline-block" aria-hidden="true">{pad(value)}</span>
+      <span key={`in-${value}`} className="mm-num-in [grid-area:1/1]" aria-hidden="true">{pad(value)}</span>
     </span>
   );
 }

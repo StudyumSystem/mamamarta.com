@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
+import Burst, { PINK_BLACK } from "./Burst.jsx";
 import { pad2, shuffle, takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
 import { play as playSound } from "./sound.js";
 const play = (name) => playSound(name, "word-hunt");
@@ -16,6 +17,12 @@ const LETTERS = "ABCDEFGHIJKLMNOPRSTUVWY";
 const INSTRUCTIONS =
   "Find the 10 hidden art-inspired words. Swipe across letters horizontally or vertically. Find them all to complete the game."; // MM-G01-03 (11 Nov)
 const WORD_STARS = 10; // her MM-G01-03: one word found = "10 MM✦"
+
+// The same confetti as Memory Match's finish (two rings, pink and black, from the middle of the board).
+function Firework() {
+  const reach = useMemo(() => Math.max(320, Math.min(window.innerWidth, window.innerHeight) * 0.5), []);
+  return <Burst rings={[{ n: 52, reach, size: 11 }, { n: 36, reach: reach * 0.55, size: 9, delay: 260 }]} colors={PINK_BLACK} />;
+}
 
 // Every row and column read both ways, to count how often a word can be found.
 function lines(grid) {
@@ -157,21 +164,28 @@ export default function WordHunt({ open, onClose }) {
     if (next.length === COUNT) {
       play("win");
       recordStars("word-hunt", ROUND_STARS);
-      // 12 Nov (Marta): the letters of the grid rain down off the board, then the score screen
+      // 12 Nov 01:50 (Marta: "something like in Memory Match"): the squares of the grid burst outward from its
+      // middle, a little turned, with the same pink-and-black confetti as Memory Match, then the score screen
       // (with reduced motion the board simply fades)
       if (prefersReducedMotion()) {
         later(() => setFinish("fade"), 350);
         later(() => setPhase("score"), 1150);
       } else {
         later(() => {
-          const cell = (gridRef.current?.offsetHeight || 360) / SIZE;
-          setFinish(Array.from({ length: SIZE * SIZE }, (_, i) => ({
-            fall: `${cell * (SIZE + 2)}px`,
-            rot: `${(Math.random() - 0.5) * 70}deg`,
-            delay: `${(SIZE - 1 - Math.floor(i / SIZE)) * 35 + Math.random() * 120}ms`,
-          })));
-        }, 350);
-        later(() => setPhase("score"), 1700);
+          const g = gridRef.current?.getBoundingClientRect();
+          if (!g) return;
+          const cx = g.left + g.width / 2, cy = g.top + g.height / 2;
+          const far = Math.max(window.innerWidth, window.innerHeight) * 0.75;
+          const cell = g.width / SIZE;
+          setFinish(Array.from({ length: SIZE * SIZE }, (_, i) => {
+            let dx = g.left + (i % SIZE + 0.5) * cell - cx, dy = g.top + (Math.floor(i / SIZE) + 0.5) * cell - cy;
+            const len = Math.hypot(dx, dy) || 1;
+            dx /= len; dy /= len;
+            const d = far * (0.8 + Math.random() * 0.4);
+            return { dx: `${dx * d}px`, dy: `${dy * d}px`, rot: `${(Math.random() - 0.5) * 140}deg`, delay: `${Math.random() * 120}ms` };
+          }));
+        }, 450);
+        later(() => setPhase("score"), 450 + 1450);
       }
     } else {
       // a found word, then its MM✦ credited (Marta, 11 Nov 19:56)
@@ -220,23 +234,27 @@ export default function WordHunt({ open, onClose }) {
             onPointerCancel={onUp}
             role="grid"
             aria-label={`Word Hunt letter grid, ${found.length} of ${COUNT} words found${found.length ? `: ${found.join(", ")}` : ""}`}
-            className={`${finish === "fade" ? "mm-fade-out" : ""} grid w-full max-w-[640px] select-none grid-cols-10 gap-px border border-[#d4d4d4] bg-[#d4d4d4] [container-type:inline-size] [touch-action:none] lg:w-[min(38.5vw,calc(100vh_-_200px))] lg:max-w-none`}
+            className={`${finish === "fade" ? "mm-fade-out" : ""} relative grid w-full max-w-[640px] select-none grid-cols-10 gap-px border [container-type:inline-size] [touch-action:none] lg:w-[min(38.5vw,calc(100vh_-_200px))] lg:max-w-none ${
+              Array.isArray(finish) ? "border-transparent bg-transparent" : "border-[#d4d4d4] bg-[#d4d4d4]"
+            }`}
           >
             {round?.grid.map((ch, i) => {
               const on = selCells.has(i) || foundCells.has(i);
-              const drop = Array.isArray(finish) && finish[i];
+              const f = Array.isArray(finish) && finish[i];
               return (
                 <span
                   key={i}
                   role="gridcell"
                   className={`flex aspect-square items-center justify-center text-[7.2cqw] lg:text-[6.7cqw] font-normal leading-none transition-colors duration-300 motion-reduce:transition-none ${
                     on ? "bg-[#fef7fc] text-[#F600A9]" : "bg-white text-black"
-                  } ${popCells.has(i) ? "mm-match" : ""}`}
+                  } ${popCells.has(i) ? "mm-match" : ""} ${f ? "mm-fly" : ""}`}
+                  style={f ? { "--dx": f.dx, "--dy": f.dy, "--rot": f.rot, animationDelay: f.delay } : undefined}
                 >
-                  {drop ? <span className="mm-rain" style={{ "--fall": drop.fall, "--rot": drop.rot, "--delay": drop.delay }}>{ch}</span> : ch}
+                  {ch}
                 </span>
               );
             })}
+            {Array.isArray(finish) && <Firework />}
           </div>
         </div>
       )}

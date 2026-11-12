@@ -187,13 +187,8 @@ body {
       from left to right in 2.4 s and stays whole after that. Without the script it is simply there.
    2) Then a pink light runs along it from left to right every 7 s, inside the cable's own shape (the picture
       is the mask), so nothing moves the cable itself. */
-html.mm-js .mm-wire-draw {
-	clip-path: inset(0 100% 0 0);
-}
-html.mm-js .mm-in .mm-wire-draw {
-	clip-path: inset(0 0 0 0);
-	transition: clip-path 2.4s cubic-bezier(0.65, 0, 0.35, 1);
-}
+/* 11 Nov 19:58, Marta: no drawing-in ("there was no such effect"); the cable is simply there, only the pink
+   light runs along it like an electric current. */
 .mm-wire-sheen {
 	-webkit-mask-image: url(/assets/what-is-line.webp);
 	mask-image: url(/assets/what-is-line.webp);
@@ -211,7 +206,7 @@ html.mm-js .mm-in .mm-wire-draw {
 .mm-in .mm-wire-sheen {
 	/* 11 Nov 19:45 (Marta: smoother, shorter break): an even run of about 2.9 s that fades in and out, then
 	   1.3 s of rest, every 4.2 s (was a 2.7 s run and 4.3 s of rest, with the light switching on and off) */
-	animation: mm-wire-sheen 4.2s linear 2.4s infinite;
+	animation: mm-wire-sheen 4.2s linear 0.3s infinite;
 }
 @keyframes mm-wire-sheen {
 	0% { background-position: 100% 0; opacity: 0; }
@@ -243,10 +238,6 @@ html.mm-js .mm-in .mm-wire-draw {
 	.mm-num-out,
 	.mm-wire-sheen {
 		animation: none !important;
-	}
-	html.mm-js .mm-wire-draw {
-		clip-path: none !important;
-		transition: none !important;
 	}
 	.mm-fly,
 	.mm-spark {

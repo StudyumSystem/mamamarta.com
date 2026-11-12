@@ -18,9 +18,11 @@ const PINK = "#fcd2f0";
 // Its dot is drawn here (it sits too close to the "e" to cut cleanly), its hook comes from the picture.
 const Squiggle = () => (
   <span aria-hidden="true" className="whitespace-nowrap">
+    {/* Marta, 11 Nov 20:00 (her mockup beside the site): the dot is bigger, lower, and sits on the end of the
+        "e"'s tail, the hook following close after it */}
     <span
-      className="inline-block rounded-full"
-      style={{ width: "0.075em", height: "0.075em", marginLeft: "0.02em", verticalAlign: "0.185em", background: "#F600A9" }}
+      className="relative inline-block rounded-full"
+      style={{ width: "0.093em", height: "0.093em", marginLeft: "-0.085em", verticalAlign: "0.07em", background: "#F600A9" }}
     />
     <span
       className="inline-block"

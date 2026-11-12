@@ -108,20 +108,77 @@ function computerMove(board) {
 // grey (multiply); the still picture shows until the video has loaded.
 const X_VIDEO = "/assets/games/ttt-x.mp4";
 const APPLE_VIDEO = "/assets/apple.mp4";
-// hop: a winning symbol jumps (12 Nov). The jump is on the video itself, so it still melts into the grey.
-const Symbol = ({ who, hop = null }) => (
-  <video
-    src={who === "X" ? X_VIDEO : APPLE_VIDEO}
-    poster={who === "X" ? X_SRC : APPLE_SRC}
-    aria-label={who === "X" ? "X" : "Apple"}
-    muted
-    autoPlay
-    loop
-    playsInline
-    className={`${hop ? "mm-hop" : "mm-symbol"} object-contain mix-blend-multiply brightness-[1.04] contrast-[1.08] ${who === "X" ? "h-[80%] w-[80%]" : "h-full w-full"}`}
-    style={hop ? { clipPath: "inset(3%)", "--delay": hop } : { clipPath: "inset(3%)" }}
-  />
-);
+// 12 Nov 01:07 (Marta, screenshot: "X disappears"): her X video blows part of the fur away as it plays, so on
+// the board the X faded out on one side. Now the video's own first frame (the whole X, same framing) lies under
+// the playing video and both multiply together: the X stays whole and the fur still moves over it. The frame is
+// taken once from the video in the browser and shared by every X on the board.
+let xFrame = null;
+let xFrameLoading = null;
+function loadXFrame() {
+  if (xFrame || xFrameLoading || typeof document === "undefined") return xFrameLoading;
+  xFrameLoading = new Promise((resolve) => {
+    const v = document.createElement("video");
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = "auto";
+    v.src = X_VIDEO;
+    v.addEventListener("loadeddata", () => {
+      try {
+        const c = document.createElement("canvas");
+        c.width = v.videoWidth;
+        c.height = v.videoHeight;
+        c.getContext("2d").drawImage(v, 0, 0);
+        xFrame = c.toDataURL("image/jpeg", 0.9);
+      } catch {
+        xFrame = null;
+      }
+      v.removeAttribute("src");
+      v.load();
+      resolve(xFrame);
+    }, { once: true });
+    v.addEventListener("error", () => resolve(null), { once: true });
+  });
+  return xFrameLoading;
+}
+
+function useXFrame(active) {
+  const [frame, setFrame] = useState(xFrame);
+  useEffect(() => {
+    if (!active || frame) return;
+    let live = true;
+    loadXFrame()?.then((f) => live && f && setFrame(f));
+    return () => { live = false; };
+  }, [active, frame]);
+  return frame;
+}
+
+// hop: a winning symbol jumps (12 Nov). The jump is on the symbol itself, so it still melts into the grey.
+const Symbol = ({ who, hop = null }) => {
+  const isX = who === "X";
+  const frame = useXFrame(isX);
+  const motion = hop ? "mm-hop" : "mm-symbol";
+  const style = hop ? { clipPath: "inset(3%)", "--delay": hop } : { clipPath: "inset(3%)" };
+  const video = (
+    <video
+      src={isX ? X_VIDEO : APPLE_VIDEO}
+      poster={isX ? X_SRC : APPLE_SRC}
+      aria-label={isX ? "X" : "Apple"}
+      muted
+      autoPlay
+      loop
+      playsInline
+      className={isX ? "absolute inset-0 h-full w-full object-contain mix-blend-multiply" : `${motion} h-full w-full object-contain mix-blend-multiply brightness-[1.04] contrast-[1.08]`}
+      style={isX ? undefined : style}
+    />
+  );
+  if (!isX) return video;
+  return (
+    <span className={`${motion} relative block h-[80%] w-[80%] mix-blend-multiply brightness-[1.04] contrast-[1.08]`} style={style}>
+      {frame && <img src={frame} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-contain" />}
+      {video}
+    </span>
+  );
+};
 
 // The pink line across a winning row, in board units (each square 1 x 1), a little past the outer centres.
 function lineEnds(line, n) {

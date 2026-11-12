@@ -7,8 +7,14 @@ import InnerNav, { PhoneBack } from "./InnerNav";
 // sizes are her 1920 px drawn in vw (px / 19.2), like the home page, so every screen width keeps her
 // proportions; the phone keeps her 390 px sizes. Texts are her current Figma wording (11 Nov), and the text
 // wraps by itself in a column the width of hers. Spacing: [phone px, computer px of the 1920 frame].
+// 11 Nov 20:56, Marta (screenshot of a wide, short laptop window: the charcoal filled the whole screen and Back
+// was out of scale): "the proportions aren't right". The computer sizes followed the width only, and Back
+// stayed in fixed px. Now one unit, --u = one pixel of her 1920 x 1080 frame fitted to the screen (the smaller
+// of width and height), like the home's first screen: on any window the first screen shows what hers does
+// (the charcoal, its label and the title), and Back scales with the page.
 
-const vw = (n) => `${+(n / 19.2).toFixed(4)}vw`;
+const du = (n) => `calc(var(--u) * ${n})`;
+const unit = { "--u": "min(calc(100vw / 1920), calc(100dvh / 1080))" };
 
 const stages = [
   {
@@ -63,9 +69,9 @@ const foundation = [
   "Marta sees her work in much the same way. Four stages, each with its own material, rhythm, and purpose. Each shaping what comes next.",
 ];
 
-// margin-top: px on the phone, vw (from her 1920 px) on the computer
+// margin-top: px on the phone, her 1920 px times --u on the computer
 const gapClass = "mt-[var(--m)] md:mt-[var(--d)]";
-const gap = (m, d) => ({ "--m": `${m}px`, "--d": vw(d) });
+const gap = (m, d) => ({ "--m": `${m}px`, "--d": du(d) });
 
 // Both her frames set the type 4% tighter than the font's own spacing (measured side by side, 28 Oct).
 function Stage({ img, gap: g, label, title, subtitle, paragraphs }) {
@@ -77,19 +83,19 @@ function Stage({ img, gap: g, label, title, subtitle, paragraphs }) {
         height={img.h}
         alt={img.alt}
         className={`mx-auto block h-auto max-w-none w-[var(--w)] md:w-[var(--wd)] ${gapClass}`}
-        style={{ ...gap(g[0], g[1]), "--w": `${img.size[0]}px`, "--wd": vw(img.size[1]) }}
+        style={{ ...gap(g[0], g[1]), "--w": `${img.size[0]}px`, "--wd": du(img.size[1]) }}
       />
-      <p className={`uppercase leading-none text-[14px] md:text-[1.1458vw] md:tracking-[-0.02em] text-[#5e5e5e] md:text-[#7f7f7f] ${gapClass}`} style={gap(g[2], g[3])}>
+      <p className={`uppercase leading-none text-[14px] md:text-[length:calc(var(--u)*22)] md:tracking-[-0.02em] text-[#5e5e5e] md:text-[#7f7f7f] ${gapClass}`} style={gap(g[2], g[3])}>
         {label}
       </p>
-      <h2 className={`font-normal leading-none text-black text-[32px] tracking-[-0.05em] md:tracking-[-0.04em] md:text-[2.6042vw] ${gapClass}`} style={gap(50.5, 70.7)}>
+      <h2 className={`font-normal leading-none text-black text-[32px] tracking-[-0.05em] md:tracking-[-0.04em] md:text-[length:calc(var(--u)*50)] ${gapClass}`} style={gap(50.5, 70.7)}>
         {title}
       </h2>
-      <p className={`leading-none text-[#6b6b6b] md:text-[#4f4f4f] text-[12px] tracking-[-0.03em] md:tracking-[-0.04em] md:text-[0.9375vw] ${gapClass}`} style={gap(15.8, 26.85)}>
+      <p className={`leading-none text-[#6b6b6b] md:text-[#4f4f4f] text-[12px] tracking-[-0.03em] md:tracking-[-0.04em] md:text-[length:calc(var(--u)*18)] ${gapClass}`} style={gap(15.8, 26.85)}>
         {subtitle}
       </p>
       <div
-        className={`mx-auto flex max-w-[296px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#4f4f4f] md:max-w-[28.2vw] md:gap-[1.7708vw] md:text-[1.1458vw] md:leading-[1.7708vw] ${gapClass}`}
+        className={`mx-auto flex max-w-[296px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#4f4f4f] md:max-w-[calc(var(--u)*541.44)] md:gap-[calc(var(--u)*34)] md:text-[length:calc(var(--u)*22)] md:leading-[calc(var(--u)*34)] ${gapClass}`}
         style={gap(30.2, 57.95)}
       >
         {paragraphs.map((text, i) => (
@@ -102,7 +108,7 @@ function Stage({ img, gap: g, label, title, subtitle, paragraphs }) {
 
 export default function MethodPage() {
   return (
-    <div className="relative overflow-hidden font-sans bg-white">
+    <div className="relative overflow-hidden font-sans bg-white" style={unit}>
       <InnerNav active="What is" />
       <div className="absolute left-[21px] top-[24px] z-10 md:hidden">
         <PhoneBack />
@@ -114,23 +120,23 @@ export default function MethodPage() {
         ))}
 
         <section
-          className={`bg-black px-[20px] text-center tracking-[-0.04em] pt-[109.2px] pb-[43.9px] md:pt-[13.078vw] md:pb-[13.396vw] ${gapClass}`}
+          className={`bg-black px-[20px] text-center tracking-[-0.04em] pt-[109.2px] pb-[43.9px] md:pt-[calc(var(--u)*251.1)] md:pb-[calc(var(--u)*257.2)] ${gapClass}`}
           style={gap(60.4, 208.5)}
         >
           {/* Both frames: regular weight, very tight, "Four stages." on one line */}
-          <h2 className="font-normal tracking-[-0.075em] text-white text-[64px] leading-[64px] md:text-[7.8125vw] md:leading-[8.5938vw]">
+          <h2 className="font-normal tracking-[-0.075em] text-white text-[64px] leading-[64px] md:text-[length:calc(var(--u)*150)] md:leading-[calc(var(--u)*165)]">
             <span className="whitespace-nowrap">Four stages.</span>
             <br />
             <em>One</em>
             <br />
             foundation.
           </h2>
-          <div className="mx-auto mt-[28.4px] flex max-w-[296px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#cfcfcf] md:mt-[4.38vw] md:max-w-[36.4vw] md:gap-[2.0833vw] md:text-[1.4583vw] md:leading-[2.0833vw] md:text-[#b0b0b0]">
+          <div className="mx-auto mt-[28.4px] flex max-w-[296px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#cfcfcf] md:mt-[calc(var(--u)*84.1)] md:max-w-[calc(var(--u)*698.88)] md:gap-[calc(var(--u)*40)] md:text-[length:calc(var(--u)*28)] md:leading-[calc(var(--u)*40)] md:text-[#b0b0b0]">
             {foundation.map((text, i) => (
               <p key={i}>{text}</p>
             ))}
           </div>
-          <p className="mt-[39.7px] font-bold text-white text-[20px] leading-[28px] md:mt-[3.4167vw] md:text-[1.5625vw] md:leading-[2.2917vw]">
+          <p className="mt-[39.7px] font-bold text-white text-[20px] leading-[28px] md:mt-[calc(var(--u)*65.6)] md:text-[length:calc(var(--u)*30)] md:leading-[calc(var(--u)*44)]">
             Everything that follows stands <br className="md:hidden" />
             on four.
           </p>

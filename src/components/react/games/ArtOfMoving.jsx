@@ -31,12 +31,16 @@ const MIN_VIEW_W = 560; // on tall phone frames the world is scaled to show at l
 // smaller (400) and plain pink dots. Now 490 of 726 = 510 here, and the badge.
 const FH = 510; // figure (video) height; the video is 2:3
 const FW = (FH * 2) / 3;
-const FOOT_Y = 0.95; // feet sit at 95% of the video height
+// feet sit at 96.5% of the video height (12 Nov: at 95% she stood a little above the bricks, checked at 1440)
+const FOOT_Y = 0.965;
 const JH = FH; // leap video height: its figure stands about as tall in its 3:4 frame as the walker in hers
 const JW = (JH * 3) / 4;
 const JFOOT_Y = 0.91; // the tucked feet of the airborne frame sit at 91% of its height
 const JCX = 0.45; // the leaping body's centre across the (mirrored) frame
-const FOOT_TOL = 34; // half width of the feet on a platform
+// How far past a brick's edge the feet may still be (12 Nov, Marta: "she must stand on the bricks"): she walks off
+// once her front foot leaves it, and lands only with a foot on it. Was 34 both ways, so she walked on air.
+const FOOT_TOL = 20; // landing: a foot reaches the brick
+const STAND_TOL = 8; // standing: she steps off when her middle passes the edge by more than this
 const BODY_W = 115;
 const BODY_H = 0.88 * FH;
 const PLAT_H = 37;
@@ -122,6 +126,34 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+// The middle frame of her leap video as a still picture, made once in the browser and kept.
+let leapStillUrl = null;
+let leapStillLoading = null;
+function loadLeapStill() {
+  if (leapStillUrl) return Promise.resolve(leapStillUrl);
+  if (leapStillLoading || typeof document === "undefined") return leapStillLoading;
+  leapStillLoading = new Promise((resolve) => {
+    const v = document.createElement("video");
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = "auto";
+    v.src = "/assets/games/jump.mp4";
+    v.addEventListener("loadedmetadata", () => { v.currentTime = v.duration / 2; }, { once: true });
+    v.addEventListener("seeked", () => {
+      try {
+        const c = document.createElement("canvas");
+        c.width = v.videoWidth;
+        c.height = v.videoHeight;
+        c.getContext("2d").drawImage(v, 0, 0);
+        leapStillUrl = c.toDataURL("image/png");
+      } catch { /* keep the walking frame */ }
+      resolve(leapStillUrl);
+    }, { once: true });
+    v.addEventListener("error", () => resolve(null), { once: true });
+  });
+  return leapStillLoading;
+}
+
 const coinLabel = (n) => `${n} ${n > 1 ? "coins" : "coin"}`; // Figma: "0 coin", "3 coins"
 
 export default function ArtOfMoving({ open, onClose }) {
@@ -157,6 +189,13 @@ export default function ArtOfMoving({ open, onClose }) {
   // Closing or reopening always comes back to the Default screen; the best score stays.
   useEffect(() => { if (open) reset(); return clearTimers; }, [open, reset]);
   useEffect(() => { setTouch(window.matchMedia?.("(pointer: coarse)").matches ?? false); }, []);
+  const [leapStill, setLeapStill] = useState(leapStillUrl);
+  useEffect(() => {
+    if (!open || leapStill) return;
+    let live = true;
+    loadLeapStill()?.then((u) => live && u && setLeapStill(u));
+    return () => { live = false; };
+  }, [open, leapStill]);
 
   const start = useCallback(() => {
     clearTimers();
@@ -231,13 +270,10 @@ export default function ArtOfMoving({ open, onClose }) {
     video.pause();
     try { video.currentTime = 0; } catch { /* not loaded yet */ }
 
-    // The airborne pose = the middle frame of her leap video, held still; until it is there, a jump keeps
-    // the walking frame as before.
-    leap.muted = true;
-    leap.pause();
-    const toMiddle = () => { if (leap.duration) leap.currentTime = leap.duration / 2; };
-    if (leap.readyState >= 1) toMiddle(); else leap.addEventListener("loadedmetadata", toMiddle, { once: true });
-    const leapReady = () => leap.readyState >= 2 && !leap.seeking && leap.currentTime > 0;
+    // The airborne pose = the middle frame of her leap video, taken once as a still picture (leapStill); until
+    // it is there, a jump keeps the walking frame. 12 Nov (Marta: "the person is in thin air"): the paused video
+    // seeked to its middle was not always ready, so she often jumped in a walking step.
+    const leapReady = () => leap.complete && leap.naturalWidth > 0 && leap.getAttribute("src");
 
     const land = (plat) => {
       const p = g.p;
@@ -270,7 +306,7 @@ export default function ArtOfMoving({ open, onClose }) {
         video.playbackRate = clamp(speed / SPEED0, 0.6, 1.8);
         g.anchor = 0.5 - 0.2 * (1 - Math.pow(1 - Math.min(1, g.t / 0.7), 3));
         p.x += speed * h;
-        if (p.ground && p.x - FOOT_TOL > p.ground.x + p.ground.w) { p.ground = null; p.offAt = g.clock; }
+        if (p.ground && p.x - STAND_TOL > p.ground.x + p.ground.w) { p.ground = null; p.offAt = g.clock; }
         if (!p.ground) {
           const prevY = p.y;
           p.vy += G * h;
@@ -450,14 +486,12 @@ export default function ArtOfMoving({ open, onClose }) {
               aria-hidden="true"
               className={`pointer-events-none absolute left-0 top-0 mix-blend-multiply [filter:brightness(1.07)_contrast(1.12)] ${running ? "" : "invisible"}`}
             />
-            <video
+            <img
               ref={leapRef}
-              src="/assets/games/jump.mp4"
-              muted
-              playsInline
-              preload="auto"
+              src={leapStill || undefined}
+              alt=""
               aria-hidden="true"
-              className={`pointer-events-none absolute left-0 top-0 opacity-0 mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)] [clip-path:inset(0_1.5%)] ${running ? "" : "invisible"}`}
+              className={`pointer-events-none absolute left-0 top-0 max-w-none opacity-0 mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)] [clip-path:inset(0_1.5%)] ${running ? "" : "invisible"}`}
             />
 
             {count && (

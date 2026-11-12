@@ -56,13 +56,22 @@ function computerMove(board) {
   return free[Math.floor(Math.random() * free.length)];
 }
 
+// Marta, 11 Nov 19:50: the symbols are her animations (her Letter X video, the apple video of the home slider),
+// and they sit straight on the grey board: no white square behind them. The videos' white melts into the
+// grey (multiply); the still picture shows until the video has loaded.
+const X_VIDEO = "/assets/games/ttt-x.mp4";
+const APPLE_VIDEO = "/assets/apple.mp4";
 const Symbol = ({ who }) => (
-  <img
-    src={who === "X" ? X_SRC : APPLE_SRC}
-    alt={who === "X" ? "X" : "Apple"}
-    className="mm-symbol h-[78%] w-[78%] object-contain"
-    style={{ clipPath: "inset(5%)" }}
-    draggable="false"
+  <video
+    src={who === "X" ? X_VIDEO : APPLE_VIDEO}
+    poster={who === "X" ? X_SRC : APPLE_SRC}
+    aria-label={who === "X" ? "X" : "Apple"}
+    muted
+    autoPlay
+    loop
+    playsInline
+    className={`mm-symbol object-contain mix-blend-multiply brightness-[1.04] contrast-[1.08] ${who === "X" ? "h-[80%] w-[80%]" : "h-full w-full"}`}
+    style={{ clipPath: "inset(3%)" }}
   />
 );
 
@@ -153,7 +162,7 @@ export default function TicTacToe({ open, onClose }) {
         <ScoreScreen badge="Well played" label="Round completed" value={RESULT[outcome].value} stars={RESULT[outcome].stars} onDone={toQuote} />
       ) : (
         <div className="flex flex-1 items-center justify-center px-[15px] py-8 lg:items-start lg:pb-[3vw] lg:pt-[4.6vw]">
-          {/* MM-G03-02 (11 Nov): 175 px squares at 1920, 1 px #969696 lines, played squares white */}
+          {/* MM-G03-02 (11 Nov): 175 px squares at 1920, 1 px #969696 lines; played squares stay grey (Marta, 11 Nov 19:50) */}
           <div className="relative grid w-[92.8%] max-w-[420px] grid-cols-3 gap-px border border-[#969696] bg-[#969696] lg:w-[27.4vw] lg:max-w-none" role="grid" aria-label="Tic-Tac-Toe board">
             {board.map((v, i) => (
               <button
@@ -162,7 +171,7 @@ export default function TicTacToe({ open, onClose }) {
                 onClick={() => play(i)}
                 disabled={!!v || busy}
                 aria-label={v ? (v === "X" ? "X" : "Apple") : `Empty square ${i + 1}`}
-                className={`flex aspect-square items-center justify-center transition-colors duration-300 ${v ? "bg-white" : "bg-[#F0F0F0]"} ${
+                className={`flex aspect-square items-center justify-center overflow-hidden bg-[#F0F0F0] transition-colors duration-300 ${
                   !v && !busy ? "cursor-pointer hover:bg-white/60" : "cursor-default"
                 }`}
               >

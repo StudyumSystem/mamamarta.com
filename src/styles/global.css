@@ -204,7 +204,26 @@ body {
 	to { clip-path: inset(0 0 0 0); }
 }
 
+/* The memory card's number (Marta, 11 Nov 19:23): the old number fades up and away, the new one fades in from
+   just below, softly blurred; it never travels more than a few px, so it stays clear of the pink line. */
+.mm-num-in {
+	animation: mm-num-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.mm-num-out {
+	animation: mm-num-out 320ms ease-in both;
+}
+@keyframes mm-num-in {
+	from { opacity: 0; transform: translateY(0.04em); filter: blur(0.02em); }
+	to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes mm-num-out {
+	from { opacity: 1; transform: none; filter: none; }
+	to { opacity: 0; transform: translateY(-0.04em); filter: blur(0.02em); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+	.mm-num-in,
+	.mm-num-out,
 	.mm-wire-float,
 	.mm-wire-draw {
 		animation: none;

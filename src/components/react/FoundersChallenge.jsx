@@ -21,13 +21,13 @@ const autoplayMs = (entry) => Math.min(10000, Math.max(7000, 3000 + 300 * wordsO
 // frame, drawn in vw so every screen width keeps her proportions. w x h = the entry's size, y = its top in the
 // 1080 tall block, gap = the space to the entry after it. Her strip: the M 699 wide (our M video is drawn
 // 726 wide so its letter has her size and place), Memory Match 420x540, the apple 532 wide, The Art of
-// Moving 306x540, the glove 577x579, 74 / 59 / 58 / 69 px apart; the key (not in her frame) as before.
+// Moving 420x540 (her MM-G04-00 card), the glove 577x579, 74 / 59 / 58 / 69 px apart; the key (not in her frame) as before.
 const px = (n) => `${+(n / 19.2).toFixed(4)}vw`;
 const SLIDE = {
   "word-hunt": { w: 726, h: 787, y: 177, gap: 51 },
   "memory-match": { w: 420, h: 540, y: 287, gap: 59 },
   "tic-tac-toe": { w: 532, h: 587, y: 237, gap: 58 },
-  "art-of-moving": { w: 306, h: 540, y: 287, gap: 69 },
+  "art-of-moving": { w: 420, h: 540, y: 287, gap: 69 },
   // the glove's picture and the key's have wide white sides, so their boxes sit closer for the same look
   "connect-the-path": { w: 577, h: 579, y: 251, gap: -20 },
   collaborate: { w: 595, h: 557, y: 262, gap: 17 },
@@ -201,7 +201,8 @@ function MemoryCard() {
   return (
     <div className="relative overflow-hidden bg-[#171717] text-left text-white [font-family:Arial,Helvetica,sans-serif]" style={{ width: px(420), height: px(540), borderRadius: px(18) }}>
       <span className="absolute grid place-items-center rounded-full bg-white uppercase text-black" style={{ left: px(24), top: px(22), width: px(106), height: px(32), fontSize: px(10), lineHeight: px(11) }}>Memory game</span>
-      <span className="absolute font-normal" style={{ right: px(-11), top: px(-38), fontSize: px(194) }}><RollingCounter digitWidth="0.513em" /></span>
+      {/* the number ends where the pink line does, so no digit is cut by the card's edge (Marta, 11 Nov 19:23) */}
+      <span className="absolute font-normal leading-none" style={{ right: px(29), top: px(8), fontSize: px(194) }}><RollingCounter /></span>
       <p className="absolute whitespace-nowrap text-right text-[#F600A9]" style={{ right: px(29), top: px(186), fontSize: px(10), lineHeight: px(14) }}>© Mamamarta 2026</p>
       <p className="absolute whitespace-nowrap text-right text-[#E1E6E2]/[.86]" style={{ right: px(29), top: px(270), fontSize: px(12), lineHeight: px(15) }}>
         A LITTLE TEST FOR YOUR MIND.<br />Flip the cards.<br />Find the pairs.<br />Trust your memory.
@@ -218,7 +219,7 @@ function MemoryCardPhone() {
   return (
     <div className="relative h-[calc(var(--q)*450)] w-[calc(var(--q)*350)] overflow-hidden rounded-[calc(var(--q)*22)] bg-[#1c1c1c] text-white [font-family:'Helvetica_Neue',Helvetica,Arial,sans-serif]">
       <span className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*18)] grid h-[calc(var(--q)*25)] w-[calc(var(--q)*88)] place-items-center rounded-full bg-white text-[length:calc(var(--q)*8.5)] font-medium uppercase text-black/85">Memory game</span>
-      <RollingCounter digitWidth="0.46em" className="absolute right-[calc(var(--q)*14)] top-[calc(var(--q)*-8)] text-[length:calc(var(--q)*164)] font-light" />
+      <span className="absolute right-[calc(var(--q)*23)] top-[calc(var(--q)*13)] text-[length:calc(var(--q)*150)] font-light leading-none"><RollingCounter /></span>
       <p className="absolute right-[calc(var(--q)*23)] top-[calc(var(--q)*156)] text-[length:calc(var(--q)*8)] text-[#e3009c]">© Mamamarta 2026</p>
       <p className="absolute right-[calc(var(--q)*23)] top-[calc(var(--q)*226)] text-right text-[length:calc(var(--q)*9.5)] font-light leading-[calc(var(--q)*12.6)] tracking-[-0.03em] text-white/85">
         A LITTLE TEST FOR YOUR MIND.<br />Flip the cards.<br />Find the pairs.<br />Trust your memory.
@@ -249,18 +250,19 @@ function WalkingCardPhone({ active }) {
   );
 }
 
-// Desktop walking card, her card in Desktop - 40: black 306 x 540 (corners 24), the picture 286 x 368 inset
-// 10 px (corners 15), then centred the title 18 px, the line 10 px and the pink round arrow 24 px. Her
-// template's trench-coat words are not used: the card says The Art of Moving / Keep moving. Collect the pink stars.
+// Desktop walking card, her card in MM-G04-00 "Homepage / Slider Position 04" (Marta, 11 Nov 19:23: the
+// centred 306-wide card was "still not the card format of the design"): black 420 x 540, the size of the
+// Memory Match card, the picture 400 x 454 inset 10 px, then on the left "THE ART OF MOVING" Inter 22 px and
+// "Keep moving. Collect the pink stars." 14 px white 69%, the pink round arrow 38 px on the right.
 function WalkingCard({ active }) {
   return (
-    <div className="relative overflow-hidden bg-black text-center text-white" style={{ width: px(306), height: px(540), borderRadius: px(24) }}>
-      <div className="absolute overflow-hidden bg-white" style={{ left: px(10), top: px(10), width: px(286), height: px(368), borderRadius: px(15) }}>
+    <div className="relative overflow-hidden bg-black text-left text-white" style={{ width: px(420), height: px(540), borderRadius: px(24) }}>
+      <div className="absolute overflow-hidden bg-white" style={{ left: px(10), top: px(10), width: px(400), height: px(454), borderRadius: px(16) }}>
         <MovingFigure active={active} pos="50% 0%" className="h-full w-full" />
       </div>
-      <p className="absolute inset-x-0 whitespace-nowrap font-normal" style={{ top: px(407), fontSize: px(18), lineHeight: px(22) }}>The Art of Moving</p>
-      <p className="absolute inset-x-0 whitespace-nowrap text-white/[.59]" style={{ top: px(438), fontSize: px(10), lineHeight: px(14) }}>Keep moving. Collect the pink stars.</p>
-      <span className="absolute grid place-items-center rounded-full bg-[#F600A9] text-white" style={{ left: `calc(50% - ${px(12)})`, top: px(486), width: px(24), height: px(24), fontSize: px(13) }} aria-hidden="true"><ArrowIcon dir="up-right" /></span>
+      <p className="absolute whitespace-nowrap font-normal uppercase" style={{ left: px(22), top: px(481), fontSize: px(22), lineHeight: px(21) }}>The Art of Moving</p>
+      <p className="absolute whitespace-nowrap text-white/[.69]" style={{ left: px(22), top: px(509), fontSize: px(14), lineHeight: px(17) }}>Keep moving. Collect the pink stars.</p>
+      <span className="absolute grid place-items-center rounded-full bg-[#F600A9] text-white" style={{ right: px(22), top: px(483), width: px(38), height: px(38), fontSize: px(15) }} aria-hidden="true"><ArrowIcon dir="up-right" /></span>
     </div>
   );
 }
@@ -282,6 +284,15 @@ function Visual({ entry, active }) {
   const size = { width: px(s.w), height: px(s.h) };
   if (v.kind === "video") {
     const video = <LoopVideo src={v.src} poster={v.poster} alt={v.alt} active={active} className="block h-full w-full object-cover mix-blend-multiply brightness-[1.04] contrast-[1.08]" />;
+    // the apple's video has wide white around it, so it is drawn a third larger and cut to its box: the apple
+    // then has the weight of the M and the cards next to it (Marta, 11 Nov 19:23: "the apple is too small").
+    // No transform here: it would stop the video melting into the white page.
+    if (entry.id === "tic-tac-toe")
+      return (
+        <div className="relative overflow-hidden" style={size}>
+          <div className="absolute" style={{ top: "-16%", bottom: "-16%", left: "-16%", right: "-16%" }}>{video}</div>
+        </div>
+      );
     if (entry.id !== "connect-the-path") return <div style={size}>{video}</div>;
     return (
       <div className="relative overflow-hidden" style={size}>

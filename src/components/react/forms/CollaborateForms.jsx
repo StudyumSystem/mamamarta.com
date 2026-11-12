@@ -41,14 +41,16 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const newId = () =>
   typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-const labelCls = "block text-[11px] lg:text-[clamp(12px,0.68vw,13px)] font-normal leading-[1.3] text-black/80";
+// Phone sizes from her MM-C06 phone frames (1200:1745, kept copy, 13 Nov): labels Inter 12/15 black 69%, fields
+// 310 x 41 five px under their label, 12 apart, placeholder 16/19 black 40%, boxes 18 x 18. The computer keeps its own.
+const labelCls = "block text-[12px] lg:text-[clamp(12px,0.68vw,13px)] font-normal leading-[15px] lg:leading-[1.3] text-black/[0.69] lg:text-black/80";
 const inputCls =
-  "mt-[6px] lg:mt-[4px] block w-full h-[40px] lg:h-[clamp(44px,2.76vw,53px)] border border-black/20 bg-white px-[12px] lg:px-[clamp(14px,1.15vw,22px)] " +
-  "text-[15px] lg:text-[clamp(15px,1.1vw,21px)] font-light text-black placeholder:text-black/45 outline-none transition-colors focus:border-black";
+  "mt-[5px] lg:mt-[4px] block w-full h-[41px] lg:h-[clamp(44px,2.76vw,53px)] border border-black/20 bg-white px-[12px] lg:px-[clamp(14px,1.15vw,22px)] " +
+  "text-[16px] lg:text-[clamp(15px,1.1vw,21px)] font-normal lg:font-light text-black placeholder:text-black/40 lg:placeholder:text-black/45 outline-none transition-colors focus:border-black";
 const errorCls = "mt-1 text-[12px] lg:text-[clamp(12px,0.73vw,14px)] text-[#c2006f]";
 // Checked boxes are filled with the pink glow from the frames.
 const boxCls =
-  "peer h-[17px] w-[17px] lg:h-[clamp(18px,1.25vw,24px)] lg:w-[clamp(18px,1.25vw,24px)] shrink-0 appearance-none border border-black/70 bg-white " +
+  "peer h-[18px] w-[18px] lg:h-[clamp(18px,1.25vw,24px)] lg:w-[clamp(18px,1.25vw,24px)] shrink-0 appearance-none border border-black/70 bg-white " +
   "checked:border-black checked:bg-[radial-gradient(circle,#ff2fbf_0%,#b0007a_45%,#2b0019_100%)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-black/40";
 
 const ArrowRight = () => (
@@ -120,17 +122,20 @@ function Form({ flow, onDone }) {
 
   return (
     <form noValidate onSubmit={onSubmit} className="lg:max-w-[42.4vw]">
-      <div className="mt-[30px] grid gap-[18px] lg:mt-[3.05vw] lg:grid-cols-[18.75vw_1fr] lg:gap-x-[4.1vw] lg:gap-y-0">
+      {/* phone (her frame): Name 22 under the intro; the question 40 under Company, 12/17 black 60%; options in
+          44 px rows 16 under it, 16/19 black 69%; the idea field 24 below (160 tall), the consent row (44, 12/15)
+          17 below it, Submit 310 x 46 with 16 px type 24 below that */}
+      <div className="mt-[22px] grid gap-[18px] lg:mt-[3.05vw] lg:grid-cols-[18.75vw_1fr] lg:gap-x-[4.1vw] lg:gap-y-0">
         <div className="flex flex-col gap-[12px] lg:gap-[clamp(14px,1.15vw,22px)]">
           <Field id={`${flow}-name`} label="Name *" placeholder="Your Name" autoComplete="name" value={values.name} onChange={set("name")} error={errors.name} />
           <Field id={`${flow}-email`} label="Email *" type="email" inputMode="email" placeholder="Your Email Address" autoComplete="email" value={values.email} onChange={set("email")} error={errors.email} />
           <Field id={`${flow}-company`} label="Company *" placeholder="Where you work" autoComplete="organization" value={values.company} onChange={set("company")} error={errors.company} />
         </div>
         <fieldset className="mt-[22px] lg:mt-0" aria-describedby={errors.options ? `${flow}-opt-err` : undefined}>
-          <legend className={labelCls}>{f.question}<br />(Select all that apply)</legend>
-          <div className="mt-[14px] flex flex-col gap-[20px] lg:mt-[clamp(14px,1.4vw,26px)] lg:gap-[clamp(12px,1.08vw,21px)]">
+          <legend className={`${labelCls} max-lg:leading-[17px] max-lg:text-black/60`}>{f.question}<br />(Select all that apply)</legend>
+          <div className="mt-[16px] flex flex-col gap-0 lg:mt-[clamp(14px,1.4vw,26px)] lg:gap-[clamp(12px,1.08vw,21px)]">
             {f.options.map((o, i) => (
-              <label key={o} className="flex cursor-pointer items-center gap-[14px] lg:gap-[clamp(10px,0.83vw,16px)]">
+              <label key={o} className="flex min-h-[44px] cursor-pointer items-center gap-[14px] lg:min-h-0 lg:gap-[clamp(10px,0.83vw,16px)]">
                 <input
                   type="checkbox"
                   className={boxCls}
@@ -138,7 +143,7 @@ function Form({ flow, onDone }) {
                   onChange={() => toggle(o)}
                   data-invalid={i === 0 && errors.options ? "true" : undefined}
                 />
-                <span className="text-[15px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[1.2] text-black/80">{o}</span>
+                <span className="text-[16px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[19px] lg:leading-[1.2] text-black/[0.69] lg:text-black/80">{o}</span>
               </label>
             ))}
           </div>
@@ -146,7 +151,7 @@ function Form({ flow, onDone }) {
         </fieldset>
       </div>
 
-      <div className="mt-[26px] lg:mt-[clamp(24px,2.85vw,55px)]">
+      <div className="mt-[24px] lg:mt-[clamp(24px,2.85vw,55px)]">
         <label htmlFor={`${flow}-idea`} className={labelCls}>Your idea (optional)</label>
         <textarea
           id={`${flow}-idea`}
@@ -154,14 +159,14 @@ function Form({ flow, onDone }) {
           placeholder={f.placeholder}
           value={values.idea}
           onChange={set("idea")}
-          className={`${inputCls} h-[158px] lg:h-[clamp(130px,9.3vw,178px)] resize-none py-[10px] lg:py-[clamp(10px,1vw,20px)] leading-[1.3]`}
+          className={`${inputCls} h-[160px] lg:h-[clamp(130px,9.3vw,178px)] resize-none py-[10px] lg:py-[clamp(10px,1vw,20px)] leading-[19px] lg:leading-[1.3]`}
         />
       </div>
 
-      <div className="mt-[20px] flex flex-col gap-[40px] lg:mt-[clamp(20px,1.72vw,33px)] lg:flex-row lg:items-center lg:justify-between lg:gap-[2vw]">
-        <label className="flex cursor-pointer items-start gap-[14px] lg:items-center lg:gap-[clamp(8px,0.6vw,12px)]">
-          <input type="checkbox" className={`${boxCls} rounded-full mt-[1px] lg:mt-0`} checked={values.marketing} onChange={set("marketing")} />
-          <span className="text-[13px] lg:text-[clamp(12px,0.7vw,13.5px)] lg:whitespace-nowrap font-light leading-[1.35] text-black/80">
+      <div className="mt-[17px] flex flex-col gap-[24px] lg:mt-[clamp(20px,1.72vw,33px)] lg:flex-row lg:items-center lg:justify-between lg:gap-[2vw]">
+        <label className="flex min-h-[44px] cursor-pointer items-center gap-[14px] lg:min-h-0 lg:gap-[clamp(8px,0.6vw,12px)]">
+          <input type="checkbox" className={`${boxCls} rounded-full`} checked={values.marketing} onChange={set("marketing")} />
+          <span className="text-[12px] lg:text-[clamp(12px,0.7vw,13.5px)] lg:whitespace-nowrap font-normal lg:font-light leading-[15px] lg:leading-[1.35] text-black/[0.69] lg:text-black/80">
             I'd like to receive occasional updates and creative insights from Mamamarta.
           </span>
         </label>
@@ -169,7 +174,7 @@ function Form({ flow, onDone }) {
           type="submit"
           disabled={sending}
           aria-busy={sending}
-          className="mm-gradient inline-flex h-[46px] w-full shrink-0 items-center justify-center gap-2 text-[18px] font-semibold text-white disabled:opacity-70 lg:h-[clamp(52px,3.54vw,68px)] lg:w-[13.3vw] lg:min-w-[200px] lg:text-[clamp(16px,1.146vw,22px)]"
+          className="mm-gradient inline-flex h-[46px] w-full shrink-0 items-center justify-center gap-2 text-[16px] font-semibold text-white disabled:opacity-70 lg:h-[clamp(52px,3.54vw,68px)] lg:w-[13.3vw] lg:min-w-[200px] lg:text-[clamp(16px,1.146vw,22px)]"
         >
           {sending ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-label="Sending" /> : <>Submit <ArrowRight /></>}
         </button>
@@ -185,14 +190,16 @@ function Success({ flow, onExplore }) {
   const f = FLOWS[flow];
   return (
     <div className="mm-fade-in" role="status">
-      <h2 className="text-[22px] lg:mt-[1.3vw] lg:text-[clamp(32px,2.4vw,46px)] font-normal leading-[1.15] tracking-[-0.01em] text-black">{f.successTitle}</h2>
-      <p className="mt-[14px] lg:mt-[clamp(14px,1.5vw,28px)] lg:max-w-[29.5vw] text-[11.5px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[20px] lg:leading-[1.5] text-black/70">
+      {/* phone, her MM-C06 sent frames (13 Nov): title 24/29, text 12/20 black 60% 8 below, both -0.04em in a 293
+          column; Explore the games 300 x 46 with 16 px type, 22 below */}
+      <h2 className="max-lg:mx-auto max-lg:max-w-[293px] text-[24px] lg:mt-[1.3vw] lg:text-[clamp(32px,2.4vw,46px)] font-normal leading-[29px] lg:leading-[1.15] tracking-[-0.01em] max-lg:tracking-[-0.04em] text-black">{f.successTitle}</h2>
+      <p className="mt-[8px] lg:mt-[clamp(14px,1.5vw,28px)] max-lg:mx-auto max-lg:max-w-[293px] lg:max-w-[29.5vw] text-[12px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[20px] lg:leading-[1.5] max-lg:tracking-[-0.04em] text-black/60 lg:text-black/70">
         {f.successText[0]}<br />{f.successText[1]}
       </p>
       <button
         type="button"
         onClick={onExplore}
-        className="mm-gradient mt-[28px] inline-flex h-[46px] w-[calc(100%-10px)] items-center justify-center gap-2 text-[18px] font-semibold text-white lg:mt-[clamp(28px,2.6vw,50px)] lg:h-[clamp(52px,3.54vw,68px)] lg:w-[17.7vw] lg:min-w-[260px] lg:text-[clamp(16px,1.146vw,22px)]"
+        className="mm-gradient mt-[22px] inline-flex h-[46px] w-[calc(100%-10px)] items-center justify-center gap-2 text-[16px] font-semibold text-white lg:mt-[clamp(28px,2.6vw,50px)] lg:h-[clamp(52px,3.54vw,68px)] lg:w-[17.7vw] lg:min-w-[260px] lg:text-[clamp(16px,1.146vw,22px)]"
       >
         Explore the games <ArrowRight />
       </button>
@@ -235,8 +242,10 @@ export default function CollaborateForms({ initialFlow = null, initialSent = fal
           <Success flow={flow} onExplore={explore} />
         ) : (
           <>
-            <h2 className="text-[22px] lg:mt-[1.3vw] lg:text-[clamp(32px,2.4vw,46px)] font-normal leading-[1.15] tracking-[-0.01em] text-black">{f.title}</h2>
-            <p className="mt-[10px] lg:mt-[clamp(14px,1.5vw,28px)] lg:max-w-[31.5vw] text-[11.5px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[17px] lg:leading-[1.5] text-black/70">{f.intro}</p>
+            {/* phone (her MM-C06 phone frames): title 24/29 at -0.04em on one line, intro 12/17 black 60% 8 below in a
+                293 column */}
+            <h2 className="text-[24px] lg:mt-[1.3vw] lg:text-[clamp(32px,2.4vw,46px)] font-normal leading-[29px] lg:leading-[1.15] tracking-[-0.01em] max-lg:tracking-[-0.04em] text-black">{f.title}</h2>
+            <p className="mt-[8px] lg:mt-[clamp(14px,1.5vw,28px)] max-lg:max-w-[293px] lg:max-w-[31.5vw] text-[12px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[17px] lg:leading-[1.5] text-black/60 lg:text-black/70">{f.intro}</p>
             <Form key={flow} flow={flow} onDone={() => setSent(true)} />
           </>
         )}

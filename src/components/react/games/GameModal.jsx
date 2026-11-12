@@ -122,7 +122,7 @@ function LeaveDialog({ kind, onLeave, onStay }) {
   useEffect(() => { stayRef.current?.focus(); }, []);
   return (
     <div
-      className={`mm-fade-in fixed inset-x-[20px] top-[28px] bottom-[28px] z-20 flex items-center justify-center bg-white/[0.78] px-[25px] lg:top-0 lg:bottom-0 ${GAME_PANEL_X}`}
+      className={`mm-fade-in fixed inset-x-[20px] top-[28px] bottom-[28px] z-20 flex items-center justify-center bg-white/[0.78] px-[25px] max-lg:pt-[57px] lg:top-0 lg:bottom-0 ${GAME_PANEL_X}`}
       style={{ backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
       role="alertdialog" aria-modal="true" aria-labelledby="mm-leave-title"
     >
@@ -133,7 +133,8 @@ function LeaveDialog({ kind, onLeave, onStay }) {
         <p className="mt-[8px] text-[12px] leading-[20px] text-black/60 lg:text-[clamp(16px,1.146vw,22px)] lg:leading-[1.41] lg:text-black/[0.69]">
           {stars ? "Your MMStars haven't been saved yet." : "Your progress will be lost."}
         </p>
-        <div className="mt-[30px] flex w-full flex-col gap-[15px] lg:mt-[clamp(28px,2.4vw,46px)] lg:w-[clamp(360px,22.8vw,437px)] lg:flex-row lg:gap-[clamp(14px,1.1vw,21px)]">
+        {/* phone, her MM_Mobile _Confirmation (1071:2552, 13 Nov): the buttons 78 under the subtitle (were 30) */}
+        <div className="mt-[78px] flex w-full flex-col gap-[15px] lg:mt-[clamp(28px,2.4vw,46px)] lg:w-[clamp(360px,22.8vw,437px)] lg:flex-row lg:gap-[clamp(14px,1.1vw,21px)]">
           <button type="button" onClick={onLeave} className={btnOutline}>
             {stars ? "Leave anyway" : "Leave game"} <BackArrowIcon />
           </button>

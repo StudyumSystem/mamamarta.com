@@ -260,21 +260,21 @@ function MemoryCardPhone() {
   );
 }
 
-// Phone walking card, her new phone frame of 9 Nov (350 x 450): picture inset 12 px and 370 tall, then
-// "THE ART OF MOVING", "Keep moving. Collect the pink stars." and the pink round arrow on the right.
-// Her title font looks geometric (Montserrat-like); Inter Light until she names it.
+// Phone walking card, MM-HOME-002 (kept Figma copy, 13 Nov): black 350 x 450, picture 326 x 370 inset 12 px,
+// "THE ART OF MOVING" Inter 400 14/20 white, "Keep moving. Collect the pink stars." Inter 400 12/20 white 70%,
+// the pink round arrow 30 x 30 #F600A9 on the right.
 function WalkingCardPhone({ active }) {
   return (
-    <div className="flex w-[calc(var(--q)*350)] flex-col overflow-hidden rounded-[calc(var(--q)*24)] bg-black p-[calc(var(--q)*12)] pb-[calc(var(--q)*18)] text-white">
+    <div className="flex h-[calc(var(--q)*450)] w-[calc(var(--q)*350)] flex-col overflow-hidden rounded-[calc(var(--q)*24)] bg-black p-[calc(var(--q)*12)] text-white">
       <div className="w-full overflow-hidden rounded-[calc(var(--q)*16)] bg-white">
         <MovingFigure pos="50% 20%" phone className="h-[calc(var(--q)*370)] w-full" />
       </div>
-      <div className="mt-[calc(var(--q)*18)] flex items-center justify-between">
+      <div className="flex flex-1 items-center justify-between">
         <div>
-          <p className="text-[length:calc(var(--q)*18.5)] font-light uppercase leading-none tracking-[-0.03em]">The Art of Moving</p>
-          <p className="mt-[calc(var(--q)*7)] text-[length:calc(var(--q)*9.5)] font-light leading-[calc(var(--q)*14)] text-white/75">Keep moving. Collect the pink stars.</p>
+          <p className="text-[length:calc(var(--q)*14)] font-normal uppercase leading-[calc(var(--q)*20)]">The Art of Moving</p>
+          <p className="text-[length:calc(var(--q)*12)] font-normal leading-[calc(var(--q)*20)] text-white/70">Keep moving. Collect the pink stars.</p>
         </div>
-        <span className="grid h-[calc(var(--q)*30)] w-[calc(var(--q)*30)] shrink-0 place-items-center rounded-full bg-[#e3009c] text-[length:calc(var(--q)*11)] text-white" aria-hidden="true"><ArrowIcon dir="up-right" /></span>
+        <span className="grid h-[calc(var(--q)*30)] w-[calc(var(--q)*30)] shrink-0 place-items-center rounded-full bg-[#F600A9] text-[length:calc(var(--q)*11)] text-white" aria-hidden="true"><ArrowIcon dir="up-right" /></span>
       </div>
     </div>
   );

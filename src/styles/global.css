@@ -299,15 +299,10 @@ body {
 
 /* Marta's "experience" (What is heading): her Figma's Inter Italic 400 is Inter 3.19's italic (flat e and c
    endings, the upright letters slanted); the site's Inter (4.x, fontsource) draws its italic differently.
-   Inter 3.19 Italic from Inter's own repository (rsms/inter, tag v3.19, SIL Open Font License) through jsDelivr;
-   until it arrives the word shows in the site's Inter italic. */
-@font-face {
-	font-family: "Inter 3.19 Italic";
-	font-style: italic;
-	font-weight: 400;
-	font-display: swap;
-	src: url(https://cdn.jsdelivr.net/gh/rsms/inter@v3.19/docs/font-files/Inter-Italic.woff2) format("woff2");
-}
+   Inter 3.19 Italic from Inter's own repository (rsms/inter, tag v3.19, SIL Open Font License) through jsDelivr,
+   asked for only after the page has loaded (scripts/late-fonts.js): as an @font-face here it was part of the
+   page's own load, so a slow or unanswered font server kept the page from ever finishing (13 Nov: the phone home
+   timed out). Until it arrives the word shows in the site's Inter italic. */
 .mm-exp {
 	font-family: "Inter 3.19 Italic", "Inter", ui-sans-serif, system-ui, sans-serif;
 	font-style: italic;

@@ -25,7 +25,11 @@ const STAR_RAIN = 28; // pink stars falling over the panel when a run ends (12 N
 // World in Figma units: the desktop frame is 660 x 755 (MM-G04-03 at 2000 px wide).
 const H0 = 755;
 const MIN_VIEW_W = 560; // on tall phone frames the world is scaled to show at least this much ahead
-const FH = 400; // figure (video) height; the video is 2:3
+// 12 Nov (Marta's screenshot, after "take the design from my Figma"): her MM-G04-03 Gameplay (kept Figma copy)
+// has the figure 348 x 490 in the 635 x 726 frame, standing on the lower platforms, and every coin is her pink
+// badge: a 45 px pink circle with her white four-point star (31.5 px) in the middle. Ours had the figure a fifth
+// smaller (400) and plain pink dots. Now 490 of 726 = 510 here, and the badge.
+const FH = 510; // figure (video) height; the video is 2:3
 const FW = (FH * 2) / 3;
 const FOOT_Y = 0.95; // feet sit at 95% of the video height
 const JH = FH; // leap video height: its figure stands about as tall in its 3:4 frame as the walker in hers
@@ -33,18 +37,23 @@ const JW = (JH * 3) / 4;
 const JFOOT_Y = 0.91; // the tucked feet of the airborne frame sit at 91% of its height
 const JCX = 0.45; // the leaping body's centre across the (mirrored) frame
 const FOOT_TOL = 34; // half width of the feet on a platform
-const BODY_W = 90;
+const BODY_W = 115;
 const BODY_H = 0.88 * FH;
 const PLAT_H = 37;
 const PLAT_R = 12;
-const COIN_R = 24;
+const COIN_R = 23.4; // her badge, 45 of 635 px
+// Her four-point star (Star 2, the same as in GameModal), drawn in a 24 x 24 box, 70% of the badge across.
+const STAR = typeof Path2D !== "undefined" ? new Path2D("M12 0c.9 6.4 5.1 10.9 12 12-6.9 1.1-11.1 5.6-12 12-.9-6.4-5.1-10.9-12-12C6.9 10.9 11.1 6.4 12 0z") : null;
+const STAR_K = (COIN_R * 2 * 0.7) / 24;
 const APEX = 150; // jump height
 const AIR = 0.78; // time in the air on level ground
 const V0 = (4 * APEX) / AIR;
 const G = (2 * V0) / AIR;
-const Y_MIN = 560;
+// Platform tops: hers run 562 to 682 here; with her taller figure the highest sit at 600, so the head stays
+// inside the frame at the top of a jump.
+const Y_MIN = 600;
 const Y_MAX = 700;
-const Y_START = 600;
+const Y_START = 640;
 const SPEED0 = 280;
 const SPEED_MAX = 470;
 const ACCEL = 5; // speed gained per second of running
@@ -318,9 +327,19 @@ export default function ArtOfMoving({ open, onClose }) {
         const x = c.x - camX;
         if (x < -COIN_R * 2 || x > viewW + COIN_R * 2) continue;
         ctx.globalAlpha = a;
+        ctx.fillStyle = PINK;
         ctx.beginPath();
         ctx.arc(x, c.y, r, 0, Math.PI * 2);
         ctx.fill();
+        if (STAR) {
+          const k = STAR_K * (r / COIN_R);
+          ctx.save();
+          ctx.translate(x - 12 * k, c.y - 12 * k);
+          ctx.scale(k, k);
+          ctx.fillStyle = "#fff";
+          ctx.fill(STAR);
+          ctx.restore();
+        }
       }
       ctx.globalAlpha = 1;
       const air = g.p.jumped && !g.p.ground && leapReady();

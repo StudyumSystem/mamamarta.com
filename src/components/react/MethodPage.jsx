@@ -18,8 +18,11 @@ const unit = { "--u": "min(calc(100vw / 1920), calc(100dvh / 1080))" };
 
 const stages = [
   {
-    img: { src: "/assets/charcoal.png", w: 1406, h: 1802, size: [320, 703], alt: "A stick of black MAMAMARTA charcoal" },
-    gap: [0, 0, 29, 3],
+    // 12 Nov (Marta changed her frame: "I fixed the first block, the charcoal, do the same"): the charcoal is now
+    // drawn 613 px wide (her 703 x 1054 image box shows it at 87%), pushed up so its tip sits right on the label
+    // at 557 px, its top cut by the page edge (computer only).
+    img: { src: "/assets/charcoal.png", w: 1406, h: 1802, size: [320, 613], alt: "A stick of black MAMAMARTA charcoal" },
+    gap: [0, -228.7, 29, 0],
     label: "01 — CHARCOAL / DISCOVERY",
     title: "The First Spark",
     subtitle: "Raw potential. Light and shadow. The beginning of form.",
@@ -120,8 +123,8 @@ export default function MethodPage() {
         ))}
 
         <section
-          className={`bg-black px-[20px] text-center tracking-[-0.04em] pt-[109.2px] pb-[43.9px] md:pt-[calc(var(--u)*251.1)] md:pb-[calc(var(--u)*257.2)] ${gapClass}`}
-          style={gap(60.4, 208.5)}
+          className={`bg-black px-[20px] text-center tracking-[-0.04em] pt-[109.2px] pb-[43.9px] md:pt-[calc(var(--u)*250)] md:pb-[calc(var(--u)*251)] ${gapClass}`}
+          style={gap(60.4, 624)} /* her 12 Nov frame: the black block stays at 5914 px while the stages above moved up */
         >
           {/* Her current MM-METHOD (kept Figma copy, 12 Nov, "the font is different, above all the italic"): the words
               are Inter Medium 500 and only "One" is Inter Italic 400, letter spacing -0.06em on both, lines 167 / 65 px
@@ -133,12 +136,12 @@ export default function MethodPage() {
             <br />
             foundation.
           </h2>
-          <div className="mx-auto mt-[28.4px] flex max-w-[296px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#cfcfcf] md:mt-[calc(var(--u)*84.1)] md:max-w-[calc(var(--u)*698.88)] md:gap-[calc(var(--u)*40)] md:text-[length:calc(var(--u)*28)] md:leading-[calc(var(--u)*40)] md:text-[#b0b0b0]">
+          <div className="mx-auto mt-[28.4px] flex max-w-[296px] flex-col gap-[20px] text-[14px] leading-[20px] text-[#cfcfcf] md:mt-[calc(var(--u)*80)] md:max-w-[calc(var(--u)*547)] md:gap-[calc(var(--u)*34)] md:text-[length:calc(var(--u)*22)] md:leading-[calc(var(--u)*34)] md:text-[#b0b0b0]">
             {foundation.map((text, i) => (
               <p key={i}>{text}</p>
             ))}
           </div>
-          <p className="mt-[39.7px] font-bold text-white text-[20px] leading-[28px] md:mt-[calc(var(--u)*65.6)] md:text-[length:calc(var(--u)*30)] md:leading-[calc(var(--u)*44)]">
+          <p className="mt-[39.7px] font-bold text-white text-[20px] leading-[28px] md:mt-[calc(var(--u)*59)] md:text-[length:calc(var(--u)*30)] md:leading-[calc(var(--u)*44)]">
             Everything that follows stands <br className="md:hidden" />
             on four.
           </p>

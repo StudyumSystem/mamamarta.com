@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
 import { pad2, shuffle, takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
 import { play } from "./sound.js";
+import Burst, { PINK_BLACK } from "./Burst.jsx";
 
 // MM-GAME-02 Memory Match (Marta's spec + her 11 Nov frames MM-G02-01…06): 20 cards, 10 pairs, no timer,
 // counter 0/10, 10 MM✦ a pair, mismatch flips back after ~900 ms, max two cards up.
-// All pairs found: the cards fly apart and a pink firework opens (skipped with reduced motion),
+// All pairs found: the cards fly apart and a pink and black firework opens (a fade instead with reduced motion),
 // then the score screen (timer line), then the quote screen.
 const IMAGES = [
   ["1", "Chess queen"], ["2", "Ice cream"], ["3", "Balloon dog"], ["4", "Heart"], ["5", "Lipstick"],
@@ -20,34 +21,11 @@ const INSTRUCTIONS =
 
 const newDeck = () => shuffle(IMAGES.flatMap(([n, alt]) => [{ n, alt }, { n, alt }])).map((c, i) => ({ ...c, key: `${c.n}-${i}` }));
 
-// A pink firework: two rings of sparks from the middle of the board.
+// The firework: two rings of confetti from the middle of the board. 12 Nov (Marta: more confetti): twice as many
+// pieces (88, was 44), Mamamarta pink #F600A9 and black, thrown about twice as far (up to half the screen).
 function Firework() {
-  const sparks = useMemo(() => {
-    const out = [];
-    const colors = ["#F600A9", "#F600A9", "#ff4fc4", "#ffa3dd", "#c4007f"];
-    [0, 260].forEach((delay, ring) => {
-      const n = ring ? 18 : 26;
-      for (let i = 0; i < n; i++) {
-        const a = (i / n) * Math.PI * 2 + Math.random() * 0.2;
-        const r = (ring ? 0.55 : 1) * (150 + Math.random() * 120);
-        out.push({
-          dx: `${Math.cos(a) * r}px`,
-          dy: `${Math.sin(a) * r}px`,
-          s: `${(ring ? 6 : 8) + Math.random() * 6}px`,
-          c: colors[Math.floor(Math.random() * colors.length)],
-          delay: `${delay + Math.random() * 90}ms`,
-        });
-      }
-    });
-    return out;
-  }, []);
-  return (
-    <span className="pointer-events-none absolute left-1/2 top-1/2 z-10 block h-0 w-0" aria-hidden="true">
-      {sparks.map((p, i) => (
-        <span key={i} className="mm-spark" style={{ "--dx": p.dx, "--dy": p.dy, "--s": p.s, "--c": p.c, "--delay": p.delay }} />
-      ))}
-    </span>
-  );
+  const reach = useMemo(() => Math.max(320, Math.min(window.innerWidth, window.innerHeight) * 0.5), []);
+  return <Burst rings={[{ n: 52, reach, size: 11 }, { n: 36, reach: reach * 0.55, size: 9, delay: 260 }]} colors={PINK_BLACK} />;
 }
 
 export default function MemoryMatch({ open, onClose }) {
@@ -55,7 +33,7 @@ export default function MemoryMatch({ open, onClose }) {
   const [up, setUp] = useState([]); // indices currently face up (unmatched)
   const [matched, setMatched] = useState(() => new Set());
   const [pulse, setPulse] = useState(null);
-  const [phase, setPhase] = useState("play"); // play | burst | score | done
+  const [phase, setPhase] = useState("play"); // play | burst (or fade, reduced motion) | score | done
   const [fly, setFly] = useState(null); // per-card flight vectors during the burst
   const [quote, setQuote] = useState(null);
   const [moved, setMoved] = useState(false);
@@ -105,7 +83,8 @@ export default function MemoryMatch({ open, onClose }) {
     lock.current = true;
     play("win");
     recordStars("memory-match", ROUND_STARS);
-    if (prefersReducedMotion()) { later(() => setPhase("score"), 500); return; }
+    // reduced motion: no flight and no firework, the board simply fades (12 Nov)
+    if (prefersReducedMotion()) { later(() => setPhase("fade"), 300); later(() => setPhase("score"), 1100); return; }
     later(() => { setPhase("burst"); burst(); }, 450);
     later(() => setPhase("score"), 450 + 1450);
   };
@@ -157,7 +136,7 @@ export default function MemoryMatch({ open, onClose }) {
         <ScoreScreen badge="Perfect find" label="All pairs found" value="10 / 10" stars={ROUND_STARS} onDone={toQuote} />
       ) : (
         <div className="flex flex-1 items-start justify-center overflow-hidden px-[15px] pb-8 pt-[18px] lg:pb-[3vw] lg:pt-[3.96vw]">
-          <div ref={gridRef} className="relative grid w-full max-w-[640px] grid-cols-4 gap-[6px] lg:w-[36vw] lg:max-w-none lg:grid-cols-5 lg:gap-x-[0.85vw] lg:gap-y-[1.1vw]">
+          <div ref={gridRef} className={`${phase === "fade" ? "mm-fade-out" : ""} relative grid w-full max-w-[640px] grid-cols-4 gap-[6px] lg:w-[36vw] lg:max-w-none lg:grid-cols-5 lg:gap-x-[0.85vw] lg:gap-y-[1.1vw]`}>
             {deck.map((card, i) => {
               const faceUp = phase !== "play" || matched.has(i) || up.includes(i);
               const f = phase === "burst" && fly?.[i];

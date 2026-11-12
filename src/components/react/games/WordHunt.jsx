@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
-import { pad2, shuffle, takeQuote, recordStars, ROUND_STARS } from "./shared.js";
+import { pad2, shuffle, takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
 import { play as playSound } from "./sound.js";
 const play = (name) => playSound(name, "word-hunt");
 
@@ -89,6 +89,7 @@ export default function WordHunt({ open, onClose }) {
   const [pop, setPop] = useState(null);
   const [quote, setQuote] = useState(null);
   const [phase, setPhase] = useState("play"); // play | score | done
+  const [finish, setFinish] = useState(null); // null | "fade" | per-letter rain
   const drag = useRef(null);
   const selRef = useRef([]);
   const gridRef = useRef(null);
@@ -105,6 +106,7 @@ export default function WordHunt({ open, onClose }) {
     setPop(null);
     setQuote(null);
     setPhase("play");
+    setFinish(null);
   }, []);
 
   // Closing or reopening always starts a fresh grid at 0/10.
@@ -155,7 +157,22 @@ export default function WordHunt({ open, onClose }) {
     if (next.length === COUNT) {
       play("win");
       recordStars("word-hunt", ROUND_STARS);
-      later(() => setPhase("score"), 1100);
+      // 12 Nov (Marta): the letters of the grid rain down off the board, then the score screen
+      // (with reduced motion the board simply fades)
+      if (prefersReducedMotion()) {
+        later(() => setFinish("fade"), 350);
+        later(() => setPhase("score"), 1150);
+      } else {
+        later(() => {
+          const cell = (gridRef.current?.offsetHeight || 360) / SIZE;
+          setFinish(Array.from({ length: SIZE * SIZE }, (_, i) => ({
+            fall: `${cell * (SIZE + 2)}px`,
+            rot: `${(Math.random() - 0.5) * 70}deg`,
+            delay: `${(SIZE - 1 - Math.floor(i / SIZE)) * 35 + Math.random() * 120}ms`,
+          })));
+        }, 350);
+        later(() => setPhase("score"), 1700);
+      }
     } else {
       // a found word, then its MM✦ credited (Marta, 11 Nov 19:56)
       play("match");
@@ -194,7 +211,7 @@ export default function WordHunt({ open, onClose }) {
       ) : phase === "score" ? (
         <ScoreScreen badge="Perfect find" label="All words discovered" value={`${COUNT} / ${COUNT}`} stars={ROUND_STARS} onDone={toQuote} />
       ) : (
-        <div className="flex flex-1 items-start justify-center px-[15px] pt-[19px] pb-8 lg:pb-[2.4vw] lg:pt-[2.9vw]">
+        <div className="flex flex-1 items-start justify-center overflow-clip px-[15px] pt-[19px] pb-8 lg:pb-[2.4vw] lg:pt-[2.9vw]">
           <div
             ref={gridRef}
             onPointerDown={onDown}
@@ -203,10 +220,11 @@ export default function WordHunt({ open, onClose }) {
             onPointerCancel={onUp}
             role="grid"
             aria-label={`Word Hunt letter grid, ${found.length} of ${COUNT} words found${found.length ? `: ${found.join(", ")}` : ""}`}
-            className="grid w-full max-w-[640px] select-none grid-cols-10 gap-px border border-[#d4d4d4] bg-[#d4d4d4] [container-type:inline-size] [touch-action:none] lg:w-[min(38.5vw,calc(100vh_-_200px))] lg:max-w-none"
+            className={`${finish === "fade" ? "mm-fade-out" : ""} grid w-full max-w-[640px] select-none grid-cols-10 gap-px border border-[#d4d4d4] bg-[#d4d4d4] [container-type:inline-size] [touch-action:none] lg:w-[min(38.5vw,calc(100vh_-_200px))] lg:max-w-none`}
           >
             {round?.grid.map((ch, i) => {
               const on = selCells.has(i) || foundCells.has(i);
+              const drop = Array.isArray(finish) && finish[i];
               return (
                 <span
                   key={i}
@@ -215,7 +233,7 @@ export default function WordHunt({ open, onClose }) {
                     on ? "bg-[#fef7fc] text-[#F600A9]" : "bg-white text-black"
                   } ${popCells.has(i) ? "mm-match" : ""}`}
                 >
-                  {ch}
+                  {drop ? <span className="mm-rain" style={{ "--fall": drop.fall, "--rot": drop.rot, "--delay": drop.delay }}>{ch}</span> : ch}
                 </span>
               );
             })}

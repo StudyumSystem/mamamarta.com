@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
-import { pad2, takeQuote, recordStars, ROUND_STARS } from "./shared.js";
+import { pad2, takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
 import { play as playSound } from "./sound.js";
+import Burst from "./Burst.jsx";
 const play = (name) => playSound(name, "connect-the-path");
 
 // MM-GAME-05 Connect the Path (Marta's spec): 15 dots on an invisible grid, one pink start.
@@ -77,6 +78,8 @@ export default function ConnectPath({ open, onClose }) {
   const [quote, setQuote] = useState(null);
   const [phase, setPhase] = useState("play"); // play | score | done
   const [best, setBest] = useState(false);
+  const [finish, setFinish] = useState(null); // null | light | burst | fade
+  const spacing = useRef(60); // px between two dots, for the sparks
   const startedAt = useRef(0);
   const pathRef = useRef([]);
   const dragging = useRef(false);
@@ -98,6 +101,7 @@ export default function ConnectPath({ open, onClose }) {
     setQuote(null);
     setPhase("play");
     setBest(false);
+    setFinish(null);
     startedAt.current = 0;
   }, []);
 
@@ -134,7 +138,19 @@ export default function ConnectPath({ open, onClose }) {
         setBest(isBest);
         recordStars("connect-the-path", ROUND_STARS);
         play("win");
-        later(() => setPhase("score"), 900);
+        // 12 Nov (Marta): a pink light runs along the finished path like an electric current, then the dots
+        // burst into small sparks, then the score screen (with reduced motion the shape simply fades)
+        if (prefersReducedMotion()) {
+          later(() => setFinish("fade"), 300);
+          later(() => setPhase("score"), 1100);
+        } else {
+          later(() => setFinish("light"), 120);
+          later(() => {
+            spacing.current = (svgRef.current?.getBoundingClientRect().width || 300) / layout.cols;
+            setFinish("burst");
+          }, 780);
+          later(() => setPhase("score"), 1650);
+        }
       } else play("flip");
       return true;
     }
@@ -181,6 +197,7 @@ export default function ConnectPath({ open, onClose }) {
   // MM-G05-02: the path fades from the pink start to near-black at the dot you're on; complete = all pink.
   const shade = (k) => (done || path.length < 2 ? PINK : mix(PINK, DARK, k / (path.length - 1)));
   const at = new Map(path.map((d, k) => [d, k]));
+  const lightPoints = finish === "light" ? path.map((d) => pos(d).join(",")).join(" ") : "";
 
   const toQuote = useCallback(() => { setQuote(takeQuote("connect-the-path")); setPhase("done"); }, []);
   const ended = phase !== "play";
@@ -203,48 +220,74 @@ export default function ConnectPath({ open, onClose }) {
       ) : phase === "score" ? (
         <ScoreScreen badge={best ? "New personal best" : "Well played"} label="All dots connected" value={`${DOTS} / ${DOTS}`} stars={ROUND_STARS} onDone={toQuote} />
       ) : (
-        <div className="flex flex-1 items-center justify-center px-[15px] py-8 lg:pb-[3.5vw] lg:pt-[2vw]">
+        <div className="flex flex-1 items-center justify-center overflow-clip px-[15px] py-8 lg:pb-[3.5vw] lg:pt-[2vw]">
           {layout && (
-            <svg
-              ref={svgRef}
-              viewBox={`0 0 ${layout.cols * UNIT} ${layout.rows * UNIT}`}
-              onPointerDown={onDown}
-              onPointerMove={onMove}
-              onPointerUp={onUp}
-              onPointerCancel={onUp}
-              role="img"
-              aria-label={`Connect the Path, ${path.length} of ${DOTS} dots connected`}
-              className="block select-none [touch-action:none] [--s:min(14vw,70px)] lg:[--s:min(6vw,calc((100vh_-_260px)/6))]"
-              style={{ width: `calc(${layout.cols} * var(--s))`, height: `calc(${layout.rows} * var(--s))` }}
-            >
-              <defs>
-                {path.slice(1).map((d, j) => {
-                  const [x1, y1] = pos(d), [x2, y2] = pos(path[j]);
+            <div className={`relative ${finish === "fade" ? "mm-fade-out" : ""}`}>
+              <svg
+                ref={svgRef}
+                viewBox={`0 0 ${layout.cols * UNIT} ${layout.rows * UNIT}`}
+                onPointerDown={onDown}
+                onPointerMove={onMove}
+                onPointerUp={onUp}
+                onPointerCancel={onUp}
+                role="img"
+                aria-label={`Connect the Path, ${path.length} of ${DOTS} dots connected`}
+                className="block select-none [touch-action:none] [--s:min(14vw,70px)] lg:[--s:min(6vw,calc((100vh_-_260px)/6))]"
+                style={{ width: `calc(${layout.cols} * var(--s))`, height: `calc(${layout.rows} * var(--s))` }}
+              >
+                <defs>
+                  <filter id="cp-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7" /></filter>
+                  {path.slice(1).map((d, j) => {
+                    const [x1, y1] = pos(d), [x2, y2] = pos(path[j]);
+                    return (
+                      <linearGradient key={d} id={`cp-g${d}`} gradientUnits="userSpaceOnUse" x1={x1} y1={y1} x2={x2} y2={y2}>
+                        <stop offset="0" stopColor={shade(j + 1)} />
+                        <stop offset="1" stopColor={shade(j)} />
+                      </linearGradient>
+                    );
+                  })}
+                </defs>
+                <g className={finish === "burst" ? "mm-fade-out" : undefined} style={finish === "burst" ? { animationDuration: "300ms" } : undefined}>
+                  {path.slice(1).map((d, j) => {
+                    const [x1, y1] = pos(path[j]), [x2, y2] = pos(d);
+                    return <line key={d} x1={x1} y1={y1} x2={x2} y2={y2} stroke={`url(#cp-g${d})`} strokeWidth="2.6" strokeLinecap="round" />;
+                  })}
+                </g>
+                {layout.dots.map((d, i) => {
+                  const k = at.get(i);
                   return (
-                    <linearGradient key={d} id={`cp-g${d}`} gradientUnits="userSpaceOnUse" x1={x1} y1={y1} x2={x2} y2={y2}>
-                      <stop offset="0" stopColor={shade(j + 1)} />
-                      <stop offset="1" stopColor={shade(j)} />
-                    </linearGradient>
+                    <circle
+                      key={`${d.r}-${d.c}`}
+                      cx={(d.c + 0.5) * UNIT}
+                      cy={(d.r + 0.5) * UNIT}
+                      r={R}
+                      fill={k == null ? "#000" : k === 0 ? shade(0) : `url(#cp-g${i})`}
+                      className={finish === "burst" ? "mm-dot-out" : undefined}
+                    />
                   );
                 })}
-              </defs>
-              {path.slice(1).map((d, j) => {
-                const [x1, y1] = pos(path[j]), [x2, y2] = pos(d);
-                return <line key={d} x1={x1} y1={y1} x2={x2} y2={y2} stroke={`url(#cp-g${d})`} strokeWidth="2.6" strokeLinecap="round" />;
-              })}
-              {layout.dots.map((d, i) => {
-                const k = at.get(i);
-                return (
-                  <circle
+                {finish === "light" && (
+                  /* the current: a soft pink glow with a light core, running from the start dot to the last */
+                  <g aria-hidden="true">
+                    <polyline points={lightPoints} pathLength="1" fill="none" stroke={PINK} strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" filter="url(#cp-glow)" className="mm-current" />
+                    <polyline points={lightPoints} pathLength="1" fill="none" stroke="#ffe0f4" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" className="mm-current" />
+                  </g>
+                )}
+              </svg>
+              {/* then every dot bursts into small sparks */}
+              {finish === "burst" &&
+                layout.dots.map((d) => (
+                  <Burst
                     key={`${d.r}-${d.c}`}
-                    cx={(d.c + 0.5) * UNIT}
-                    cy={(d.r + 0.5) * UNIT}
-                    r={R}
-                    fill={k == null ? "#000" : k === 0 ? shade(0) : `url(#cp-g${i})`}
+                    x={`${((d.c + 0.5) / layout.cols) * 100}%`}
+                    y={`${((d.r + 0.5) / layout.rows) * 100}%`}
+                    rings={[{ n: 9, reach: spacing.current * 0.6, size: 5 }]}
+                    colors={[PINK, PINK, "#ff6fd0"]}
+                    fall="10px"
+                    dur="760ms"
                   />
-                );
-              })}
-            </svg>
+                ))}
+            </div>
           )}
         </div>
       )}

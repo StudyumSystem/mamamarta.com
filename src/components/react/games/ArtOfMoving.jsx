@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
-import { takeQuote, recordStars, ROUND_STARS } from "./shared.js";
+import GameModal, { Completion, ScoreScreen, StarIcon } from "./GameModal.jsx";
+import { takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
 import { play as playSound } from "./sound.js";
 const sound = (name) => playSound(name, "art-of-moving");
 
@@ -20,6 +20,7 @@ const BEST_KEY = "mm-art-of-moving-best";
 // 11 Nov (her MM-G04-04 Desktop_Score: 23 coins, 150 MM✦STARS): 10 MM✦ a coin, at most 150 a run (question for Marta).
 const COIN_STARS = 10;
 const runStars = (n) => Math.min(ROUND_STARS, n * COIN_STARS);
+const STAR_RAIN = 28; // pink stars falling over the panel when a run ends (12 Nov)
 
 // World in Figma units: the desktop frame is 660 x 755 (MM-G04-03 at 2000 px wide).
 const H0 = 755;
@@ -121,6 +122,7 @@ export default function ArtOfMoving({ open, onClose }) {
   const [coins, setCoins] = useState(0);
   const [result, setResult] = useState(null);
   const [quote, setQuote] = useState(null);
+  const [finish, setFinish] = useState(null); // null | "fade" | the falling stars
   const [touch, setTouch] = useState(false);
   const [layout, setLayout] = useState({ s: 1, offY: 0 });
   const frameRef = useRef(null);
@@ -140,6 +142,7 @@ export default function ArtOfMoving({ open, onClose }) {
     setCoins(0);
     setResult(null);
     setQuote(null);
+    setFinish(null);
   }, []);
 
   // Closing or reopening always comes back to the Default screen; the best score stays.
@@ -150,6 +153,7 @@ export default function ArtOfMoving({ open, onClose }) {
     clearTimers();
     setCoins(0);
     setResult(null);
+    setFinish(null);
     setPhase("countdown");
     setRunId((n) => n + 1);
   }, []);
@@ -161,7 +165,23 @@ export default function ArtOfMoving({ open, onClose }) {
     setResult({ coins: n, isBest });
     recordStars("art-of-moving", runStars(n));
     sound("win");
-    setPhase("score");
+    // 12 Nov (Marta): pink stars rain over the panel, then the score screen (reduced motion: the panel fades)
+    if (prefersReducedMotion()) {
+      setFinish("fade");
+      later(() => setPhase("score"), 800);
+      return;
+    }
+    const f = frameRef.current;
+    const w = f?.offsetWidth || 320, h = f?.offsetHeight || 500;
+    setFinish(Array.from({ length: STAR_RAIN }, (_, i) => ({
+      left: `${((i + Math.random()) / STAR_RAIN) * 100}%`,
+      s: w * (0.035 + Math.random() * 0.045),
+      fall: `${h * 1.15}px`,
+      rot: `${(Math.random() - 0.5) * 240}deg`,
+      delay: `${Math.random() * 420}ms`,
+      dur: `${820 + Math.random() * 240}ms`,
+    })));
+    later(() => setPhase("score"), 1500);
   }, []);
 
   const toQuote = useCallback(() => { setQuote(takeQuote("art-of-moving")); setPhase("done"); }, []);
@@ -397,7 +417,7 @@ export default function ArtOfMoving({ open, onClose }) {
         >
           <div
             ref={frameRef}
-            className="relative isolate w-full aspect-[311/584] overflow-hidden rounded-[30px] border border-black bg-white lg:min-h-0 lg:w-auto lg:rounded-[2vw] lg:h-[min(37.75vw,calc(100vh_-_260px))] lg:aspect-[660/755]"
+            className={`${finish === "fade" ? "mm-fade-out" : ""} relative isolate w-full aspect-[311/584] overflow-hidden rounded-[30px] border border-black bg-white lg:min-h-0 lg:w-auto lg:rounded-[2vw] lg:h-[min(37.75vw,calc(100vh_-_260px))] lg:aspect-[660/755]`}
           >
             <canvas ref={canvasRef} className={`absolute inset-0 h-full w-full ${running ? "" : "invisible"}`} aria-hidden="true" />
             <video
@@ -447,6 +467,17 @@ export default function ArtOfMoving({ open, onClose }) {
               </div>
             )}
 
+            {Array.isArray(finish) &&
+              finish.map((st, i) => (
+                <span
+                  key={i}
+                  className="mm-star-fall pointer-events-none"
+                  style={{ left: st.left, width: st.s, height: st.s, marginLeft: -st.s / 2, "--fall": st.fall, "--rot": st.rot, "--delay": st.delay, "--dur": st.dur }}
+                  aria-hidden="true"
+                >
+                  <StarIcon className="block h-full w-full" fill={PINK} />
+                </span>
+              ))}
           </div>
         </div>
       )}

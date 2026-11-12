@@ -162,13 +162,76 @@ body {
 	border-radius: 9999px;
 	background: var(--c, #f600a9);
 	opacity: 0;
-	animation: mm-spark 1100ms cubic-bezier(0.15, 0.7, 0.3, 1) var(--delay, 0ms) forwards;
+	animation: mm-spark var(--dur, 1100ms) cubic-bezier(0.15, 0.7, 0.3, 1) var(--delay, 0ms) forwards;
 }
 @keyframes mm-spark {
 	0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
 	8% { opacity: 1; }
 	70% { opacity: 1; }
-	100% { transform: translate(var(--dx), calc(var(--dy) + 40px)) scale(0.2); opacity: 0; }
+	100% { transform: translate(var(--dx), calc(var(--dy) + var(--fall, 40px))) scale(0.2); opacity: 0; }
+}
+
+/* 12 Nov (Marta): a short finish for every game before its score screen; with reduced motion a plain fade. */
+.mm-fade-out {
+	animation: mm-fade-out 750ms ease-in forwards;
+}
+@keyframes mm-fade-out {
+	to { opacity: 0; }
+}
+/* Word Hunt: the letters rain down off the board (bottom rows first). --fall, --rot, --delay from the script. */
+.mm-rain {
+	display: inline-block;
+	animation: mm-rain 850ms cubic-bezier(0.5, 0, 0.85, 0.4) var(--delay, 0ms) both;
+}
+@keyframes mm-rain {
+	0% { transform: translateY(0) rotate(0); opacity: 1; }
+	12% { transform: translateY(calc(var(--fall) * -0.012)) rotate(0); opacity: 1; }
+	85% { opacity: 1; }
+	100% { transform: translateY(var(--fall)) rotate(var(--rot)); opacity: 0; }
+}
+/* Tic-Tac-Toe win: the winning symbols jump, one after the other along the line */
+.mm-hop {
+	animation: mm-hop 620ms cubic-bezier(0.3, 0, 0.4, 1) var(--delay, 0ms) both;
+}
+@keyframes mm-hop {
+	0% { transform: translateY(0) scale(1); }
+	30% { transform: translateY(-26%) scale(1.06); }
+	55% { transform: translateY(0) scale(1.05, 0.94); }
+	75% { transform: translateY(-9%) scale(1.02); }
+	100% { transform: translateY(0) scale(1); }
+}
+/* Connect the Path: a pink light runs along the finished path like a current (the path has pathLength 1) */
+.mm-current {
+	stroke-dasharray: 0.16 1.3;
+	stroke-dashoffset: 0.16;
+	animation: mm-current 680ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
+}
+@keyframes mm-current {
+	0% { stroke-dashoffset: 0.16; opacity: 1; }
+	88% { opacity: 1; }
+	100% { stroke-dashoffset: -1; opacity: 0; }
+}
+/* ...then each dot swells and goes out as its sparks fly */
+.mm-dot-out {
+	transform-box: fill-box;
+	transform-origin: center;
+	animation: mm-dot-out 300ms ease-in forwards;
+}
+@keyframes mm-dot-out {
+	to { transform: scale(1.5); opacity: 0; }
+}
+/* The Art of Moving: pink stars rain over the panel at the end of a run */
+.mm-star-fall {
+	position: absolute;
+	top: 0;
+	opacity: 0;
+	animation: mm-star-fall var(--dur, 1000ms) cubic-bezier(0.4, 0, 0.75, 0.6) var(--delay, 0ms) forwards;
+}
+@keyframes mm-star-fall {
+	0% { transform: translateY(-120%) rotate(0); opacity: 0; }
+	10% { opacity: 1; }
+	85% { opacity: 1; }
+	100% { transform: translateY(var(--fall)) rotate(var(--rot)); opacity: 0; }
 }
 
 /* Tic-Tac-Toe: the pink line draws itself across the three in a row */
@@ -240,8 +303,15 @@ body {
 		animation: none !important;
 	}
 	.mm-fly,
-	.mm-spark {
+	.mm-spark,
+	.mm-rain,
+	.mm-hop,
+	.mm-dot-out {
 		animation: none;
+	}
+	.mm-current,
+	.mm-star-fall {
+		display: none;
 	}
 	.mm-draw-line {
 		animation: none;

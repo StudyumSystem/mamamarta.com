@@ -167,7 +167,10 @@ export function ScoreScreen({ badge, label, value, stars, onDone, ms = SCORE_MS 
           <p className="inline-flex items-center gap-[10px] whitespace-nowrap text-[18px] leading-[31px] text-black lg:gap-[clamp(8px,0.6vw,12px)] lg:text-[clamp(22px,1.5625vw,30px)]">
             {stars} MM✦STARS <StarBadge className="h-[24px] w-[24px] lg:h-[clamp(30px,1.98vw,38px)] lg:w-[clamp(30px,1.98vw,38px)]" />
           </p>
-          <p className="mt-[4px] max-w-[229px] text-[12px] leading-[20px] text-black/60 lg:mt-[clamp(10px,1vw,20px)] lg:max-w-[clamp(240px,15.2vw,292px)] lg:text-[clamp(14px,0.833vw,16px)] lg:leading-[1.25] lg:tracking-[-0.01em] lg:text-black/[0.69]">
+          {/* her Desktop_Score: this text sits in the 271 px column of the MM✦STARS line at 16/20, two lines. Its
+              width is now in em (271 / 16), so it wraps exactly as hers on every screen; in px it hit its minimum
+              before the type did and broke into three lines (Marta, 11 Nov 19:46) */}
+          <p className="mt-[4px] max-w-[229px] text-[12px] leading-[20px] text-black/60 lg:mt-[clamp(10px,1vw,20px)] lg:max-w-[18.2em] lg:text-[clamp(14px,0.833vw,16px)] lg:leading-[1.25] lg:tracking-[-0.01em] lg:text-black/[0.69]">
             Great work! Your Stars can unlock a discount on your next design project.
           </p>
         </div>
@@ -226,7 +229,7 @@ function StarsBlock() {
   if (step === "saved") {
     return (
       <div className="mm-fade-in flex w-full max-w-[300px] items-center justify-between gap-4 text-left lg:max-w-[clamp(420px,27.4vw,526px)]" role="status">
-        <p className={`${text} max-w-[203px] lg:max-w-[clamp(260px,17.8vw,342px)]`}>Your Stars are saved. Keep playing to collect more and unlock your design discount.</p>
+        <p className={`${text} max-w-[203px] lg:max-w-[23.5em]`}>Your Stars are saved. Keep playing to collect more and unlock your design discount.</p>
         <p className="inline-flex shrink-0 items-center gap-[8px] text-[18px] leading-[31px] text-black lg:gap-[clamp(8px,0.6vw,12px)] lg:text-[clamp(22px,1.5625vw,30px)]">{total} <StarBadge className={badge} /></p>
       </div>
     );
@@ -236,7 +239,8 @@ function StarsBlock() {
     <form onSubmit={submit} noValidate className="flex w-full max-w-[300px] flex-col items-stretch gap-[16px] lg:max-w-[clamp(420px,27.4vw,526px)] lg:gap-[clamp(20px,1.67vw,32px)]">
       {step === "idle" ? (
         <div className="flex items-center justify-between gap-4 text-left">
-          <p className={`${text} max-w-[220px] lg:max-w-[clamp(260px,17.8vw,342px)]`}>Play all 5 games to earn MM✦STARS. Save them with your email and unlock a design discount.</p>
+          {/* her text box is 342 x 50 at 16/25 (two lines); width in em so it wraps as hers on every screen */}
+          <p className={`${text} max-w-[220px] lg:max-w-[23.5em]`}>Play all 5 games to earn MM✦STARS. Save them with your email and unlock a design discount.</p>
           <p className="inline-flex shrink-0 items-center gap-[8px] text-[18px] leading-[31px] text-black lg:gap-[clamp(8px,0.6vw,12px)] lg:text-[clamp(22px,1.5625vw,30px)]">{total} <StarBadge className={badge} /></p>
         </div>
       ) : (

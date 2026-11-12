@@ -16,30 +16,20 @@ const PINK = "#fcd2f0";
 // Her pink "?" on its side, taken from her heading picture (whatIs.webp, 1200x633, lines 200 px apart,
 // type about 213 px): only the corner where the "?" is, so nothing of the letters comes with it.
 // Its dot is drawn here (it sits too close to the "e" to cut cleanly), its hook comes from the picture.
-// 12 Nov 01:38, Marta sent the "?" itself (68 x 38, her 1920 frame): in her Figma it is a pink "?" in Inter
-// Regular 91 px (heading 150 px) turned 87.65° so it lies on its side, the dot on the left. It is drawn the same
-// way here, as type, so it stays sharp on every screen: a box her glyph's size (68 x 38 of 150), the dot where
-// she placed it on the end of the e's tail (11 Nov 20:00).
+// 12 Nov, Marta sent the "?" itself, 68 x 38 in her 1920 frame and then at four times that (271 x 152): her
+// pink Inter "?" lying on its side, the dot on the left. Her own picture is used, at her size (68 x 38 of the
+// heading's 150 px); at four times the size it stays sharp on every screen. The dot sits where she placed it,
+// on the end of the e's tail (11 Nov 20:00).
 const Squiggle = () => (
-  <span
+  <img
+    src="/assets/what-is-question.png"
+    width={271}
+    height={152}
+    alt=""
     aria-hidden="true"
-    className="relative inline-block"
+    className="inline-block max-w-none"
     style={{ width: `${68 / 150}em`, height: `${38 / 150}em`, marginLeft: "-0.085em", verticalAlign: "-0.03em" }}
-  >
-    <span
-      className="absolute left-1/2 top-1/2 not-italic"
-      style={{
-        fontSize: `${91 / 150}em`,
-        lineHeight: 1,
-        fontWeight: 400,
-        letterSpacing: 0,
-        color: "#F600A9",
-        transform: "translate(-50%, -50%) rotate(87.65deg)",
-      }}
-    >
-      ?
-    </span>
-  </span>
+  />
 );
 
 const Heading = ({ className = "" }) => (

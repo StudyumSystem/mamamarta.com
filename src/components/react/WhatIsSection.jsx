@@ -32,16 +32,31 @@ const Squiggle = () => (
   />
 );
 
-const Heading = ({ className = "" }) => (
+const Heading = ({ className = "", inlineMark = true }) => (
   <h2 className={className}>
     What is
     <br />
     an amazing
     <br />
     <em className="font-normal italic">experience</em>
-    <Squiggle />
+    {inlineMark && <Squiggle />}
     <span className="sr-only">?</span>
   </h2>
+);
+
+// Computer: her "?" exactly where her Figma has it (12 Nov 02:05, Marta: "put it as it is in my design"). The
+// kept Figma copy gives its drawn ink 69 x 41 px at 682, 359 from the heading's top-left corner (her heading at
+// 1011, 148 of the 1920 frame); her picture (68 x 38 at 1x) is centred there, in vw of the 1920 frame.
+const DesktopMark = () => (
+  <img
+    src="/assets/what-is-question.png"
+    width={271}
+    height={152}
+    alt=""
+    aria-hidden="true"
+    className="pointer-events-none absolute max-w-none"
+    style={{ left: `${682.3 / 19.2}vw`, top: `${360.5 / 19.2}vw`, width: `${68 / 19.2}vw`, height: `${38 / 19.2}vw` }}
+  />
 );
 
 const BODY = "It is never accidental. It is the decisions people never notice, but always feel.";
@@ -93,8 +108,9 @@ export default function WhatIsSection() {
           <Cable />
         </div>
 
-        <div className="absolute left-[52.7vw] top-[7.81vw] z-10">
-          <Heading className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
+        <div className="absolute left-[52.7vw] top-[7.71vw] z-10">
+          <Heading inlineMark={false} className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
+          <DesktopMark />
         </div>
         <p className="absolute left-[52.7vw] top-[32.35vw] z-10 w-[30.5vw] text-[1.094vw] leading-[1.615vw] tracking-[-0.02em] text-black/70">{BODY}</p>
         <a

@@ -188,6 +188,7 @@ export default function ConnectPath({ open, onClose }) {
     <GameModal
       open={open}
       onClose={onClose}
+      onBack={phase === "done" ? () => setPhase("score") : null}
       label="Connect the Path"
       game
       instructions={ended ? null : INSTRUCTIONS}

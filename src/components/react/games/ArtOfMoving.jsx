@@ -375,6 +375,7 @@ export default function ArtOfMoving({ open, onClose }) {
     <GameModal
       open={open}
       onClose={onClose}
+      onBack={phase === "done" && result ? () => setPhase("score") : null}
       label="The Art of Moving"
       game
       instructions={ended ? null : INSTRUCTIONS}

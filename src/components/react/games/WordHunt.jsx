@@ -175,6 +175,7 @@ export default function WordHunt({ open, onClose }) {
     <GameModal
       open={open}
       onClose={onClose}
+      onBack={phase === "done" ? () => setPhase("score") : null}
       label="Word Hunt"
       game
       instructions={ended ? null : INSTRUCTIONS}

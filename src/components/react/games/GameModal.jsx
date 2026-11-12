@@ -104,12 +104,18 @@ const btnGradient = `${btnBase} mm-gradient text-white`;
 
 // "Leave the game?" / "Leave without saving?" (her MM-confirmation_dialog and MM-G01-05 variant):
 // a white veil over the panel, the question, the safe choice on the right in the gradient.
+// 11 Nov 19:34 (Marta: "blur the background more, as in my design"): the veil also blurs what is behind it
+// strongly, so nothing of the screen underneath competes with the question.
 function LeaveDialog({ kind, onLeave, onStay }) {
   const stars = kind === "stars";
   const stayRef = useRef(null);
   useEffect(() => { stayRef.current?.focus(); }, []);
   return (
-    <div className="mm-fade-in fixed inset-x-[20px] top-[28px] bottom-[28px] z-20 flex items-center justify-center bg-white/[0.78] px-[25px] lg:inset-x-[13.5%] lg:top-0 lg:bottom-0" role="alertdialog" aria-modal="true" aria-labelledby="mm-leave-title">
+    <div
+      className="mm-fade-in fixed inset-x-[20px] top-[28px] bottom-[28px] z-20 flex items-center justify-center bg-white/[0.78] px-[25px] lg:inset-x-[13.5%] lg:top-0 lg:bottom-0"
+      style={{ backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
+      role="alertdialog" aria-modal="true" aria-labelledby="mm-leave-title"
+    >
       <div className="flex w-full max-w-[300px] flex-col items-center text-center lg:max-w-[clamp(420px,26.25vw,504px)]">
         <p id="mm-leave-title" className="text-[24px] leading-[29px] text-black lg:text-[clamp(26px,1.77vw,34px)] lg:leading-[1.5]">
           {stars ? "Leave without saving?" : "Leave the game?"}
@@ -133,7 +139,8 @@ function LeaveDialog({ kind, onLeave, onStay }) {
 // Score screen (her MM-G0x Desktop_Score / Mobile_Score): trophy line, what was done, the big result,
 // the round's MM✦STARS, and a grey line that fills pink; when it is full the quote screen follows by itself.
 // With reduced motion the line is shown full and the switch still comes after the same few seconds.
-export const SCORE_MS = 4200;
+// 8 s (Marta, 11 Nov 19:34: at 4.2 s "the result went by too fast, I couldn't read it all")
+export const SCORE_MS = 8000;
 export function ScoreScreen({ badge, label, value, stars, onDone, ms = SCORE_MS }) {
   const done = useRef(onDone);
   done.current = onDone;
@@ -286,17 +293,20 @@ export function Completion({ quote, onPlayAgain }) {
 // "completed" asks only when MM✦STARS are not saved yet.
 export default function GameModal({
   open, onClose, instructions, counter, label, children, phoneCounter = "mt-3",
-  game = false, stars = null, hud = true, confirm = null,
+  game = false, stars = null, hud = true, confirm = null, onBack = null,
 }) {
   const panelRef = useRef(null);
   const returnFocus = useRef(null);
   const [asking, setAsking] = useState(null); // null | "game" | "stars"
 
+  // onBack: Back goes one screen back instead of leaving (Marta, 11 Nov 19:34: from the quote screen,
+  // Back returns to the score screen).
   const requestClose = useCallback(() => {
+    if (onBack) { onBack(); return; }
     if (confirm === "game") { setAsking("game"); return; }
     if (confirm === "completed" && unsavedStars()) { setAsking("stars"); return; }
     onClose();
-  }, [confirm, onClose]);
+  }, [confirm, onClose, onBack]);
 
   useEffect(() => { if (!open) setAsking(null); }, [open]);
 

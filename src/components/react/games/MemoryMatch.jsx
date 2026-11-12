@@ -140,6 +140,7 @@ export default function MemoryMatch({ open, onClose }) {
     <GameModal
       open={open}
       onClose={onClose}
+      onBack={phase === "done" ? () => setPhase("score") : null}
       label="Memory Match"
       game
       instructions={ended ? null : INSTRUCTIONS}

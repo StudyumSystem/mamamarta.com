@@ -139,6 +139,7 @@ export default function TicTacToe({ open, onClose }) {
     <GameModal
       open={open}
       onClose={onClose}
+      onBack={phase === "done" ? () => setPhase("score") : null}
       label="Tic-Tac-Toe"
       game
       instructions={ended ? null : INSTRUCTIONS}

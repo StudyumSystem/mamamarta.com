@@ -77,9 +77,20 @@ const SETS = {
   },
 };
 
+// Marta, 11 Nov 19:56: "also a sound for found elements in the games, and for the coins being credited".
+// match = a pair / a word found (its own per game); coin = a coin taken in The Art of Moving;
+// coins = MM✦ credited (a small sparkle, the same in every game); count = the MM✦STARS counted on the score screen.
+SETS["memory-match"].match = (ac) => { tone(ac, { freq: 1318.5, dur: 0.12, gain: 0.06 }); tone(ac, { freq: 1567.98, start: 0.08, dur: 0.22, gain: 0.06 }); };
+SETS["word-hunt"].match = (ac) => [783.99, 987.77, 1174.66].forEach((freq, i) => tone(ac, { freq, start: i * 0.06, dur: 0.22, gain: 0.055 }));
+SETS["art-of-moving"].coin = SETS["art-of-moving"].flip;
+const SHARED = {
+  coins: (ac) => [1567.98, 2093, 2637].forEach((freq, i) => tone(ac, { freq, type: "triangle", start: i * 0.045, dur: 0.08, gain: 0.03 })),
+  count: (ac) => Array.from({ length: 8 }, (_, i) => tone(ac, { freq: 1200 + i * 110, type: "triangle", start: i * 0.075, dur: 0.05, gain: 0.03 })),
+};
+
 export function play(name, game = "memory-match") {
   if (!soundOn()) return;
   const ac = audio();
   if (!ac) return;
-  try { (SETS[game] || SETS["memory-match"])[name]?.(ac); } catch { /* never let a sound break a game */ }
+  try { ((SETS[game] || SETS["memory-match"])[name] || SHARED[name])?.(ac); } catch { /* never let a sound break a game */ }
 }

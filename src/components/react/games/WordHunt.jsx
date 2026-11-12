@@ -156,7 +156,11 @@ export default function WordHunt({ open, onClose }) {
       play("win");
       recordStars("word-hunt", ROUND_STARS);
       later(() => setPhase("score"), 1100);
-    } else play("flip");
+    } else {
+      // a found word, then its MM✦ credited (Marta, 11 Nov 19:56)
+      play("match");
+      later(() => play("coins"), 220);
+    }
   };
 
   const toQuote = useCallback(() => { setQuote(takeQuote("word-hunt")); setPhase("done"); }, []);

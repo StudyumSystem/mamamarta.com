@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { WHATSAPP_URL, prefersReducedMotion, totalStars, savedStars, markStarsSaved, unsavedStars } from "./shared.js";
-import { soundOn, setSound } from "./sound.js";
+import { soundOn, setSound, play as playSound } from "./sound.js";
 import { sendStars } from "../forms/submitForm.js";
 
 // Shared modal for the five games and the two forms (Marta's spec, MM-GAME-01…05, MM-C06).
@@ -146,9 +146,11 @@ export function ScoreScreen({ badge, label, value, stars, onDone, ms = SCORE_MS 
   done.current = onDone;
   useEffect(() => {
     const t = setTimeout(() => done.current?.(), ms);
+    // the round's MM✦STARS are counted in with a short run of ticks (Marta, 11 Nov 19:56)
+    const c = setTimeout(() => playSound("count"), 450);
     const skip = () => done.current?.(); // "Save my Stars" from the leave question: straight to the email field
     window.addEventListener("mm-stars-save", skip);
-    return () => { clearTimeout(t); window.removeEventListener("mm-stars-save", skip); };
+    return () => { clearTimeout(t); clearTimeout(c); window.removeEventListener("mm-stars-save", skip); };
   }, [ms]);
   const still = prefersReducedMotion();
   return (

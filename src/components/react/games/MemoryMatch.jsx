@@ -123,6 +123,8 @@ export default function MemoryMatch({ open, onClose }) {
       setUp([]);
       setPulse(deck[a].n);
       later(() => setPulse(null), 450);
+      // a found pair, then its MM✦ credited (Marta, 11 Nov 19:56)
+      if (m.size !== deck.length) { later(() => play("match"), 120); later(() => play("coins"), 340); }
       if (m.size === deck.length) finish();
     } else {
       setUp(next);

@@ -259,7 +259,7 @@ export default function ArtOfMoving({ open, onClose }) {
             c.taken = g.clock;
             g.coinsTaken += 1;
             setCoins(g.coinsTaken);
-            sound("flip");
+            sound("coin");
           }
         }
         const camX = p.x - g.anchor * viewW;

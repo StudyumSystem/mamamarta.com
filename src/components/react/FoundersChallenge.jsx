@@ -245,17 +245,19 @@ function MemoryCard() {
 
 // Phone memory card, measured on MM-HOME-002 (350x450, the card of her live site): pill top left, the rolling
 // number top right, the four lines right, "Memory Match" bottom left, the pink ring with its arrow bottom right.
+// Colours (13 Nov, Marta: the phone card was lighter than hers): her card's own black #171717, pink #F600A9 and
+// the four lines #E1E6E2 at 86%, as on the computer card.
 function MemoryCardPhone() {
   return (
-    <div className="relative h-[calc(var(--q)*450)] w-[calc(var(--q)*350)] overflow-hidden rounded-[calc(var(--q)*22)] bg-[#1c1c1c] text-white [font-family:'Helvetica_Neue',Helvetica,Arial,sans-serif]">
+    <div className="relative h-[calc(var(--q)*450)] w-[calc(var(--q)*350)] overflow-hidden rounded-[calc(var(--q)*22)] bg-[#171717] text-white [font-family:'Helvetica_Neue',Helvetica,Arial,sans-serif]">
       <span className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*18)] grid h-[calc(var(--q)*25)] w-[calc(var(--q)*88)] place-items-center rounded-full bg-white text-[length:calc(var(--q)*8.5)] font-medium uppercase text-black/85">Memory game</span>
       <span className="absolute right-[calc(var(--q)*23)] top-[calc(var(--q)*13)] text-[length:calc(var(--q)*150)] font-light leading-none"><RollingCounter /></span>
-      <p className="absolute right-[calc(var(--q)*23)] top-[calc(var(--q)*156)] text-[length:calc(var(--q)*8)] text-[#e3009c]">© Mamamarta 2026</p>
-      <p className="absolute right-[calc(var(--q)*23)] top-[calc(var(--q)*226)] text-right text-[length:calc(var(--q)*9.5)] font-light leading-[calc(var(--q)*12.6)] tracking-[-0.03em] text-white/85">
+      <p className="absolute right-[calc(var(--q)*23)] top-[calc(var(--q)*156)] text-[length:calc(var(--q)*8)] text-[#F600A9]">© Mamamarta 2026</p>
+      <p className="absolute right-[calc(var(--q)*23)] top-[calc(var(--q)*226)] text-right text-[length:calc(var(--q)*9.5)] font-light leading-[calc(var(--q)*12.6)] tracking-[-0.03em] text-[#E1E6E2]/[.86]">
         A LITTLE TEST FOR YOUR MIND.<br />Flip the cards.<br />Find the pairs.<br />Trust your memory.
       </p>
       <p className="absolute left-[calc(var(--q)*21)] top-[calc(var(--q)*331)] text-[length:calc(var(--q)*48)] font-normal leading-[calc(var(--q)*46)] tracking-[-0.02em]">Memory<br />Match</p>
-      <span className="absolute right-[calc(var(--q)*24)] top-[calc(var(--q)*393)] grid h-[calc(var(--q)*35)] w-[calc(var(--q)*35)] place-items-center rounded-full border border-[#e3009c] text-[length:calc(var(--q)*15)] text-white" aria-hidden="true"><ArrowIcon dir="down-left" /></span>
+      <span className="absolute right-[calc(var(--q)*24)] top-[calc(var(--q)*393)] grid h-[calc(var(--q)*35)] w-[calc(var(--q)*35)] place-items-center rounded-full border border-[#F600A9] text-[length:calc(var(--q)*15)] text-white" aria-hidden="true"><ArrowIcon dir="down-left" /></span>
     </div>
   );
 }
@@ -348,8 +350,12 @@ function Visual({ entry, active }) {
 // pure #FFFFFF in the pixels (the computer's brightness 1.04 / contrast 1.08 baked in), with a poster made the same
 // way, and no blend or filter at all: white in the file is white on every screen. ar = the copy's width / height.
 // The computer keeps its videos.
+// word-hunt (13 Nov, MM-HOME-002 "image 43"): her window is 389 x 278 with 32 px above and below it (pad); her M
+// fills it, the flat top on the window's top edge and the dots ending on its bottom, 278 wide, its middle at 190 of
+// 390 (x moves it from the middle). In the video's frame the M runs 121-665 of 782 down and 87-635 of 720 across,
+// so 368 wide puts it at her size and -61 its top on the window's edge.
 const PHONE_PICTURE = {
-  "word-hunt": { w: 356, h: 342, y: -25, ar: "720 / 782" },
+  "word-hunt": { w: 368, h: 278, y: -61, x: -5, pad: 32, ar: "720 / 782" },
   "tic-tac-toe": { w: 466, h: 466, y: -15, ar: "720 / 794" },
   "connect-the-path": { w: 435, h: 389, y: -58, ar: "720 / 794" },
   // her key video has more white around the key than the still, so it is drawn narrower to keep the key's size
@@ -363,10 +369,13 @@ function PhoneVisual({ entry }) {
   if (v.kind === "walking-card") return <div className="flex justify-center pt-[calc(var(--q)*32)] pb-[calc(var(--q)*33)]"><WalkingCardPhone /></div>;
   const p = PHONE_PICTURE[entry.id];
   const style = { width: `calc(var(--q) * ${p.w})`, top: `calc(var(--q) * ${p.y})`, aspectRatio: p.ar };
+  if (p.x) style.marginLeft = `calc(var(--q) * ${p.x})`;
+  const box = { height: `calc(var(--q) * ${p.h})` };
+  if (p.pad) box.marginTop = box.marginBottom = `calc(var(--q) * ${p.pad})`;
   const src = v.kind === "video" ? v.src : v.video;
   // active={false}: the lazy loader (scripts/lazy-videos.js) fetches and plays it when it comes near
   return (
-    <div className="relative -mx-[calc(var(--q)*20)] overflow-hidden bg-white" style={{ height: `calc(var(--q) * ${p.h})` }}>
+    <div className="relative -mx-[calc(var(--q)*20)] overflow-hidden bg-white" style={box}>
       <LoopVideo src={phoneCopy(src, "-phone.mp4")} poster={phoneCopy(src, "-phone-poster.webp")} alt={v.alt} active={false} className="absolute left-1/2 block h-auto max-w-none -translate-x-1/2 bg-white" style={style} />
     </div>
   );

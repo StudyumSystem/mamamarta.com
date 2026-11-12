@@ -111,13 +111,15 @@ export default function WhatIsSection() {
         <div className="pointer-events-none absolute left-[calc(var(--q)*-40)] top-[calc(var(--q)*430)] aspect-[16/9] w-[calc(var(--q)*820)]" aria-hidden="true">
           <Cable />
         </div>
-        <Heading className="absolute left-[calc(var(--q)*18)] top-[calc(var(--q)*47)] z-10 text-[length:calc(var(--q)*56)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
-        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] z-10 w-[calc(var(--q)*260)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em] text-black/70">
+        {/* MM-HOME-002 (13 Nov): heading Inter Medium 64/65 -0.06em at 14, 40 ("experience" stays her italic 400);
+            body 14/20 -0.04em 260 wide at 20, 265; button 46 tall at 20, 378, at least her 199 wide, 16 semibold -0.023em */}
+        <Heading className="absolute left-[calc(var(--q)*14)] top-[calc(var(--q)*40)] z-10 text-[length:calc(var(--q)*64)] font-medium leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
+        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] z-10 w-[calc(var(--q)*260)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/70">
           {BODY}
         </p>
         <a
           href="/what-is"
-          className="mm-gradient absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] z-10 flex h-[calc(var(--q)*46)] items-center justify-center gap-[0.3em] px-[calc(var(--q)*20)] text-[length:calc(var(--q)*16)] font-semibold text-white"
+          className="mm-gradient absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] z-10 flex h-[calc(var(--q)*46)] min-w-[calc(var(--q)*199)] items-center justify-center gap-[0.3em] px-[calc(var(--q)*13)] text-[length:calc(var(--q)*16)] font-semibold tracking-[-0.023em] text-white"
         >
           See what's underneath <ArrowIcon />
         </a>

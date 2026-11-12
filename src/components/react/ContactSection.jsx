@@ -14,12 +14,12 @@ const newId = () =>
 
 // Computer, her current Figma (kept copy, 12 Nov, frame 1920 x 598): labels 14/17 -0.04em black 69%, fields 5 px
 // under them, email 53 tall, message 151, text 22/31 from 21 px in, placeholders black 40%, button 68 tall.
-// Phone, her frame: labels 12/15 black 69%, fields 5 px under them, email 41 tall, message 160, text 16 (16 px
-// also keeps iPhone Safari from zooming in when a field is tapped), placeholders black 40%.
-const labelCls = "block text-[12px] md:text-[0.729vw] font-normal leading-[15px] md:leading-[0.882vw] md:tracking-[-0.04em] text-black/70 md:text-black/70";
+// Phone, her frame: labels 12/15 -0.04em black 69%, fields 5 px under them, email 41 tall, message 160, text 16/19
+// -0.04em (16 px also keeps iPhone Safari from zooming in when a field is tapped), placeholders black 40%.
+const labelCls = "block text-[12px] md:text-[0.729vw] font-normal leading-[15px] md:leading-[0.882vw] tracking-[-0.04em] md:tracking-[-0.04em] text-black/[.69] md:text-black/70";
 const inputCls =
   "mt-[5px] md:mt-[0.26vw] block w-full border border-black/20 bg-white px-[12px] md:px-[1.094vw] " +
-  "text-[16px] md:text-[1.146vw] md:tracking-[-0.04em] font-normal md:font-normal text-black placeholder:text-black/40 md:placeholder:text-black/40 outline-none transition-colors focus:border-black";
+  "text-[16px] md:text-[1.146vw] tracking-[-0.04em] md:tracking-[-0.04em] font-normal md:font-normal text-black placeholder:text-black/40 md:placeholder:text-black/40 outline-none transition-colors focus:border-black";
 const errorCls = "mt-1 text-[12px] md:text-[clamp(12px,0.73vw,14px)] text-[#c2006f]";
 
 export default function ContactSection() {
@@ -54,8 +54,10 @@ export default function ContactSection() {
   return (
     <section id="contact" className="mm-phone-w bg-white font-[Inter] text-black">
       {/* Computer: heading 150/141 -0.06em at 163, 78; the form column 687 wide at 1011, its line at 97; 97 px under the button */}
-      <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*18)] pb-[calc(var(--q)*60)] md:grid md:grid-cols-[44.17vw_35.78vw] md:items-start md:px-0 md:pl-[8.49vw] md:pt-[4.06vw] md:pb-[5.05vw]">
-        <h2 className="-ml-[calc(var(--q)*4)] text-[length:calc(var(--q)*64)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em] md:ml-0 md:text-[7.8125vw] md:leading-[7.344vw] md:tracking-[-0.06em]">
+      {/* Phone, MM-HOME-002 (iPhone 16 & 17 Pro - 7, 13 Nov): heading 64/65 at 14, 40; text 292 wide at 20, 254; the
+          form at 331 with 11 px between its parts; 60 px under the button */}
+      <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*40)] pb-[calc(var(--q)*60)] md:grid md:grid-cols-[44.17vw_35.78vw] md:items-start md:px-0 md:pl-[8.49vw] md:pt-[4.06vw] md:pb-[5.05vw]">
+        <h2 className="-ml-[calc(var(--q)*6)] text-[length:calc(var(--q)*64)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em] md:ml-0 md:text-[7.8125vw] md:leading-[7.344vw] md:tracking-[-0.06em]">
           {/* Marta's advisor, 10 Nov 23:36 (replaces his 23:13 word): keep it, and follow it at once with who it is for */}
           We are
           <br />
@@ -64,9 +66,9 @@ export default function ContactSection() {
           everyone.
         </h2>
 
-        <div className="mt-[calc(var(--q)*22)] md:mt-[0.99vw]">
-          {/* who it is for, 18/34 -0.04em black 69% on the computer, 14/20 on the phone */}
-          <p className="w-[calc(var(--q)*330)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] text-black/70 max-md:text-black/60 md:w-auto md:text-[0.9375vw] md:leading-[1.77vw] md:tracking-[-0.04em]">
+        <div className="mt-[calc(var(--q)*19)] md:mt-[0.99vw]">
+          {/* who it is for, 18/34 -0.04em black 69% on the computer, 14/20 -0.04em black 60% on the phone */}
+          <p className="w-[calc(var(--q)*292)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] text-black/70 max-md:tracking-[-0.04em] max-md:text-black/60 md:w-auto md:text-[0.9375vw] md:leading-[1.77vw] md:tracking-[-0.04em]">
             We work with funded founders who would rather be understood than liked.
           </p>
 
@@ -75,7 +77,7 @@ export default function ContactSection() {
               Thank you for reaching out.
             </p>
           ) : (
-            <form noValidate onSubmit={onSubmit} className="relative mt-[calc(var(--q)*36)] md:mt-[1.04vw]">
+            <form noValidate onSubmit={onSubmit} className="relative mt-[calc(var(--q)*37)] md:mt-[1.04vw]">
               <label htmlFor="contact-email" className={labelCls}>Email *</label>
               <input
                 id="contact-email"
@@ -91,14 +93,14 @@ export default function ContactSection() {
               />
               {error && <p id="contact-email-err" className={errorCls}>{error}</p>}
 
-              <label htmlFor="contact-message" className={`${labelCls} mt-[12px] md:mt-[0.729vw]`}>Your message</label>
+              <label htmlFor="contact-message" className={`${labelCls} mt-[11px] md:mt-[0.729vw]`}>Your message</label>
               <textarea
                 id="contact-message"
                 rows={5}
                 placeholder="What are you building?"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className={`${inputCls} h-[160px] resize-none py-[10px] leading-[1.3] md:h-[7.86vw] md:py-[0.573vw] md:leading-[1.615vw]`}
+                className={`${inputCls} h-[160px] resize-none py-[10px] leading-[19px] md:h-[7.86vw] md:py-[0.573vw] md:leading-[1.615vw]`}
               />
 
               <button

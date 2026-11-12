@@ -16,27 +16,29 @@ const PINK = "#fcd2f0";
 // Her pink "?" on its side, taken from her heading picture (whatIs.webp, 1200x633, lines 200 px apart,
 // type about 213 px): only the corner where the "?" is, so nothing of the letters comes with it.
 // Its dot is drawn here (it sits too close to the "e" to cut cleanly), its hook comes from the picture.
+// 12 Nov 01:38, Marta sent the "?" itself (68 x 38, her 1920 frame): in her Figma it is a pink "?" in Inter
+// Regular 91 px (heading 150 px) turned 87.65° so it lies on its side, the dot on the left. It is drawn the same
+// way here, as type, so it stays sharp on every screen: a box her glyph's size (68 x 38 of 150), the dot where
+// she placed it on the end of the e's tail (11 Nov 20:00).
 const Squiggle = () => (
-  <span aria-hidden="true" className="whitespace-nowrap">
-    {/* Marta, 11 Nov 20:00 (her mockup beside the site): the dot is bigger, lower, and sits on the end of the
-        "e"'s tail, the hook following close after it */}
+  <span
+    aria-hidden="true"
+    className="relative inline-block"
+    style={{ width: `${68 / 150}em`, height: `${38 / 150}em`, marginLeft: "-0.085em", verticalAlign: "-0.03em" }}
+  >
     <span
-      className="relative inline-block rounded-full"
-      style={{ width: "0.093em", height: "0.093em", marginLeft: "-0.085em", verticalAlign: "0.07em", background: "#F600A9" }}
-    />
-    <span
-      className="inline-block"
+      className="absolute left-1/2 top-1/2 not-italic"
       style={{
-        width: `${74 / 213}em`,
-        height: `${95 / 213}em`,
-        marginLeft: `${8 / 213}em`,
-        verticalAlign: `${-10 / 213}em`,
-        backgroundImage: "url(/assets/whatIs.webp)",
-        backgroundSize: `${1200 / 213}em auto`,
-        backgroundPosition: `${-1126 / 213}em ${-500 / 213}em`,
-        backgroundRepeat: "no-repeat",
+        fontSize: `${91 / 150}em`,
+        lineHeight: 1,
+        fontWeight: 400,
+        letterSpacing: 0,
+        color: "#F600A9",
+        transform: "translate(-50%, -50%) rotate(87.65deg)",
       }}
-    />
+    >
+      ?
+    </span>
   </span>
 );
 

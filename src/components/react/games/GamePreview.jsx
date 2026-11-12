@@ -40,6 +40,7 @@ function EndScreen({ game, screen, onClose }) {
       label="Preview"
       game
       hud={screen === "leave"}
+      stage={screen === "score"}
       instructions={screen === "leave" ? "Find the matching pairs. Flip two cards at a time and remember what you see. Match all 10 pairs to complete the game." : null}
       counter={screen === "leave" ? "01 / 10" : null}
       stars={screen === "leave" ? 10 : null}

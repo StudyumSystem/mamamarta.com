@@ -1,5 +1,5 @@
 import React from "react";
-import InnerNav, { PhoneBack, BottomBack } from "./InnerNav";
+import { TopBack, BottomBack } from "./InnerNav";
 
 // Bio page, rebuilt from Marta's Figma frames "Bio" and "iPhone Bio" (26 Oct 2026): one centred column
 // (710px wide at 1920), photo, caption, title, story, two photos, closing lines.
@@ -48,12 +48,11 @@ function Paragraphs({ items }) {
 export default function Bio() {
   return (
     <div className="mm-u relative font-sans">
-      <div className="px-[21px] pt-[24px] md:hidden">
-        <PhoneBack />
-      </div>
-      <InnerNav active="Bio" />
+      {/* The same Back as The Method, same place (12 Nov) */}
+      <TopBack />
 
-      <main className="mx-auto w-[calc(100%-42px)] max-w-[710px] md:max-w-[calc(var(--u)*710)] pt-[43px] md:pt-[calc(var(--u)*125)] pb-[40px] md:pb-[calc(var(--u)*150)]">
+      {/* phone: 88 px = the photo where it was under the Back that used to sit in the flow (24 + 21 + 43) */}
+      <main className="mx-auto w-[calc(100%-42px)] max-w-[710px] md:max-w-[calc(var(--u)*710)] pt-[88px] md:pt-[calc(var(--u)*125)] pb-[40px] md:pb-[calc(var(--u)*150)]">
         <img
           src="/assets/brand/image 46.webp"
           width="710"

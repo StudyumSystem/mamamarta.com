@@ -209,6 +209,7 @@ export default function ConnectPath({ open, onClose }) {
       onBack={phase === "done" ? () => setPhase("score") : null}
       label="Connect the Path"
       game
+      stage={phase !== "done"}
       instructions={ended ? null : INSTRUCTIONS}
       counter={ended ? null : `${pad2(path.length)} / ${DOTS}`}
       stars={ended ? null : done ? ROUND_STARS : 0}
@@ -220,9 +221,14 @@ export default function ConnectPath({ open, onClose }) {
       ) : phase === "score" ? (
         <ScoreScreen badge={best ? "New personal best" : "Well played"} label="All dots connected" value={`${DOTS} / ${DOTS}`} stars={ROUND_STARS} onDone={toQuote} />
       ) : (
-        <div className="flex flex-1 items-center justify-center overflow-clip px-[15px] py-8 lg:pb-[3.5vw] lg:pt-[2vw]">
+        <div className="flex flex-1 items-center justify-center overflow-clip px-[15px] py-8 lg:pointer-events-none lg:absolute lg:inset-0 lg:items-start lg:p-0 lg:pt-[calc(209.5*var(--mm-u))]">
+          {/* her MM-G05-01 / -02 at 1920 x 1019: 45 px dots 115 apart, the shape centred across the panel and its middle
+              554.5 from the panel's top. Shapes here are 4 to 6 dots a side, so each is centred in a field of six
+              (690) whose middle is hers; on the computer in her frame's px measured against the screen's height
+              (--mm-u, GameModal), 12 Nov */}
           {layout && (
-            <div className={`relative ${finish === "fade" ? "mm-fade-out" : ""}`}>
+            <div className="flex items-center justify-center lg:h-[calc(690*var(--mm-u))]">
+            <div className={`relative lg:pointer-events-auto ${finish === "fade" ? "mm-fade-out" : ""}`}>
               <svg
                 ref={svgRef}
                 viewBox={`0 0 ${layout.cols * UNIT} ${layout.rows * UNIT}`}
@@ -232,7 +238,7 @@ export default function ConnectPath({ open, onClose }) {
                 onPointerCancel={onUp}
                 role="img"
                 aria-label={`Connect the Path, ${path.length} of ${DOTS} dots connected`}
-                className="block select-none [touch-action:none] [--s:min(14vw,70px)] lg:[--s:min(6vw,calc((100vh_-_260px)/6))]"
+                className="block select-none [touch-action:none] [--s:min(14vw,70px)] lg:[--s:calc(115*var(--mm-u))]"
                 style={{ width: `calc(${layout.cols} * var(--s))`, height: `calc(${layout.rows} * var(--s))` }}
               >
                 <defs>
@@ -287,6 +293,7 @@ export default function ConnectPath({ open, onClose }) {
                     dur="760ms"
                   />
                 ))}
+            </div>
             </div>
           )}
         </div>

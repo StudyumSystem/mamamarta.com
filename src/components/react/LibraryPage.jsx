@@ -9,8 +9,8 @@ import { WHATSAPP_URL } from "./games/shared";
 export default function LibraryPage() {
   return (
     <div className="mm-fit relative mx-auto h-[100dvh] overflow-hidden font-sans bg-white text-black">
-      {/* MM-LIBRARY-01: Back without the underline */}
-      <InnerNav active="Library" underline={false} />
+      {/* The same Back as Bio and The Method (12 Nov, Marta: identical on every inner page) */}
+      <InnerNav />
 
       <img
         src="/assets/brush.png"

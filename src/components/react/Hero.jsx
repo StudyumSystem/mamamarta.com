@@ -125,25 +125,32 @@ export default function Hero({ initialMenuOpen = false }) {
               alt="MAMA MARTA"
             />
           </h1>
-          <p className="absolute inset-x-0 text-center font-normal text-white tracking-[-0.01em] top-[calc(var(--p)*343)] text-[length:calc(var(--p)*20)] leading-[calc(var(--p)*29)]">
-            Your product works.
-            <br />
-            Nobody remembers it.
-          </p>
-          <p className="absolute inset-x-0 text-center font-normal text-white top-[calc(var(--p)*420)] text-[length:calc(var(--p)*14)] leading-[calc(var(--p)*20)]">
-            {FOR_WHOM}
-            <br />
-            {WHAT}
-          </p>
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="absolute left-1/2 flex -translate-x-1/2 items-center justify-center gap-[0.3em] rounded-xs border border-white/20 font-semibold text-white backdrop-blur-md top-[calc(var(--p)*552)] h-[calc(var(--p)*46)] w-[calc(var(--p)*199)] whitespace-nowrap text-[length:calc(var(--p)*15.5)]"
-            style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
-          >
-            Straight to Marta <ArrowIcon />
-          </a>
+          {/* Marta, 12 Nov 23:36 (her iPhone): "Design for funded startups…" too small to read. The type was in --p,
+              which follows the screen's HEIGHT too, so in Safari (toolbars take ~100 px) the 14 px lines drew ~12 px.
+              Now her phone type in plain px: the line under the logo Inter 20/29 (her frame), the two lines Inter
+              Medium 16/23 (medium as on the computer), the button text 16 semibold; the blocks follow each other, so
+              on a short screen they never overlap; at 390 x 844 the button sits at her 552. */}
+          <div className="absolute inset-x-0 flex flex-col items-center px-5 text-center text-white top-[calc(var(--p)*343)]">
+            <p className="text-[20px] font-normal leading-[29px] tracking-[-0.01em]">
+              Your product works.
+              <br />
+              Nobody remembers it.
+            </p>
+            <p className="mt-[calc(var(--p)*16)] max-w-[262px] text-[16px] font-medium leading-[23px] tracking-[-0.01em]">
+              {FOR_WHOM}
+              <br />
+              {WHAT}
+            </p>
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-[calc(var(--p)*66)] flex h-[46px] w-[199px] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[16px] font-semibold whitespace-nowrap text-white backdrop-blur-md"
+              style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
+            >
+              Straight to Marta <ArrowIcon />
+            </a>
+          </div>
         </div>
 
 

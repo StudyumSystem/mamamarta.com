@@ -279,28 +279,39 @@ body {
 	100% { background-position: 0% 0; opacity: 0; }
 }
 
-/* 12 Nov (Marta: "it may only sway, the right and the left part; the ends stay fixed"): the left part of the
-   cable turns a little around its left end (0, 43.6% of her frame), the right part around its right end (the
-   bottom-right corner); the parts are cut at the joint behind the button (64.5% across) with a soft seam. */
-.mm-wire-left {
-	-webkit-mask-image: linear-gradient(90deg, #000 62.5%, transparent 66.5%);
-	mask-image: linear-gradient(90deg, #000 62.5%, transparent 66.5%);
+/* 12 Nov (Marta: the cable moved as two halves and looked split in two; it must move as ONE whole piece, a
+   single gentle sway, both ends fixed). One picture, one motion: every point of the cable moves straight up or
+   down by 2.2% of its distance from the line joining its two ends (left end on the left edge at 43.6% down,
+   right end in the bottom-right corner), first one way, then the other. The two ends lie on that line, so they
+   never move; nothing moves sideways, so the cable never comes loose from the screen's edges; the loops above
+   and below the line sway together (about 6 to 9 px at 1920).
+   As a transform from the left end: y' = y + c (y - m x), m = the line's slope = 0.564 x 9/16 = 0.31725 (the
+   cable's box is 16:9 on the computer and the phone) = scaleY(1 + c) then skewY(atan(-c m)); c = ±0.022 gives
+   scaleY 1.022 / 0.978 and skewY ∓0.3999deg. Both values move in step, so the right end stays put all the way. */
+.mm-wire-sway {
 	transform-origin: 0% 43.6%;
-	animation: mm-wire-sway-left 7s ease-in-out infinite alternate;
+	animation: mm-wire-sway 6.5s ease-in-out infinite alternate;
 }
-.mm-wire-right {
-	-webkit-mask-image: linear-gradient(90deg, transparent 62.5%, #000 66.5%);
-	mask-image: linear-gradient(90deg, transparent 62.5%, #000 66.5%);
-	transform-origin: 100% 100%;
-	animation: mm-wire-sway-right 5.6s ease-in-out infinite alternate;
+@keyframes mm-wire-sway {
+	from { transform: skewY(-0.3999deg) scaleY(1.022); }
+	to { transform: skewY(0.3999deg) scaleY(0.978); }
 }
-@keyframes mm-wire-sway-left {
-	from { transform: rotate(-0.45deg); }
-	to { transform: rotate(0.45deg); }
+
+/* Marta's "experience" (What is heading): her Figma's Inter Italic 400 is Inter 3.19's italic (flat e and c
+   endings, the upright letters slanted); the site's Inter (4.x, fontsource) draws its italic differently.
+   Inter 3.19 Italic from Inter's own repository (rsms/inter, tag v3.19, SIL Open Font License) through jsDelivr;
+   until it arrives the word shows in the site's Inter italic. */
+@font-face {
+	font-family: "Inter 3.19 Italic";
+	font-style: italic;
+	font-weight: 400;
+	font-display: swap;
+	src: url(https://cdn.jsdelivr.net/gh/rsms/inter@v3.19/docs/font-files/Inter-Italic.woff2) format("woff2");
 }
-@keyframes mm-wire-sway-right {
-	from { transform: rotate(0.6deg); }
-	to { transform: rotate(-0.6deg); }
+.mm-exp {
+	font-family: "Inter 3.19 Italic", "Inter", ui-sans-serif, system-ui, sans-serif;
+	font-style: italic;
+	font-weight: 400;
 }
 
 /* The memory card's number. 12 Nov (Marta: it twitched, floated and blurred): a plain, quick cross-fade in one

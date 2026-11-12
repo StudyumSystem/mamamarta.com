@@ -51,34 +51,41 @@ const ENTRIES = [
     textW: "27.5vw",
     visual: { kind: "video", src: "/assets/m.mp4", poster: "/assets/m-poster.webp", alt: "Letter M" },
   },
+  // 02-06: her updated texts (kept Figma copy, 12 Nov: the "Homepage / Slider Position" frames of MM-GAME-02 … 05
+  // and MM-C06), Inter 22/34 -0.04em black 69%, text boxes 617 px wide (598 for The Art of Moving).
   {
     id: "memory-match",
     label: "02 / 05 MEMORY MATCH",
-    text: "20 cards, 10 pairs. A brand works the same way: people come back to what they recognise.",
+    text: "Half of what you need is already in front of you. Finding the pair feels like remembering, not learning.",
+    textW: px(617),
     visual: { kind: "memory-card" },
   },
   {
     id: "tic-tac-toe",
     label: "03 / 05 TIC-TAC-TOE",
-    text: "Every move is a decision. Three in a row sounds easy. But can you outsmart your opponent? Your move.",
+    text: "Every move closes a door. You will feel the cost of a move you did not think about.",
+    textW: px(617),
     visual: { kind: "video", src: "/assets/apple.mp4", poster: "/assets/apple-poster.webp", alt: "Black apple" },
   },
   {
     id: "art-of-moving",
     label: "04 / 05 THE ART OF MOVING",
-    text: ["Momentum. Keep moving, collect the pink.", "Growth is a series of small, well-timed steps."],
+    text: "Keep moving and collect the pink. Small steps, on time, build the whole run.",
+    textW: px(598),
     visual: { kind: "walking-card" },
   },
   {
     id: "connect-the-path",
     label: "05 / 05 CONNECT THE PATH",
-    text: "Every point has a purpose. A good product leads people there without a map. Can you complete it?",
+    text: "Every point matters. A good product leads people there without a map.",
+    textW: px(617),
     visual: { kind: "video", src: "/assets/google.mp4", poster: "/assets/google-poster.webp", alt: "Glove in the shape of a G" },
   },
   {
     id: "collaborate",
     label: "WHAT IF YOUR BRAND HAD ITS OWN GAME?",
-    text: "Turn your idea into something people can play with. Suggest a game for Mamamarta or create a custom interactive experience for your brand.",
+    text: "Bring your idea, or let us shape one together. Turn your brand into an interactive experience your audience can play with.",
+    textW: px(617),
     // Her jelly key animation (Marta, 10 Nov); the still key is its poster until the video plays.
     visual: { kind: "image", src: "/assets/games/plus-key.png", video: "/assets/games/plus-key.mp4", alt: "Black key with a plus sign" },
   },
@@ -106,6 +113,15 @@ const GamepadIcon = () => (
 const BriefcaseIcon = () => (
   <svg width="1.25em" height="1.25em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
     <rect x="3" y="7" width="18" height="13" rx="3" /><path d="M9 7V5h6v2" /><path d="M3 12h18" />
+  </svg>
+);
+
+// Her own icon for "Suggest a game" (Design System > Icons, Icon_Gaming_Controller_Outline_18: a game controller
+// outline with a short bar on top), drawn as a line icon. Phone buttons only for now; the computer keeps its icon.
+const ControllerIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true" className="shrink-0">
+    <path d="M7.4 6.2h9.2c1.5 0 2.7 1 3 2.5l1.3 6.2c.3 1.5-.8 2.9-2.3 2.9-.9 0-1.6-.5-2-1.2l-1-1.8H8.4l-1 1.8c-.4.7-1.1 1.2-2 1.2-1.5 0-2.6-1.4-2.3-2.9l1.3-6.2c.3-1.5 1.5-2.5 3-2.5z" />
+    <path d="M10 6.2V5h4v1.2" />
   </svg>
 );
 
@@ -140,8 +156,18 @@ const MOVES = [
   { src: "/assets/games/stumble.mp4", fix: "mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)]" },
 ];
 const MOVE_ORDER = [0, 1, 0, 2];
+// The phone (Marta, 12 Nov: "no animations"): the same walk, leap, walk, stumble, from copies whose white is in
+// the pixels (scripts/make-phone-videos.mjs: the computer's brightness / contrast baked in, the background pure
+// #FFFFFF), so no blend or filter is needed; iPhone Safari applies neither to a <video>.
+const PHONE_CLIPS = [
+  { src: "/assets/human-walking-phone.mp4", poster: "/assets/human-walking-phone-poster.webp", fix: "" },
+  { src: "/assets/games/jump-phone.mp4", fix: "" },
+  { src: "/assets/games/stumble-phone.mp4", fix: "" },
+];
 
-function MovingFigure({ active = true, pos = "50% 0%", className = "" }) {
+// phone: the phone copies above (the leap and stumble keep their 1.04 scale, which hides their thin side lines)
+function MovingFigure({ active = true, pos = "50% 0%", className = "", order = MOVE_ORDER, phone = false }) {
+  const clips = phone ? PHONE_CLIPS : MOVES;
   const box = useRef(null);
   const vids = useRef([]);
   const [step, setStep] = useState(0);
@@ -158,38 +184,40 @@ function MovingFigure({ active = true, pos = "50% 0%", className = "" }) {
   }, []);
   const playing = active && onScreen && !reduced;
   useEffect(() => {
-    const cur = MOVE_ORDER[step];
-    const nextIdx = MOVE_ORDER[(step + 1) % MOVE_ORDER.length];
+    const cur = order[step];
+    const nextIdx = order[(step + 1) % order.length];
     vids.current.forEach((v, i) => {
       if (!v) return;
-      if (playing && (i === cur || i === nextIdx) && !v.getAttribute("src")) { v.src = MOVES[i].src; v.preload = "auto"; }
+      if (playing && (i === cur || i === nextIdx) && !v.getAttribute("src")) { v.src = clips[i].src; v.preload = "auto"; }
       if (i !== cur || !playing) { v.pause(); return; }
       v.muted = true;
       v.play().catch(() => {});
     });
   }, [step, playing]);
   const onEnded = (i) => {
-    if (i !== MOVE_ORDER[step]) return;
-    const nextStep = (step + 1) % MOVE_ORDER.length;
-    const nv = vids.current[MOVE_ORDER[nextStep]];
+    if (i !== order[step]) return;
+    const nextStep = (step + 1) % order.length;
+    const nv = vids.current[order[nextStep]];
     if (nv) { try { nv.currentTime = 0; } catch { /* not loaded yet */ } }
+    // one clip only: the step doesn't change, so it is started again here
+    if (nextStep === step) { nv?.play().catch(() => {}); return; }
     setStep(nextStep);
   };
   return (
     <div ref={box} className={`relative overflow-hidden bg-white ${className}`}>
-      {MOVES.map((m, i) => (
+      {clips.map((m, i) => (
         <video
           key={m.src}
           ref={(v) => (vids.current[i] = v)}
-          poster={i === 0 ? "/assets/human-walking-poster.webp" : undefined}
+          poster={i === 0 ? m.poster || "/assets/human-walking-poster.webp" : undefined}
           muted
           playsInline
           preload="none"
           aria-label={i === 0 ? "Walking figure" : undefined}
           aria-hidden={i === 0 ? undefined : "true"}
           onEnded={() => onEnded(i)}
-          className={`absolute inset-0 h-full w-full object-cover ${m.fix} ${i === MOVE_ORDER[step] ? "" : "opacity-0"}`}
-          style={{ transform: m.fix ? "scale(-1.04, 1.04)" : "scaleX(-1)", objectPosition: pos }}
+          className={`absolute inset-0 h-full w-full object-cover ${m.fix} ${i === order[step] ? "" : "opacity-0"}`}
+          style={{ transform: i > 0 ? "scale(-1.04, 1.04)" : "scaleX(-1)", objectPosition: pos }}
         />
       ))}
     </div>
@@ -239,7 +267,7 @@ function WalkingCardPhone({ active }) {
   return (
     <div className="flex w-[calc(var(--q)*350)] flex-col overflow-hidden rounded-[calc(var(--q)*24)] bg-black p-[calc(var(--q)*12)] pb-[calc(var(--q)*18)] text-white">
       <div className="w-full overflow-hidden rounded-[calc(var(--q)*16)] bg-white">
-        <MovingFigure pos="50% 20%" className="h-[calc(var(--q)*370)] w-full" />
+        <MovingFigure pos="50% 20%" phone className="h-[calc(var(--q)*370)] w-full" />
       </div>
       <div className="mt-[calc(var(--q)*18)] flex items-center justify-between">
         <div>
@@ -308,30 +336,38 @@ function Visual({ entry, active }) {
 }
 
 // Phone pictures, measured on MM-HOME-002 (px of the 390 frame): each one shows through a window the size of
-// the object plus her gaps above and below, so nothing of the video's own edge (a light box, a grey line)
-// can show, and the video is blended into the pure white page (Marta, 2 Nov: "no frames, the background
-// pure white #FFFFFF, one with the landing"). w = video width, h = window height, y = video top in the window.
+// the object plus her gaps above and below, so nothing of the picture's own edge can show (Marta, 2 Nov: "no
+// frames, the background pure white #FFFFFF, one with the landing"). w = picture width, h = window height,
+// y = picture top in the window.
+// Marta, 12 Nov 23:36 (her iPhone): grey block, white boxes round the M, the key… These were <video>s whose own
+// background is off-white/light grey, made white only by mix-blend-mode: multiply + a filter. iPhone Safari draws
+// a playing <video> in its own layer and doesn't blend it (nor match its colours to the page), so the videos'
+// grey showed across the screen and their whitened posters as white boxes; Chrome (our checks) blends them, so
+// it never showed there. Marta, 12 Nov (later): "no animations" on the phone with the stills. The phone now plays
+// her videos again, from phone copies (scripts/make-phone-videos.mjs, max 720 wide, no sound) whose background is
+// pure #FFFFFF in the pixels (the computer's brightness 1.04 / contrast 1.08 baked in), with a poster made the same
+// way, and no blend or filter at all: white in the file is white on every screen. ar = the copy's width / height.
+// The computer keeps its videos.
 const PHONE_PICTURE = {
-  "word-hunt": { w: 356, h: 342, y: -25 },
-  "tic-tac-toe": { w: 466, h: 466, y: -15 },
-  "connect-the-path": { w: 435, h: 389, y: -58 },
+  "word-hunt": { w: 356, h: 342, y: -25, ar: "720 / 782" },
+  "tic-tac-toe": { w: 466, h: 466, y: -15, ar: "720 / 794" },
+  "connect-the-path": { w: 435, h: 389, y: -58, ar: "720 / 794" },
   // her key video has more white around the key than the still, so it is drawn narrower to keep the key's size
-  collaborate: { w: 275, h: 357, y: 36 },
+  collaborate: { w: 275, h: 357, y: 36, ar: "640 / 706" },
 };
+const phoneCopy = (src, ext) => src.replace(/\.mp4$/, ext);
 
 function PhoneVisual({ entry }) {
   const v = entry.visual;
   if (v.kind === "memory-card") return <div className="flex justify-center pt-[calc(var(--q)*31)] pb-[calc(var(--q)*33)]"><MemoryCardPhone /></div>;
   if (v.kind === "walking-card") return <div className="flex justify-center pt-[calc(var(--q)*32)] pb-[calc(var(--q)*33)]"><WalkingCardPhone /></div>;
   const p = PHONE_PICTURE[entry.id];
-  const style = { width: `calc(var(--q) * ${p.w})`, top: `calc(var(--q) * ${p.y})` };
+  const style = { width: `calc(var(--q) * ${p.w})`, top: `calc(var(--q) * ${p.y})`, aspectRatio: p.ar };
+  const src = v.kind === "video" ? v.src : v.video;
+  // active={false}: the lazy loader (scripts/lazy-videos.js) fetches and plays it when it comes near
   return (
     <div className="relative -mx-[calc(var(--q)*20)] overflow-hidden bg-white" style={{ height: `calc(var(--q) * ${p.h})` }}>
-      {v.kind === "video" || v.video ? (
-        <LoopVideo src={v.video || v.src} poster={v.video ? v.src : v.poster} alt={v.alt} active={false} className="absolute left-1/2 max-w-none -translate-x-1/2 mix-blend-multiply brightness-[1.06] contrast-[1.1]" style={style} />
-      ) : (
-        <img src={v.src} alt={v.alt} className="absolute left-1/2 h-auto max-w-none -translate-x-1/2" style={style} />
-      )}
+      <LoopVideo src={phoneCopy(src, "-phone.mp4")} poster={phoneCopy(src, "-phone-poster.webp")} alt={v.alt} active={false} className="absolute left-1/2 block h-auto max-w-none -translate-x-1/2 bg-white" style={style} />
     </div>
   );
 }
@@ -357,17 +393,19 @@ function Ctas({ entry, onPlay }) {
   );
 }
 
-// Phone buttons (MM-HOME-002): Play 199x46 in the middle, the two collaborate buttons 300x46, 15 px apart.
+// Phone buttons (MM-HOME-002): Play 199x46 in the middle, the two collaborate buttons 300 x 47 / 46, 15 px
+// apart, text Inter 16 semibold. "Suggest a game" with her controller icon, "Create for my brand" with her arrow
+// (Icon_Arrow_Right_Outline_18, as in her phone frame).
 function PhoneCtas({ entry, onPlay }) {
-  const base = "flex items-center justify-center gap-[0.3em] font-semibold h-[calc(var(--q)*46)] text-[length:calc(var(--q)*15.5)]";
+  const base = "flex items-center justify-center gap-[0.4em] font-semibold h-[calc(var(--q)*46)] text-[length:calc(var(--q)*16)]";
   if (entry.id === "collaborate")
     return (
       <div className="flex flex-col items-center gap-[calc(var(--q)*15)]">
-        <button type="button" onClick={() => openForm("suggest")} className={`${base} w-[calc(var(--q)*300)] border border-black bg-white text-black`}>
-          Suggest a game <GamepadIcon />
+        <button type="button" onClick={() => openForm("suggest")} className={`${base} h-[calc(var(--q)*47)] w-[calc(var(--q)*300)] border border-black bg-white text-black`}>
+          Suggest a game <ControllerIcon />
         </button>
         <button type="button" onClick={() => openForm("brand")} className={`${base} mm-gradient w-[calc(var(--q)*300)] text-white`}>
-          Create for my brand <BriefcaseIcon />
+          Create for my brand <ArrowIcon />
         </button>
       </div>
     );
@@ -466,11 +504,11 @@ export default function FoundersChallenge({ start = 0, still = false }) {
             entry text 22/34 at 701; the two lines at 797; Play 312 x 68 at 839. */}
         <div className="self-start pl-[8.85vw] pt-[9.48vw] pb-[6vw]">
           <h2 className="relative z-20 -ml-[0.625vw] whitespace-nowrap text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]">{HEADING_LINES[0]}<br />{HEADING_LINES[1]}</h2>
-          <p className="mt-[3.125vw] max-w-[32.81vw] text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.04em] text-black/70">{INTRO}</p>
+          <p className="mt-[3.125vw] max-w-[32.81vw] text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.04em] text-black/[.69]">{INTRO}</p>
           {/* The description always takes exactly 2 lines, so the progress line and buttons never move. */}
           <div key={active} className="mm-slide-in mt-[3.54vw]">
             <p className="text-[1.146vw] font-normal uppercase leading-[1.094vw] tracking-[-0.017em] text-black/50">{entry.label}</p>
-            <p className="mt-[1.04vw] h-[3.54vw] max-w-[37vw] overflow-hidden text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.04em] text-black/70 line-clamp-2" style={entry.textW ? { maxWidth: entry.textW } : undefined}><EntryText text={entry.text} /></p>
+            <p className="mt-[1.04vw] h-[3.54vw] max-w-[37vw] overflow-hidden text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.04em] text-black/[.69] line-clamp-2" style={entry.textW ? { maxWidth: entry.textW } : undefined}><EntryText text={entry.text} /></p>
           </div>
           {/* her Desktop.jpg (11 Nov): two lines, back (grey, arrow left) and next (light pink, arrow right);
               the next line fills with pink over the entry's reading time, so it shows when the slider moves on */}
@@ -542,11 +580,12 @@ export default function FoundersChallenge({ start = 0, still = false }) {
       <div className="mm-phone-w px-[calc(var(--q)*20)] pt-[calc(var(--q)*42)] pb-[calc(var(--q)*60)] lg:hidden">
         {/* the computer's copy, at her phone heading size (62/65) */}
         <h2 className="-ml-[calc(var(--q)*2)] whitespace-nowrap text-[length:calc(var(--q)*62)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.07em]">{HEADING_LINES[0]}<br />{HEADING_LINES[1]}</h2>
-        <p className="mt-[calc(var(--q)*24)] w-[calc(var(--q)*302)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-[#666]">{INTRO}</p>
+        {/* her phone type (12 Nov): intro and label Inter 14/20 black 60%, entry text 14/20 black 70%, 325 wide */}
+        <p className="mt-[calc(var(--q)*24)] w-[calc(var(--q)*325)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em] text-black/60">{INTRO}</p>
         {ENTRIES.map((e, i) => (
           <div key={e.id} className={i === 0 ? "mt-[calc(var(--q)*41)]" : "mt-[calc(var(--q)*57)]"}>
-            <p className="text-[length:calc(var(--q)*13)] font-normal uppercase leading-[calc(var(--q)*18)] tracking-[-0.01em] text-[#707070]">{e.label}</p>
-            <p className="mt-[calc(var(--q)*13)] w-[calc(var(--q)*302)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-[#4a4a4a]"><EntryText text={e.text} /></p>
+            <p className="text-[length:calc(var(--q)*14)] font-normal uppercase leading-[calc(var(--q)*20)] tracking-[-0.01em] text-black/60">{e.label}</p>
+            <p className="mt-[calc(var(--q)*12)] w-[calc(var(--q)*325)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em] text-black/70"><EntryText text={e.text} /></p>
             <PhoneVisual entry={e} />
             <PhoneCtas entry={e} onPlay={onPlay} />
           </div>

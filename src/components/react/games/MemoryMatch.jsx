@@ -41,6 +41,7 @@ export default function MemoryMatch({ open, onClose }) {
   const timers = useRef([]);
   const gridRef = useRef(null);
   const cardRefs = useRef([]);
+  const streak = useRef(0); // pairs found in a row, for the rising sound (Marta, 12 Nov)
 
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
   const clearTimers = () => { timers.current.forEach(clearTimeout); timers.current = []; };
@@ -48,6 +49,7 @@ export default function MemoryMatch({ open, onClose }) {
   const reset = useCallback(() => {
     clearTimers();
     lock.current = false;
+    streak.current = 0;
     setDeck(newDeck());
     setUp([]);
     setMatched(new Set());
@@ -102,13 +104,19 @@ export default function MemoryMatch({ open, onClose }) {
       setUp([]);
       setPulse(deck[a].n);
       later(() => setPulse(null), 450);
-      // a found pair, then its MM✦ credited (Marta, 11 Nov 19:56)
-      if (m.size !== deck.length) { later(() => play("match"), 120); later(() => play("coins"), 340); }
+      // a found pair, then its MM✦ credited (Marta, 11 Nov 19:56). 12 Nov (Marta): pairs in a row build up,
+      // each one a step higher, with an extra sparkle from the second in a row on.
+      streak.current += 1;
+      const run = streak.current;
+      if (m.size !== deck.length) { later(() => play("match", "memory-match", run), 120); later(() => play("coins"), 380); }
       if (m.size === deck.length) finish();
     } else {
       setUp(next);
       lock.current = true;
-      later(() => { setUp([]); lock.current = false; play("back"); }, 900);
+      streak.current = 0;
+      // 12 Nov (Marta): a short "miss" as soon as the two cards don't match, then they turn back quietly
+      later(() => play("back"), 300);
+      later(() => { setUp([]); lock.current = false; play("turn"); }, 900);
     }
   };
 
@@ -124,6 +132,8 @@ export default function MemoryMatch({ open, onClose }) {
       onBack={phase === "done" ? () => setPhase("score") : null}
       label="Memory Match"
       game
+      stage={phase !== "done"}
+      textBox={[333, 608]}
       instructions={ended ? null : INSTRUCTIONS}
       counter={ended ? null : counter}
       stars={ended ? null : pairs * PAIR_STARS}
@@ -135,8 +145,11 @@ export default function MemoryMatch({ open, onClose }) {
       ) : phase === "score" ? (
         <ScoreScreen badge="Perfect find" label="All pairs found" value="10 / 10" stars={ROUND_STARS} onDone={toQuote} />
       ) : (
-        <div className="flex flex-1 items-start justify-center overflow-hidden px-[15px] pb-8 pt-[18px] lg:pb-[3vw] lg:pt-[3.96vw]">
-          <div ref={gridRef} className={`${phase === "fade" ? "mm-fade-out" : ""} relative grid w-full max-w-[640px] grid-cols-4 gap-[6px] lg:w-[36vw] lg:max-w-none lg:grid-cols-5 lg:gap-x-[0.85vw] lg:gap-y-[1.1vw]`}>
+        <div className="flex flex-1 items-start justify-center overflow-hidden px-[15px] pb-8 pt-[18px] lg:pointer-events-none lg:absolute lg:inset-0 lg:p-0 lg:pt-[calc(198*var(--mm-u))]">
+          {/* her MM-G02-01 / -02 at 1920 x 1019: five cards of 125 x 159.5 a row, 16 apart, rows 22 apart (689 wide),
+              198 from the panel's top; on the computer in her frame's px measured against the screen's height
+              (--mm-u, GameModal), so the cards take the share of the height hers do on every screen (12 Nov) */}
+          <div ref={gridRef} className={`${phase === "fade" ? "mm-fade-out" : ""} relative grid w-full max-w-[640px] grid-cols-4 gap-[6px] lg:pointer-events-auto lg:w-[calc(689*var(--mm-u))] lg:max-w-none lg:grid-cols-5 lg:gap-x-[calc(16*var(--mm-u))] lg:gap-y-[calc(22*var(--mm-u))]`}>
             {deck.map((card, i) => {
               const faceUp = phase !== "play" || matched.has(i) || up.includes(i);
               const f = phase === "burst" && fly?.[i];

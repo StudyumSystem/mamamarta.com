@@ -33,21 +33,25 @@ export default function BrandSection() {
         <h2 className="select-none">
           <img src="/assets/brand/footer-logo-mobile.png" alt="MAMA MARTA" className="absolute left-[calc(var(--q)*19)] top-[calc(var(--q)*39)] h-auto w-[calc(var(--q)*357)] max-w-none" />
         </h2>
-        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*243)] w-[calc(var(--q)*330)] text-[length:calc(var(--q)*14.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em]">
-          {WHAT_WE_DO}
-        </p>
-        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*326)] w-[calc(var(--q)*330)] text-[length:calc(var(--q)*13)] font-light leading-[calc(var(--q)*18)] text-white/85">
-          {CALL_LINE}
-        </p>
-        <a
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] flex h-[calc(var(--q)*41)] w-[calc(var(--q)*215)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*15.5)] font-semibold whitespace-nowrap backdrop-blur-md"
-          style={{ background: buttonOff }}
-        >
-          Straight to Marta <ArrowIcon />
-        </a>
+        {/* her phone frame: text Inter 14/20 white, button 199 x 46 with 16 semibold; the call line (not in her
+            frame) in the same 14/20 so it reads as well; the three follow each other so they never overlap */}
+        <div className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*243)] flex w-[calc(var(--q)*330)] flex-col items-start">
+          <p className="text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em]">
+            {WHAT_WE_DO}
+          </p>
+          <p className="mt-[calc(var(--q)*12)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em] text-white/85">
+            {CALL_LINE}
+          </p>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-[calc(var(--q)*20)] flex h-[calc(var(--q)*46)] w-[calc(var(--q)*199)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*16)] font-semibold whitespace-nowrap backdrop-blur-md"
+            style={{ background: buttonOff }}
+          >
+            Straight to Marta <ArrowIcon />
+          </a>
+        </div>
         <div className="absolute bottom-[calc(var(--q)*95)] left-[calc(var(--q)*12.5)] flex gap-[calc(var(--q)*29)]">
           {icons.map((icon) => (
             <a key={icon.alt} href={icon.href} target={icon.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="inline-flex">
@@ -55,7 +59,7 @@ export default function BrandSection() {
             </a>
           ))}
         </div>
-        <p className="absolute bottom-[calc(var(--q)*36)] left-[calc(var(--q)*20)] text-[length:calc(var(--q)*18)] leading-[calc(var(--q)*22)]">© Mamamarta 2026</p>
+        <p className="absolute bottom-[calc(var(--q)*36)] left-[calc(var(--q)*20)] text-[length:calc(var(--q)*18)] font-medium leading-[calc(var(--q)*25)] text-[#F5F5F5]">© Mamamarta 2026</p>
       </div>
 
       {/* Desktop, her new home frame of 9 Nov: copy, button and the icons / © row on the left (165-852 px),

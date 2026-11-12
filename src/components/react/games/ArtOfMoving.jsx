@@ -2,17 +2,33 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import GameModal, { Completion, ScoreScreen, StarIcon } from "./GameModal.jsx";
 import { takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
 import { play as playSound } from "./sound.js";
+import { H0, FH, BODY_U, PLAT_H, COIN_R, FOOT_FRONT, GRACE, V0, Y_START, SPEED0, clamp, newWorld, pressJump, runStep } from "./aomWorld.js";
 const sound = (name) => playSound(name, "art-of-moving");
 
 // MM-GAME-04 The Art of Moving (Marta's spec + frames MM-G04-01…05): endless runner.
 // Default → Start → countdown 3, 2, 1, GO → automatic run, one input = one fixed jump → one fall ends the run
 // → score screen (coins, personal best in localStorage, MM✦STARS, timer line) → Completion with the quote rotation.
-// Her walking figure is the site's walk video, laid over the white frame with multiply so its white background disappears.
-// Jump = the current frame held on the arc; fall = a short drop and fade (Marta's OK, 28 Oct 12:42).
-// 10 Nov (Marta): the figure walks to the right (both videos mirrored), and a jump shows her leap video's
-// airborne moment (its middle frame, legs tucked, coat flying) on the arc instead of the held walking frame.
-// The leap video has a light grey background and a soft shadow: a stronger lift whitens both on multiply,
-// and its thin edge lines are cut off.
+// 10 Nov (Marta): the figure walks to the right (her clips mirrored).
+// 12 Nov (Marta: "still hangs in the air … she must stand on the brick. At the start she simply stands, then starts
+// walking, and all other moves come from the controls … make the game more alive, you can cut or choose from her
+// clips"): her three clips (walk, leap, stumble) are cut into frames in the browser when the game opens, each
+// frame's sole and middle are measured, and every frame is drawn with its own sole on her brick.
+// 12 Nov 13:39 (Marta: "she must stand still, static, like on my screen … landed on the brick … smoother, more
+// alive … she walks on air … when I start jumping, I lose straight away"):
+// - she stands on her brick from the first screen on, in one still frame of her leap clip (0.875 s: upright, feet
+//   together, the narrowest feet of all her frames), until GO; then her own first steps out of that stand
+//   (0.917 to 1.25 s of the same clip) lead into her walk at the walk frame that matches them.
+// - her walk is every frame of her clip (30 a second, not 15); the leap is her push-off (from 2.0 s), the air and
+//   her landing (3.25 to 3.42 s), and a miss is her stumble; a change from one kind of move to another is a short
+//   cross-fade (80 ms), not a cut.
+// - the leap clip loses the top of her head out of its frame from 2.46 to 3.33 s: its round top is put back.
+// - nothing under her soles is kept (her floor and its shadow), and near her soles only real darkness counts, so no
+//   grey haze hangs under her shoes over the white.
+// - the instant loss: her first brick ends 405 units ahead of her and the first gap was 70 to 114 wide; a first
+//   press about a second after GO (her first jump) came down past the brick's end with her front foot short of the
+//   next one, and she fell (30 to 80 runs of 100, measured on the check page). Her first five bricks are now level
+//   or a small step down with gaps of 64 to 70, a landing a hair late still counts, and a jump that comes down
+//   short lands on her back foot: no press there can end the run (aomWorld.js).
 
 const INSTRUCTIONS = "Keep moving. Jump between platforms and collect pink coins. One fall ends the run.";
 const PINK = "#F600A9";
@@ -22,51 +38,48 @@ const COIN_STARS = 10;
 const runStars = (n) => Math.min(ROUND_STARS, n * COIN_STARS);
 const STAR_RAIN = 28; // pink stars falling over the panel when a run ends (12 Nov)
 
-// World in Figma units: the desktop frame is 660 x 755 (MM-G04-03 at 2000 px wide).
-const H0 = 755;
 const MIN_VIEW_W = 560; // on tall phone frames the world is scaled to show at least this much ahead
-// 12 Nov (Marta's screenshot, after "take the design from my Figma"): her MM-G04-03 Gameplay (kept Figma copy)
-// has the figure 348 x 490 in the 635 x 726 frame, standing on the lower platforms, and every coin is her pink
-// badge: a 45 px pink circle with her white four-point star (31.5 px) in the middle. Ours had the figure a fifth
-// smaller (400) and plain pink dots. Now 490 of 726 = 510 here, and the badge.
-const FH = 510; // figure (video) height; the video is 2:3
-const FW = (FH * 2) / 3;
-// feet sit at 96.5% of the video height (12 Nov: at 95% she stood a little above the bricks, checked at 1440)
-const FOOT_Y = 0.965;
-const JH = FH; // leap video height: its figure stands about as tall in its 3:4 frame as the walker in hers
-const JW = (JH * 3) / 4;
-const JFOOT_Y = 0.91; // the tucked feet of the airborne frame sit at 91% of its height
-const JCX = 0.45; // the leaping body's centre across the (mirrored) frame
-// How far past a brick's edge the feet may still be (12 Nov, Marta: "she must stand on the bricks"): she walks off
-// once her front foot leaves it, and lands only with a foot on it. Was 34 both ways, so she walked on air.
-const FOOT_TOL = 20; // landing: a foot reaches the brick
-const STAND_TOL = 8; // standing: she steps off when her middle passes the edge by more than this
-const BODY_W = 115;
-const BODY_H = 0.88 * FH;
-const PLAT_H = 37;
+const SINK = 1; // a sole sits this far into the brick, so no hair of white shows under it on any screen
 const PLAT_R = 12;
-const COIN_R = 23.4; // her badge, 45 of 635 px
 // Her four-point star (Star 2, the same as in GameModal), drawn in a 24 x 24 box, 70% of the badge across.
 const STAR = typeof Path2D !== "undefined" ? new Path2D("M12 0c.9 6.4 5.1 10.9 12 12-6.9 1.1-11.1 5.6-12 12-.9-6.4-5.1-10.9-12-12C6.9 10.9 11.1 6.4 12 0z") : null;
 const STAR_K = (COIN_R * 2 * 0.7) / 24;
-const APEX = 150; // jump height
-const AIR = 0.78; // time in the air on level ground
-const V0 = (4 * APEX) / AIR;
-const G = (2 * V0) / AIR;
-// Platform tops: hers run 562 to 682 here; with her taller figure the highest sit at 600, so the head stays
-// inside the frame at the top of a jump.
-const Y_MIN = 600;
-const Y_MAX = 700;
-const Y_START = 640;
-const SPEED0 = 280;
-const SPEED_MAX = 470;
-const ACCEL = 5; // speed gained per second of running
 
-const rand = (a, b) => a + Math.random() * (b - a);
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-// Time from take-off until landing on a platform `rise` units higher (negative = lower).
-const airTime = (rise) => (V0 + Math.sqrt(Math.max(0, V0 * V0 - 2 * G * rise))) / G;
-const speedAt = (t) => (t < 0.8 ? SPEED0 * (0.35 + 0.65 * (t / 0.8)) : Math.min(SPEED_MAX, SPEED0 + ACCEL * (t - 0.8)));
+// Her clips: [file, her standing height as a share of the clip's height, speed it is read at] (measured frame by
+// frame, 12 Nov: standing upright she is 90.6% of the leap clip (0.875 s) and, at her tallest step, 88.8% of the
+// walk clip (3.7 s): 454 and 453 units here, the same size. The stumble clip is closer: her head is 10.2% of its
+// height against 9.3% in the others, so her height there is 0.965 of it, not 0.935.)
+const CLIPS = {
+  walk: ["/assets/human-walking.mp4", 0.87, 1], // 854 x 1280, 6.6 s, 30 frames a second
+  jump: ["/assets/games/jump.mp4", 0.885, 1.5], // 1440 x 1920, 5.17 s, 24 a second: walks, leaps at 2.1 s, lands at 3.25 s
+  stumble: ["/assets/games/stumble.mp4", 0.965, 1.5], // 1440 x 1920, 5.17 s: stumbles forward from 1.6 s
+};
+// Frames n..m (every `step`) of a clip at 24 frames a second, by time (a hair after each frame's own time).
+const f24 = (n, m, step = 1) => { const out = []; for (let i = n; i <= m; i += step) out.push(i / 24 + 0.004); return out; };
+const WALK_FPS = 30;
+// The poses, by time in her clips (s), chosen on her frames:
+const POSES = {
+  // standing for the first screen and the countdown: upright, feet together (0.875 s)
+  stand: ["jump", f24(21, 21)],
+  // her first steps out of that stand after GO (0.917 to 1.25 s)
+  start: ["jump", f24(22, 30)],
+  // a whole stride and a half (two steps, 1.8 s), every frame; 4.9 s meets 3.1 s again, so it loops
+  walk: ["walk", Array.from({ length: 54 }, (_, i) => 3.1 + i / WALK_FPS)],
+  // push-off (2.0 s), knees tucked, coat flying, the leg reaching down for the brick: taken by where she is on the arc
+  air: ["jump", f24(48, 76, 2)],
+  // feet down, knees giving: the landing (3.25 to 3.42 s)
+  land: ["jump", f24(78, 82)],
+  // pitching forward and down when she misses (1.5 to 2.17 s)
+  fall: ["stumble", f24(36, 52, 2)],
+};
+const START_FPS = 24;
+const SETTLE = 0.22; // landing (s)
+const XFADE = 0.08; // cross-fade between two kinds of move (s)
+const CUT_H = 600; // her standing height in a cut frame's pixels (sharp up to about 1.3 times her size on screen)
+const LIFT_LO = 55; // darker than this: fully her
+const LIFT_HI = 200; // lighter than this: background or floor shadow, cut away
+const FEET_HI = 130; // near her soles (the lowest 8% of her) only real darkness counts: no floor shadow under her shoes
+const HEAD_K = 0.093; // her head's length in profile as a share of the leap clip's height (9.2 to 9.4%, measured)
 
 function readBest() {
   try { return Number(localStorage.getItem(BEST_KEY) || 0); } catch { return 0; }
@@ -75,45 +88,270 @@ function writeBest(n) {
   try { localStorage.setItem(BEST_KEY, String(n)); } catch { /* private mode: best lasts this visit only */ }
 }
 
-// A new random route. Every gap is shorter than the jump at the speed the player will have there,
-// and every platform is long enough to take off from, so no run has an impossible gap.
-function addPlatform(g) {
-  const last = g.plats[g.plats.length - 1];
-  const hard = Math.min(1, g.genT / 40);
-  const speed = speedAt(g.genT + 1);
-  const y = clamp(last.y + rand(-80, 100), Y_MIN, Y_MAX);
-  const rise = last.y - y;
-  const reach = speed * airTime(rise);
-  const gap = rand(0.18, 0.4 + 0.22 * hard) * reach;
-  const w = Math.max(rand(0.55, 0.95 - 0.25 * hard) * reach, reach - last.w - gap + 60, 120);
-  const p = { x: last.x + last.w + gap, y, w };
-  g.plats.push(p);
-  g.genT += (gap + w) / speed;
-  // Coins: in the gap at jump height (taken on the way over), or high above a long platform (needs a jump).
-  const roll = Math.random();
-  if (roll < 0.35) g.coins.push({ x: last.x + last.w + gap / 2, y: Math.min(last.y, y) - 200, taken: 0 });
-  else if (roll < 0.6 && w > 220) g.coins.push({ x: p.x + w * rand(0.35, 0.65), y: y - (BODY_H + COIN_R + 20), taken: 0 });
+// One frame of her clip (a video at its time, or a picture) as a cut-out: black with her darkness as opacity,
+// cropped to her, with where her sole is (the lowest row with her in it), her middle (her chest) and her feet.
+function cutFrame(src, sw, sh, body) {
+  const k = CUT_H / (body * sh);
+  const W = Math.round(sw * k), H = Math.round(sh * k);
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const x = c.getContext("2d", { willReadFrequently: true });
+  x.drawImage(src, 0, 0, W, H);
+  const img = x.getImageData(0, 0, W, H);
+  const d = img.data;
+  // the leap clips have thin lines at their sides and the bottom row can carry the floor's edge: left out
+  const ex = Math.round(W * 0.02), ey = Math.round(H * 0.01);
+  const A = new Uint8ClampedArray(W * H);
+  const rows = new Uint16Array(H);
+  for (let y = 0; y < H - ey; y++) {
+    for (let xx = ex; xx < W - ex; xx++) {
+      const i = (y * W + xx) * 4;
+      const L = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      if (L >= LIFT_HI) continue;
+      const a = L <= LIFT_LO ? 255 : ((LIFT_HI - L) * 255) / (LIFT_HI - LIFT_LO);
+      A[y * W + xx] = a;
+      if (a >= 128) rows[y]++;
+    }
+  }
+  let top = -1, sole = -1;
+  for (let y = 0; y < H; y++) if (rows[y] >= 3) { if (top < 0) top = y; sole = y; }
+  if (sole < 0) return null;
+  // under her soles nothing is kept (the floor and her shadow on it); over the lowest 8% of her only real darkness
+  const fy = Math.round(sole - (sole - top) * 0.08);
+  for (let y = fy; y < H; y++) {
+    for (let xx = 0; xx < W; xx++) {
+      const j = y * W + xx;
+      if (y > sole) { A[j] = 0; continue; }
+      const L = LIFT_HI - (A[j] * (LIFT_HI - LIFT_LO)) / 255;
+      A[j] = L >= FEET_HI ? 0 : L <= LIFT_LO ? 255 : ((FEET_HI - L) * 255) / (FEET_HI - LIFT_LO);
+    }
+  }
+  // her sole again, on what is left: the lowest row with her shoe in it (a dark contact shadow is no longer her)
+  for (let y = sole, done = false; y >= fy && !done; y--) {
+    let n = 0;
+    for (let xx = ex; xx < W - ex; xx++) if (A[y * W + xx] >= 128) n++;
+    if (n >= 3) { sole = y; done = true; }
+  }
+  let bx0 = W, bx1 = -1, by0 = H, by1 = -1;
+  for (let y = 0; y < H; y++) {
+    for (let xx = 0; xx < W; xx++) {
+      const j = y * W + xx, a = A[j], i = j * 4;
+      d[i] = d[i + 1] = d[i + 2] = 0;
+      d[i + 3] = a;
+      if (a > 8) { if (xx < bx0) bx0 = xx; if (xx > bx1) bx1 = xx; if (y < by0) by0 = y; if (y > by1) by1 = y; }
+    }
+  }
+  if (bx1 < 0) return null;
+  // her middle: the dark between 20% and 40% of her height (chest and shoulders, not the swinging coat or legs)
+  let sx = 0, sn = 0;
+  const ya = Math.round(top + (sole - top) * 0.2), yb = Math.round(top + (sole - top) * 0.4);
+  for (let y = ya; y <= yb; y++) for (let xx = ex; xx < W - ex; xx++) if (A[y * W + xx] >= 128) { sx += xx; sn++; }
+  // her feet (the lowest 6% of her): front (left in her clip) and back
+  let fl = W, fr = -1;
+  for (let y = Math.round(sole - (sole - top) * 0.06); y <= sole; y++) for (let xx = ex; xx < W - ex; xx++) if (A[y * W + xx] >= 128) { if (xx < fl) fl = xx; if (xx > fr) fr = xx; }
+  // her head out of the clip's top (the leap, 2.46 to 3.33 s): the round top of her head put back, half an ellipse
+  // her head's length across and half of it high, meeting the cut where it is as wide as her head there
+  let cap = null;
+  if (top <= 1) {
+    let xa = -1, xb = -1;
+    for (let xx = ex; xx < W - ex; xx++) if (A[top * W + xx] >= 128) { if (xa < 0) xa = xx; xb = xx; }
+    const hw = HEAD_K * H, w0 = xb - xa + 1;
+    if (xa >= 0 && w0 < 1.3 * hw) {
+      const rx = Math.max(w0, hw) / 2, ry = 0.47 * hw;
+      const y0 = ry * Math.sqrt(Math.max(0, 1 - (w0 / (2 * rx)) ** 2));
+      cap = { cx: (xa + xb) / 2, cy: top + y0, rx, ry, h: Math.ceil(ry - y0) + 1 };
+      bx0 = Math.min(bx0, Math.floor(cap.cx - rx));
+      bx1 = Math.max(bx1, Math.ceil(cap.cx + rx));
+    }
+  }
+  x.putImageData(img, 0, 0);
+  bx0 = Math.max(0, bx0 - 2); by0 = Math.max(0, by0 - 2);
+  const cw = Math.min(W, bx1 + 3) - bx0, ch = Math.min(H, by1 + 3) - by0;
+  const pad = cap ? cap.h : 0;
+  const out = document.createElement("canvas");
+  out.width = cw; out.height = ch + pad;
+  const o = out.getContext("2d");
+  o.drawImage(c, bx0, by0, cw, ch, 0, pad, cw, ch);
+  if (cap) {
+    o.save();
+    o.beginPath();
+    o.rect(0, 0, cw, pad + top - by0);
+    o.clip();
+    o.fillStyle = "#000";
+    o.beginPath();
+    o.ellipse(cap.cx - bx0, pad + cap.cy - by0, cap.rx, cap.ry, 0, 0, Math.PI * 2);
+    o.fill();
+    o.restore();
+  }
+  c.width = c.height = 0;
+  // left: where the crop starts in the clip's frame, so middles of one clip's frames can be compared
+  return { img: out, sole: sole + 1 - by0 + pad, cx: (sn ? sx / sn : (bx0 + bx1) / 2) - bx0, left: bx0, fl: fl - bx0, fr: fr - bx0, ht: sole - top + (cap ? cap.ry - (cap.cy - top) : 0), u: BODY_U / CUT_H };
 }
 
-function newWorld() {
-  const first = { x: -115, y: Y_START, w: 520 };
-  const g = {
-    plats: [first],
-    coins: [],
-    genT: 1.6,
-    p: { x: 0, y: Y_START, vy: 0, ground: first, offAt: -1, jumped: false },
-    mode: "countdown", // countdown | play | fall | over
-    t: 0, // running time
-    clock: 0,
-    goAt: 0,
-    anchor: 0.5, // player position across the frame: centred for the countdown, then 30% from the left
-    fade: 1,
-    fallT: 0,
-    buffer: -1,
-    coinsTaken: 0,
-  };
-  for (let i = 0; i < 6; i++) addPlatform(g);
-  return g;
+// A clip read whole first and seeked in memory (works whatever the server; a streamed video may not seek).
+async function openClip(src) {
+  // past the browser's cache: while a <video> on the page streams the same file, the cache holds a second reader
+  // back (the walk clip is also the site's own video), and the poses would wait for it
+  const r = await fetch(src, { cache: "no-store" });
+  if (!r.ok) throw new Error(src);
+  const url = URL.createObjectURL(await r.blob());
+  const v = document.createElement("video");
+  v.muted = true;
+  v.playsInline = true;
+  v.preload = "auto";
+  v.src = url;
+  const loaded = new Promise((res, rej) => {
+    if (v.readyState >= 2) { res(); return; }
+    const timer = setTimeout(() => rej(new Error(src)), 10000);
+    v.addEventListener("loadeddata", () => { clearTimeout(timer); res(); }, { once: true });
+    v.addEventListener("error", () => { clearTimeout(timer); rej(new Error(src)); }, { once: true });
+  });
+  await v.play().catch(() => {}); // phones load a video's frames only once it is played
+  v.pause();
+  try { await loaded; } catch (e) { v.removeAttribute("src"); v.load(); URL.revokeObjectURL(url); throw e; }
+  return { v, url };
+}
+function seekTo(v, t) {
+  const tt = Math.min(t, v.duration - 0.03);
+  return new Promise((res, rej) => {
+    const timer = setTimeout(() => rej(new Error("seek")), 5000);
+    v.addEventListener("seeked", () => { clearTimeout(timer); Math.abs(v.currentTime - tt) < 0.05 ? res() : rej(new Error("seek")); }, { once: true });
+    v.currentTime = tt;
+  });
+}
+// The poses of one clip: [[name, times]] → { name: [frames] }. Her clip is played through once (at `rate`) and
+// each pose taken from the first frame shown at or after its time: one pass of decoding. Seeking frame by frame
+// decodes again from the clip's last key frame every time, which took the computer over 40 s. Where the clip
+// can't play by itself (no frame callbacks, or a phone that holds videos back), it is seeked frame by frame.
+async function cutClip(v, list, body, rate) {
+  const targets = list
+    .flatMap(([name, times]) => times.map((t) => ({ name, t: Math.min(t, v.duration - 0.05) })))
+    .sort((a, b) => a.t - b.t);
+  const take = (got, tg, f) => { if (f) (got[tg.name] ||= []).push(f); };
+  if (v.requestVideoFrameCallback) {
+    const got = {};
+    try {
+      await seekTo(v, Math.max(0, targets[0].t - 0.04));
+      let i = 0;
+      await new Promise((res, rej) => {
+        const dog = setTimeout(() => rej(new Error("play")), 15000);
+        const end = () => { clearTimeout(dog); v.pause(); res(); };
+        const onFrame = (_, meta) => {
+          if (i < targets.length && meta.mediaTime >= targets[i].t - 0.02) {
+            const f = cutFrame(v, v.videoWidth, v.videoHeight, body);
+            while (i < targets.length && meta.mediaTime >= targets[i].t - 0.02) take(got, targets[i++], f);
+          }
+          if (i < targets.length) v.requestVideoFrameCallback(onFrame);
+          else v.playbackRate = 16; // the rest of the clip runs out quickly, so its reading ends as a whole
+        };
+        v.requestVideoFrameCallback(onFrame);
+        v.addEventListener("ended", end, { once: true });
+        v.playbackRate = rate;
+        v.play().catch(rej);
+      });
+      globalThis.__aomLg?.(`played: ${Object.keys(got).join(",")} i=${i}`);
+      if (Object.keys(got).length === list.length) return got;
+    } catch (e) { globalThis.__aomLg?.(`play failed ${e}`); /* seeked below */ }
+    v.pause();
+  }
+  const got = {};
+  for (const tg of targets) {
+    await seekTo(v, tg.t);
+    take(got, tg, cutFrame(v, v.videoWidth, v.videoHeight, body));
+  }
+  return got;
+}
+
+const loadImage = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+
+// All her poses, cut once in the browser and kept for the whole visit; until then (or if her clips can't be read)
+// the run waits at the countdown, and as a last resort her walk's poster picture stands in for every pose.
+let poses = null;
+let posesLoading = null;
+function loadPoses() {
+  if (poses) return Promise.resolve(poses);
+  if (posesLoading || typeof document === "undefined") return posesLoading;
+  if (location.search.includes("nocut")) return null;
+  const DBG = location.search.includes("dbg");
+  const t0 = performance.now();
+  const lg = (m) => { (globalThis.__aomLog ||= []).push(`${Math.round(performance.now() - t0)} ${m}`); };
+  globalThis.__aomLg = lg;
+  if (DBG) { let on = true; const pg = () => on && performance.now() - t0 < 30000 && fetch(`/robots.txt?dbg=${Math.random()}`, { cache: "no-store" }).finally(() => setTimeout(pg, 200)); pg(); globalThis.__aomStop = () => { on = false; }; }
+  posesLoading = (async () => {
+    const out = {};
+    try {
+      const byClip = {};
+      for (const [name, [clip, times]] of Object.entries(POSES)) (byClip[clip] ||= []).push([name, times]);
+      // the leap clip first: her standing frame is in it, for the first screen
+      for (const clip of ["jump", "walk", "stumble"]) {
+        const [src, body, rate] = CLIPS[clip];
+        lg(`${clip} open`);
+        const { v, url } = await openClip(src);
+        lg(`${clip} opened, cutting`);
+        try {
+          Object.assign(out, await cutClip(v, byClip[clip], body, rate));
+        } finally {
+          v.removeAttribute("src"); v.load(); URL.revokeObjectURL(url);
+        }
+      }
+    } catch { /* what was cut is kept; the rest from the poster below */ }
+    if (Object.keys(POSES).some((name) => !out[name])) {
+      const img = await loadImage("/assets/human-walking-poster.webp").catch(() => null);
+      const f = img && cutFrame(img, img.naturalWidth, img.naturalHeight, CLIPS.walk[1]);
+      if (!f && !out.walk) return null;
+      for (const name of Object.keys(POSES)) if (!out[name]) out[name] = [f || out.walk[0]];
+    }
+    // middles evened out between neighbouring frames, in the clip's own frame (each crop starts elsewhere), so
+    // she doesn't shiver forward and back; round for the walk, so its loop has no seam
+    const even = (list, round) => {
+      const n = list.length;
+      const r = round ? 2 : 1;
+      return list.map((f, i) => {
+        let s = 0, m = 0;
+        for (let j = -r; j <= r; j++) {
+          const o = list[round ? (i + j + n) % n : clamp(i + j, 0, n - 1)];
+          s += o.cx + o.left; m++;
+        }
+        return { ...f, cx: 0.5 * f.cx + 0.5 * (s / m - f.left) };
+      });
+    };
+    const walk = even(out.walk, true);
+    // where her walk takes over: the walk frame whose feet are where they are in the frame before it (front foot
+    // and back foot from her middle), and the walk goes on from the frame after that one
+    const next = (f) => {
+      let best = 0, bd = Infinity;
+      walk.forEach((w, i) => {
+        const dd = Math.abs(w.cx - w.fl - (f.cx - f.fl)) + Math.abs(w.fr - w.cx - (f.fr - f.cx));
+        if (dd < bd) { bd = dd; best = i; }
+      });
+      return (best + 1) % walk.length;
+    };
+    const start = even(out.start, false);
+    poses = { stand: out.stand[0], start, startTo: next(start[start.length - 1]), walk, air: even(out.air, false), land: out.land, landTo: next(out.land[out.land.length - 1]), fall: out.fall };
+    const U = (f) => Math.round(f.ht * f.u);
+    const span = (l) => { const h = l.map(U); return `${Math.min(...h)}-${Math.max(...h)}`; };
+    lg(`done: ${Object.entries(out).map(([k, l]) => `${k} ${l.length}`).join(", ")}; start→walk ${poses.startTo}, land→walk ${poses.landTo}`);
+    lg(`her height (units): stand ${U(poses.stand)}, start ${span(start)}, walk ${span(walk)}, air ${span(poses.air)}, land ${span(poses.land)}, fall ${span(poses.fall)}`);
+    lg(`soles (px from the crop's top / crop height): stand ${poses.stand.sole}/${poses.stand.img.height}; walk ${walk.map((f) => f.img.height - f.sole).join(" ")}`);
+    globalThis.__aomStop?.();
+    return poses;
+  })()
+    .catch((e) => { lg(`error ${e}`); globalThis.__aomStop?.(); return null; })
+    .then((p) => { if (!p) posesLoading = null; return p; }); // try again on the next open
+  return posesLoading;
+}
+
+// The canvas fitted to the frame: v = { s: units → px, offY, viewW: units across, dpr }.
+function fitCanvas(canvas, frame, v) {
+  const w = frame.clientWidth, h = frame.clientHeight;
+  if (!w || !h) return false;
+  v.dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = Math.round(w * v.dpr);
+  canvas.height = Math.round(h * v.dpr);
+  v.s = Math.min(w / MIN_VIEW_W, h / H0);
+  v.viewW = w / v.s;
+  v.offY = (h - H0 * v.s) / 2;
+  return true;
 }
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -126,32 +364,87 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-// The middle frame of her leap video as a still picture, made once in the browser and kept.
-let leapStillUrl = null;
-let leapStillLoading = null;
-function loadLeapStill() {
-  if (leapStillUrl) return Promise.resolve(leapStillUrl);
-  if (leapStillLoading || typeof document === "undefined") return leapStillLoading;
-  leapStillLoading = new Promise((resolve) => {
-    const v = document.createElement("video");
-    v.muted = true;
-    v.playsInline = true;
-    v.preload = "auto";
-    v.src = "/assets/games/jump.mp4";
-    v.addEventListener("loadedmetadata", () => { v.currentTime = v.duration / 2; }, { once: true });
-    v.addEventListener("seeked", () => {
-      try {
-        const c = document.createElement("canvas");
-        c.width = v.videoWidth;
-        c.height = v.videoHeight;
-        c.getContext("2d").drawImage(v, 0, 0);
-        leapStillUrl = c.toDataURL("image/png");
-      } catch { /* keep the walking frame */ }
-      resolve(leapStillUrl);
-    }, { once: true });
-    v.addEventListener("error", () => resolve(null), { once: true });
-  });
-  return leapStillLoading;
+// One of her frames with its own sole on her feet (X, Y: a brick's top when she stands), its middle on hers, mirrored.
+function putFrame(c, f, X, Y, a) {
+  c.globalAlpha = a;
+  c.save();
+  c.translate(X, Y + SINK);
+  c.scale(-f.u, f.u);
+  c.drawImage(f.img, -f.cx, -f.sole);
+  c.restore();
+}
+
+// The world as it is: her bricks, her coins, her. fig = { f, from, k, off }: her frame, and while one kind of move
+// turns into another the frame before it, k of the way (their darkness added up on a small canvas of their own,
+// so the cross-fade never shows her paler than she is).
+function drawWorld(ctx, canvas, g, v, fig) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.setTransform(v.dpr * v.s, 0, 0, v.dpr * v.s, 0, v.dpr * v.offY);
+  const camX = g.p.x - g.anchor * v.viewW;
+  ctx.fillStyle = "#000";
+  for (const plat of g.plats) {
+    const x = plat.x - camX;
+    if (x > v.viewW || x + plat.w < 0) continue;
+    roundRect(ctx, x, plat.y, plat.w, PLAT_H, PLAT_R);
+    ctx.fill();
+  }
+  for (const c of g.coins) {
+    let r = COIN_R, a = 1;
+    if (c.taken) {
+      const k = (g.clock - c.taken) / 0.25; // quick scale and fade
+      if (k >= 1) continue;
+      r *= 1 + 0.6 * k; a = 1 - k;
+    }
+    const x = c.x - camX;
+    if (x < -COIN_R * 2 || x > v.viewW + COIN_R * 2) continue;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = PINK;
+    ctx.beginPath();
+    ctx.arc(x, c.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    if (STAR) {
+      const k = STAR_K * (r / COIN_R);
+      ctx.save();
+      ctx.translate(x - 12 * k, c.y - 12 * k);
+      ctx.scale(k, k);
+      ctx.fillStyle = "#fff";
+      ctx.fill(STAR);
+      ctx.restore();
+    }
+  }
+  ctx.globalAlpha = 1;
+  if (!fig || g.fade <= 0) return;
+  const X = g.p.x - camX, Y = g.p.y;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "medium";
+  if (!fig.from || fig.k >= 1) { putFrame(ctx, fig.f, X, Y, g.fade); ctx.globalAlpha = 1; return; }
+  // the box around her (600 x 600 units, her feet 40 from its bottom) on its own canvas
+  const BOX = 600, K = v.dpr * v.s, n = Math.ceil(BOX * K);
+  const off = fig.off;
+  if (off.width !== n) { off.width = n; off.height = n; }
+  const o = off.getContext("2d");
+  o.setTransform(1, 0, 0, 1, 0, 0);
+  o.globalCompositeOperation = "source-over";
+  o.globalAlpha = 1;
+  o.clearRect(0, 0, n, n);
+  o.setTransform(K, 0, 0, K, -(X - BOX / 2) * K, -(Y + 40 - BOX) * K);
+  o.imageSmoothingEnabled = true;
+  o.imageSmoothingQuality = "medium";
+  o.globalCompositeOperation = "lighter";
+  putFrame(o, fig.from, X, Y, 1 - fig.k);
+  putFrame(o, fig.f, X, Y, fig.k);
+  o.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = g.fade;
+  ctx.drawImage(off, X - BOX / 2, Y + 40 - BOX, BOX, BOX);
+  ctx.globalAlpha = 1;
+}
+
+function DebugLog() {
+  const [, setN] = useState(0);
+  useEffect(() => { const t = setInterval(() => setN((n) => n + 1), 200); return () => clearInterval(t); }, []);
+  return <pre className="absolute left-1 top-1 z-10 whitespace-pre-wrap text-[10px] leading-tight text-black">{(globalThis.__aomLog || []).slice(-40).join("\n")}</pre>;
 }
 
 const coinLabel = (n) => `${n} ${n > 1 ? "coins" : "coin"}`; // Figma: "0 coin", "3 coins"
@@ -166,10 +459,11 @@ export default function ArtOfMoving({ open, onClose }) {
   const [finish, setFinish] = useState(null); // null | "fade" | the falling stars
   const [touch, setTouch] = useState(false);
   const [layout, setLayout] = useState({ s: 1, offY: 0 });
+  const [ready, setReady] = useState(!!poses);
+  const [dbg, setDbg] = useState(false);
+  useEffect(() => setDbg(location.search.includes("dbg")), []);
   const frameRef = useRef(null);
   const canvasRef = useRef(null);
-  const videoRef = useRef(null);
-  const leapRef = useRef(null);
   const jumpRef = useRef(() => {});
   const timers = useRef([]);
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
@@ -189,13 +483,21 @@ export default function ArtOfMoving({ open, onClose }) {
   // Closing or reopening always comes back to the Default screen; the best score stays.
   useEffect(() => { if (open) reset(); return clearTimers; }, [open, reset]);
   useEffect(() => { setTouch(window.matchMedia?.("(pointer: coarse)").matches ?? false); }, []);
-  const [leapStill, setLeapStill] = useState(leapStillUrl);
+  // her clips are cut into poses while the Default screen is up
   useEffect(() => {
-    if (!open || leapStill) return;
+    if (!open || ready) return;
     let live = true;
-    loadLeapStill()?.then((u) => live && u && setLeapStill(u));
+    loadPoses()?.then((p) => live && p && setReady(true));
     return () => { live = false; };
-  }, [open, leapStill]);
+  }, [open, ready]);
+
+  // The first screen is her MM-G04-01: only the Start card on white (her figure behind it hid "Press Space to
+  // jump"). She appears standing still on her brick with the countdown, as in her MM-G04-02 (12 Nov).
+  useEffect(() => {
+    if (!open || phase !== "default") return;
+    const canvas = canvasRef.current;
+    if (canvas) canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+  }, [open, phase]);
 
   const start = useCallback(() => {
     clearTimers();
@@ -234,172 +536,94 @@ export default function ArtOfMoving({ open, onClose }) {
 
   const toQuote = useCallback(() => { setQuote(takeQuote("art-of-moving")); setPhase("done"); }, []);
 
-  // The run itself: one requestAnimationFrame loop per Start.
+  // The run itself: one requestAnimationFrame loop per Start. Each frame only moves numbers and draws; React hears
+  // of a coin taken and of the end, nothing else.
   useEffect(() => {
     if (!open || !runId) return;
     const canvas = canvasRef.current;
     const frame = frameRef.current;
-    const video = videoRef.current;
-    const leap = leapRef.current;
-    if (!canvas || !frame || !video || !leap) return;
+    if (!canvas || !frame) return;
     const ctx = canvas.getContext("2d");
     const g = newWorld();
-    let s = 1, offY = 0, viewW = 660, dpr = 1;
-
-    const resize = () => {
-      const r = frame.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      canvas.width = Math.round(r.width * dpr);
-      canvas.height = Math.round(r.height * dpr);
-      s = Math.min(r.width / MIN_VIEW_W, r.height / H0);
-      viewW = r.width / s;
-      offY = (r.height - H0 * s) / 2;
-      video.style.width = `${FW * s}px`;
-      video.style.height = `${FH * s}px`;
-      leap.style.width = `${JW * s}px`;
-      leap.style.height = `${JH * s}px`;
-      setLayout({ s, offY });
-    };
+    const v = { s: 1, offY: 0, viewW: 660, dpr: 1 };
+    const off = document.createElement("canvas");
+    const resize = () => { if (fitCanvas(canvas, frame, v)) setLayout({ s: v.s, offY: v.offY }); };
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(frame);
+    jumpRef.current = () => pressJump(g);
 
-    // Idle pose = the first frame of the walk.
-    video.muted = true;
-    video.pause();
-    try { video.currentTime = 0; } catch { /* not loaded yet */ }
-
-    // The airborne pose = the middle frame of her leap video, taken once as a still picture (leapStill); until
-    // it is there, a jump keeps the walking frame. 12 Nov (Marta: "the person is in thin air"): the paused video
-    // seeked to its middle was not always ready, so she often jumped in a walking step.
-    const leapReady = () => leap.complete && leap.naturalWidth > 0 && leap.getAttribute("src");
-
-    const land = (plat) => {
-      const p = g.p;
-      p.y = plat.y; p.vy = 0; p.ground = plat; p.jumped = false;
-      video.play().catch(() => {});
-      if (g.clock - g.buffer < 0.12) jump(); // pressed just before landing: still counts
-    };
-    const jump = () => {
-      const p = g.p;
-      if (g.mode !== "play") return;
-      const coyote = !p.ground && !p.jumped && g.clock - p.offAt < 0.09;
-      if (!p.ground && !coyote) { g.buffer = g.clock; return; }
-      p.vy = -V0; p.ground = null; p.jumped = true; g.buffer = -1;
-      video.pause(); // held frame on the arc
-    };
-    jumpRef.current = jump;
-
-    const fall = () => {
-      g.mode = "fall";
-      g.fallT = 0;
-      video.pause();
-    };
+    // her moves: mode = start (her first steps after GO) | walk | land; ph = where she is in her first steps,
+    // walkPh = in her walk (frames); kind/last/from/at = the cross-fade between two kinds of move
+    const m = { mode: "start", ph: 0, walkPh: 0, kind: null, last: null, from: null, at: -9, low: null };
 
     const step = (h) => {
-      g.clock += h;
+      const { ev, got } = runStep(g, h, v.viewW);
+      if (got) { setCoins(g.coinsTaken); sound("coin"); }
+      if (ev === "over") endRun(g.coinsTaken);
+      if (ev === "land") m.mode = "land";
+      // her steps keep pace with the ground: at the starting speed her clips' own pace, faster as she speeds up
+      const P = poses;
+      if (P && g.mode === "play" && g.p.ground) {
+        const rate = g.speed / SPEED0;
+        if (m.mode === "start") {
+          m.ph += h * START_FPS * Math.max(0.6, rate);
+          if (m.ph >= P.start.length) { m.mode = "walk"; m.walkPh = P.startTo; }
+        } else if (m.mode === "land") {
+          if (g.clock - g.p.landAt >= SETTLE) { m.mode = "walk"; m.walkPh = P.landTo; }
+        } else m.walkPh += h * WALK_FPS * rate;
+      }
+    };
+
+    // the highest a brick near her lets her stand: below it (and the grace) she has missed
+    const lowTop = () => {
+      let low = -Infinity;
+      for (const q of g.plats) if (q.x < g.p.x + FOOT_FRONT + 200 && q.x + q.w > g.p.x - 200) low = Math.max(low, q.y);
+      return low;
+    };
+    // Her pose for this moment, from her own frames: standing until GO, her first steps, then walking; in the air
+    // by where she is on the arc (push-off and tuck rising, the leg reaching for the brick coming down); her
+    // landing; her stumble once she has missed.
+    const pose = () => {
+      const P = poses;
+      if (!P) return null;
       const p = g.p;
-      if (g.mode === "play") {
-        g.t += h;
-        const speed = speedAt(g.t);
-        video.playbackRate = clamp(speed / SPEED0, 0.6, 1.8);
-        g.anchor = 0.5 - 0.2 * (1 - Math.pow(1 - Math.min(1, g.t / 0.7), 3));
-        p.x += speed * h;
-        if (p.ground && p.x - STAND_TOL > p.ground.x + p.ground.w) { p.ground = null; p.offAt = g.clock; }
-        if (!p.ground) {
-          const prevY = p.y;
-          p.vy += G * h;
-          p.y += p.vy * h;
-          if (p.vy > 0) {
-            for (const plat of g.plats) {
-              if (prevY <= plat.y && p.y >= plat.y && p.x + FOOT_TOL >= plat.x && p.x - FOOT_TOL <= plat.x + plat.w) { land(plat); break; }
-            }
-          }
-          if (p.y > Y_MAX + 60) fall();
-        }
-        for (const c of g.coins) {
-          if (c.taken) continue;
-          if (Math.abs(c.x - p.x) < BODY_W / 2 + COIN_R && c.y + COIN_R > p.y - BODY_H && c.y - COIN_R < p.y) {
-            c.taken = g.clock;
-            g.coinsTaken += 1;
-            setCoins(g.coinsTaken);
-            sound("coin");
-          }
-        }
-        const camX = p.x - g.anchor * viewW;
-        while (g.plats[g.plats.length - 1].x < camX + viewW + 600) addPlatform(g);
-        while (g.plats.length > 2 && g.plats[0].x + g.plats[0].w < camX - 300) g.plats.shift();
-        while (g.coins.length && g.coins[0].x < camX - 300) g.coins.shift();
-      } else if (g.mode === "fall") {
-        g.fallT += h;
-        p.vy += G * h;
-        p.y += p.vy * h;
-        g.fade = Math.max(0, 1 - g.fallT / 0.55);
-        if (g.fallT >= 0.6) { g.mode = "over"; endRun(g.coinsTaken); }
+      const pick = (list, k) => list[clamp(Math.floor(k * list.length), 0, list.length - 1)];
+      if (g.mode === "countdown") return [P.stand, "stand"];
+      if (g.mode !== "play" || (!p.ground && p.vy > 0 && p.y > lowTop() + GRACE)) {
+        if (m.low == null) m.low = lowTop();
+        return [pick(P.fall, (p.y - m.low - GRACE) / 160), "fall"];
       }
+      if (!p.ground) return [pick(P.air, p.jumped ? (p.vy + V0) / (2 * V0) : 0.6 + 0.4 * clamp(p.vy / V0, 0, 1)), "air"];
+      if (m.mode === "start") return [P.start[Math.min(P.start.length - 1, Math.floor(m.ph))], "start"];
+      if (m.mode === "land") return [pick(P.land, (g.clock - p.landAt) / SETTLE), "land"];
+      return [P.walk[Math.floor(m.walkPh) % P.walk.length], "walk"];
+    };
+    const figure = () => {
+      const ps = pose();
+      if (!ps) return null;
+      const [f, kind] = ps;
+      if (kind !== m.kind) { if (m.last && m.kind) { m.from = m.last; m.at = g.clock; } m.kind = kind; }
+      m.last = f;
+      const k = m.from ? (g.clock - m.at) / XFADE : 1;
+      if (k >= 1) m.from = null;
+      return { f, from: m.from, k, off };
     };
 
-    const draw = () => {
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.setTransform(dpr * s, 0, 0, dpr * s, 0, dpr * offY);
-      const camX = g.p.x - g.anchor * viewW;
-      ctx.fillStyle = "#000";
-      for (const plat of g.plats) {
-        const x = plat.x - camX;
-        if (x > viewW || x + plat.w < 0) continue;
-        roundRect(ctx, x, plat.y, plat.w, PLAT_H, PLAT_R);
-        ctx.fill();
-      }
-      ctx.fillStyle = PINK;
-      for (const c of g.coins) {
-        let r = COIN_R, a = 1;
-        if (c.taken) {
-          const k = (g.clock - c.taken) / 0.25; // quick scale and fade
-          if (k >= 1) continue;
-          r *= 1 + 0.6 * k; a = 1 - k;
-        }
-        const x = c.x - camX;
-        if (x < -COIN_R * 2 || x > viewW + COIN_R * 2) continue;
-        ctx.globalAlpha = a;
-        ctx.fillStyle = PINK;
-        ctx.beginPath();
-        ctx.arc(x, c.y, r, 0, Math.PI * 2);
-        ctx.fill();
-        if (STAR) {
-          const k = STAR_K * (r / COIN_R);
-          ctx.save();
-          ctx.translate(x - 12 * k, c.y - 12 * k);
-          ctx.scale(k, k);
-          ctx.fillStyle = "#fff";
-          ctx.fill(STAR);
-          ctx.restore();
-        }
-      }
-      ctx.globalAlpha = 1;
-      const air = g.p.jumped && !g.p.ground && leapReady();
-      const fx = (g.p.x - camX - FW / 2) * s;
-      const fy = offY + (g.p.y - FOOT_Y * FH) * s;
-      video.style.transform = `translate3d(${fx}px, ${fy}px, 0) scaleX(-1)`;
-      video.style.opacity = air ? "0" : String(g.fade);
-      const jx = (g.p.x - camX - JCX * JW) * s;
-      const jy = offY + (g.p.y - JFOOT_Y * JH) * s;
-      leap.style.transform = `translate3d(${jx}px, ${jy}px, 0) scaleX(-1)`;
-      leap.style.opacity = air ? String(g.fade) : "0";
-    };
-
-    // Countdown 3, 2, 1, GO (~1 s each); no input until GO.
+    // Countdown 3, 2, 1, GO (~1 s each); no input until GO. If her poses are still being cut, GO waits for them
+    // (at most 12 s more).
     setCount("3");
     later(() => setCount("2"), 1000);
     later(() => setCount("1"), 2000);
-    later(() => {
+    let waited = 0;
+    const go = () => {
+      if (!poses && waited < 12000) { waited += 100; later(go, 100); return; }
       setCount("GO");
       setPhase("play");
       g.mode = "play";
-      video.play().catch(() => {});
-    }, 3000);
-    later(() => setCount(null), 3700);
+      later(() => setCount(null), 700);
+    };
+    later(go, 3000);
 
     let last = performance.now();
     let raf;
@@ -407,7 +631,7 @@ export default function ArtOfMoving({ open, onClose }) {
       let dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       while (dt > 0) { const h = Math.min(dt, 1 / 120); step(h); dt -= h; }
-      draw();
+      drawWorld(ctx, canvas, g, v, figure());
       if (g.mode !== "over") raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -417,7 +641,6 @@ export default function ArtOfMoving({ open, onClose }) {
       ro.disconnect();
       clearTimers();
       jumpRef.current = () => {};
-      video.pause();
     };
   }, [open, runId, endRun]);
 
@@ -454,6 +677,7 @@ export default function ArtOfMoving({ open, onClose }) {
       onBack={phase === "done" && result ? () => setPhase("score") : null}
       label="The Art of Moving"
       game
+      stage={phase !== "done"}
       instructions={ended ? null : INSTRUCTIONS}
       counter={counter}
       stars={ended ? null : runStars(coins)}
@@ -467,32 +691,20 @@ export default function ArtOfMoving({ open, onClose }) {
       ) : (
         <div
           onPointerDown={onAreaDown}
-          className="flex flex-1 select-none items-start justify-center px-[19px] pt-[16px] lg:items-start lg:px-0 lg:pb-[2.4vw] lg:pt-[4.95vw] [touch-action:manipulation]"
+          className="flex flex-1 select-none items-start justify-center px-[19px] pt-[16px] lg:pointer-events-none lg:absolute lg:inset-0 lg:p-0 lg:pt-[calc(190*var(--mm-u))] [touch-action:manipulation]"
           style={running ? { touchAction: "none" } : undefined}
         >
+          {/* 12 Nov (Marta: "the size of the game doesn't match the design"): her MM-G04-03 card is 635 x 726, 190 px
+              from the panel's top, centred; on the computer in her frame's px measured against the screen's height
+              (--mm-u, see GameModal), as Tic-Tac-Toe and Word Hunt. The phone keeps her 311 x 584 frame. */}
           <div
             ref={frameRef}
-            className={`${finish === "fade" ? "mm-fade-out" : ""} relative isolate w-full aspect-[311/584] overflow-hidden rounded-[30px] border border-black bg-white lg:min-h-0 lg:w-auto lg:rounded-[2vw] lg:h-[min(37.75vw,calc(100vh_-_260px))] lg:aspect-[660/755]`}
+            data-aom={ready ? "ready" : "loading"}
+            className={`${finish === "fade" ? "mm-fade-out" : ""} relative isolate w-full aspect-[311/584] overflow-hidden rounded-[30px] border border-black bg-white lg:pointer-events-auto lg:w-auto lg:max-w-none lg:rounded-[calc(38*var(--mm-u))] lg:h-[calc(726*var(--mm-u))] lg:aspect-[635/726]`}
           >
-            <canvas ref={canvasRef} className={`absolute inset-0 h-full w-full ${running ? "" : "invisible"}`} aria-hidden="true" />
-            <video
-              ref={videoRef}
-              src="/assets/human-walking.mp4"
-              poster="/assets/human-walking-poster.webp"
-              muted
-              loop
-              playsInline
-              preload="auto"
-              aria-hidden="true"
-              className={`pointer-events-none absolute left-0 top-0 mix-blend-multiply [filter:brightness(1.07)_contrast(1.12)] ${running ? "" : "invisible"}`}
-            />
-            <img
-              ref={leapRef}
-              src={leapStill || undefined}
-              alt=""
-              aria-hidden="true"
-              className={`pointer-events-none absolute left-0 top-0 max-w-none opacity-0 mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)] [clip-path:inset(0_1.5%)] ${running ? "" : "invisible"}`}
-            />
+            {dbg && <DebugLog />}
+            {/* her brick and her, standing, from the first screen on (12 Nov) */}
+            <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
 
             {count && (
               <span
@@ -537,3 +749,4 @@ export default function ArtOfMoving({ open, onClose }) {
     </GameModal>
   );
 }
+

@@ -1,5 +1,5 @@
 import React from "react";
-import InnerNav, { PhoneBack } from "./InnerNav";
+import { BottomBack, TopBack } from "./InnerNav";
 
 // The method page (/what-is), from Marta's frames "MM-METHOD / Desktop" (1920 wide) and "MM-METHOD / Mobile"
 // (390 wide). 11 Nov 19:31, Marta: "this page is still gigantic, it must be smaller, as in my design". It was
@@ -112,10 +112,7 @@ function Stage({ img, gap: g, label, title, subtitle, paragraphs }) {
 export default function MethodPage() {
   return (
     <div className="relative overflow-hidden font-sans bg-white" style={unit}>
-      <InnerNav active="What is" />
-      <div className="absolute left-[21px] top-[24px] z-10 md:hidden">
-        <PhoneBack />
-      </div>
+      <TopBack />
 
       <main>
         {stages.map((stage) => (
@@ -124,7 +121,10 @@ export default function MethodPage() {
 
         <section
           className={`bg-black px-[20px] text-center tracking-[-0.04em] pt-[109.2px] pb-[43.9px] md:pt-[calc(var(--u)*250)] md:pb-[calc(var(--u)*251)] ${gapClass}`}
-          style={gap(60.4, 624)} /* her 12 Nov frame: the black block stays at 5914 px while the stages above moved up */
+          /* 12 Nov, Marta: "a big white gap" after the 4th point. In her frame the stages moved up 357 px (the charcoal
+             lift) but the black block stayed at 5914 px, 624 px below the 4th text; before the lift it sat 267 px below
+             it (624 - 357), which is the distance kept here. The phone keeps her 390 frame's 60 px. */
+          style={gap(60.4, 267)}
         >
           {/* Her current MM-METHOD (kept Figma copy, 12 Nov, "the font is different, above all the italic"): the words
               are Inter Medium 500 and only "One" is Inter Italic 400, letter spacing -0.06em on both, lines 167 / 65 px
@@ -145,8 +145,10 @@ export default function MethodPage() {
             Everything that follows stands <br className="md:hidden" />
             on four.
           </p>
-          <div className="mt-[100.8px] leading-none md:hidden">
-            <PhoneBack light />
+          {/* 12 Nov 23:34, Marta: "you forgot the Back at the end of the page (on the black block)": on the computer
+              too now, the same shared Back, as far below the last line as Bio's bottom Back (125) */}
+          <div className="mt-[100.8px] leading-none md:mt-[calc(var(--u)*125)]">
+            <BottomBack light />
           </div>
         </section>
       </main>

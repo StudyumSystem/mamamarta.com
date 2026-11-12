@@ -10,8 +10,18 @@ import { sendStars } from "../forms/submitForm.js";
 // 11 Nov (her updated game frames MM-G01…G05, MM-confirmation_dialog): the game panel is light grey #F0F0F0,
 // with the music button (sound on/off) and the MM✦ count on the right; Back during a round asks
 // "Leave the game?"; every round ends on a score screen with a timer line, then the quote screen with MM✦STARS.
+// On the phone the game panel is pure white #FFFFFF (Marta, 12 Nov, her iPhone: "the background is grey"); the
+// computer keeps her #F0F0F0.
 
 export const PINK = "#F600A9";
+
+// 12 Nov (Marta, two screens of ours next to her frames 26087402 and 26087591: the board and the game card came
+// out smaller than hers): the game panel was always 72.9% of the screen's width (her 1400 of 1920), while the play
+// areas follow the screen's height (--mm-u). On a window wider than her frame's shape the panel kept growing
+// sideways and everything in it looked small. On the computer the game panel is now her frame's shape: 1400 x 1019
+// scaled to the screen's height, never wider than 72.9%, centred; the blurred Homepage shows a little more on the
+// sides. The forms keep their panel.
+const GAME_PANEL_X = "lg:inset-x-0 lg:mx-auto lg:w-[min(72.917vw,calc(100vh*1400/1019))]";
 
 export function emitModal(open) {
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("mm-modal", { detail: { open } }));
@@ -49,8 +59,8 @@ const ControllerIcon = () => (
     <path d="M6 7h12a4 4 0 0 1 4 4v3a3 3 0 0 1-5.2 2L15 14H9l-1.8 2A3 3 0 0 1 2 14v-3a4 4 0 0 1 4-4z" /><path d="M7 10v3M5.5 11.5h3" /><path d="M16 11h.01M18 12.5h.01" />
   </svg>
 );
-const TrophyIcon = () => (
-  <svg className="h-[18px] w-[18px] lg:h-6 lg:w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+const TrophyIcon = ({ className = "h-[18px] w-[18px] lg:h-6 lg:w-6" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
     <path d="M8 4h8v5a4 4 0 0 1-8 0z" /><path d="M8 6H5a3 3 0 0 0 3 4" /><path d="M16 6h3a3 3 0 0 1-3 4" />
     <path d="M12 13v4" /><path d="M8.5 20h7" /><path d="M10 17h4v3h-4z" />
   </svg>
@@ -112,7 +122,7 @@ function LeaveDialog({ kind, onLeave, onStay }) {
   useEffect(() => { stayRef.current?.focus(); }, []);
   return (
     <div
-      className="mm-fade-in fixed inset-x-[20px] top-[28px] bottom-[28px] z-20 flex items-center justify-center bg-white/[0.78] px-[25px] lg:inset-x-[13.5%] lg:top-0 lg:bottom-0"
+      className={`mm-fade-in fixed inset-x-[20px] top-[28px] bottom-[28px] z-20 flex items-center justify-center bg-white/[0.78] px-[25px] lg:top-0 lg:bottom-0 ${GAME_PANEL_X}`}
       style={{ backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
       role="alertdialog" aria-modal="true" aria-labelledby="mm-leave-title"
     >
@@ -153,30 +163,40 @@ export function ScoreScreen({ badge, label, value, stars, onDone, ms = SCORE_MS 
     return () => { clearTimeout(t); clearTimeout(c); window.removeEventListener("mm-stars-save", skip); };
   }, [ms]);
   const still = prefersReducedMotion();
+  // 12 Nov (Marta, her frame "Frame 26087403" next to ours: ours sat lower and its small type was bigger): on the
+  // computer the score screen is now her frame scaled, like the play areas: every size in her frame's px times
+  // --mm-u (see GameModal), and the block placed 280 px from the panel's top, not centred under the Back row.
+  // Before, sizes were in vw with px minimums, so on a laptop the small lines and the bar stopped shrinking
+  // while the rest did, and the block was centred in the space below the top row (about 60 px low).
+  // Her measures (MM-G02 Desktop_Score): trophy row 31, label 16/19 at 41, result 88/107 at 89, MM✦STARS line
+  // 38 tall at 299 in a 271 column, its text 16/20 at 354, the 485 line at 440. Her letter spacing: -4% on the
+// small lines, -9% on the 88 px result (-3% on the phone); without it "YOU WON" ran 16% wider than hers.
+// The game passes stage here too.
+  const u = (n) => `calc(${n}*var(--mm-u))`;
   return (
-    <div className="mm-fade-in flex flex-1 flex-col items-center justify-center px-[25px] text-center" role="status">
-      <div className="flex w-full max-w-[300px] flex-col items-center lg:max-w-[clamp(400px,26.25vw,504px)]">
+    <div className="mm-fade-in flex flex-1 flex-col items-center justify-center px-[25px] text-center lg:pointer-events-none lg:absolute lg:inset-0 lg:justify-start lg:px-0 lg:pt-[var(--mm-score-top)]" style={{ "--mm-score-top": u(280) }} role="status">
+      <div className="flex w-full max-w-[300px] flex-col items-center lg:w-[var(--w)] lg:max-w-none" style={{ "--w": u(504) }}>
         {badge && (
-          <p className="inline-flex items-center gap-[6px] text-[14px] leading-[31px] text-black/[0.69] lg:text-[clamp(14px,0.833vw,16px)]">
-            <TrophyIcon /> {badge}
+          <p className="inline-flex items-center gap-[6px] text-[14px] leading-[31px] text-black/[0.69] tracking-[-0.04em] lg:gap-[var(--g)] lg:text-[length:var(--t)] lg:leading-[var(--l)]" style={{ "--g": u(8), "--t": u(16), "--l": u(31), "--i": u(24) }}>
+            <TrophyIcon className="h-[18px] w-[18px] lg:h-[var(--i)] lg:w-[var(--i)]" /> {badge}
           </p>
         )}
-        <p className="mt-[6px] text-[12px] leading-[20px] text-black/60 lg:mt-[clamp(6px,0.52vw,10px)] lg:text-[clamp(14px,0.833vw,16px)] lg:leading-[1.2] lg:text-black/[0.69]">{label}</p>
-        <p className="mt-[4px] whitespace-nowrap text-[60px] font-medium leading-[73px] text-black lg:mt-[clamp(18px,1.6vw,30px)] lg:text-[clamp(60px,4.58vw,88px)] lg:leading-[1.22]">{value}</p>
+        <p className="mt-[6px] text-[12px] leading-[20px] text-black/60 tracking-[-0.04em] lg:mt-[var(--m)] lg:text-[length:var(--t)] lg:leading-[var(--l)] lg:text-black/[0.69]" style={{ "--m": u(10), "--t": u(16), "--l": u(19) }}>{label}</p>
+        <p className="mt-[4px] whitespace-nowrap text-[60px] font-medium leading-[73px] tracking-[-0.03em] text-black lg:mt-[var(--m)] lg:text-[length:var(--t)] lg:leading-[var(--l)] lg:tracking-[-0.09em]" style={{ "--m": u(29), "--t": u(88), "--l": u(107) }}>{value}</p>
       </div>
-      <div className="mt-[52px] w-full max-w-[229px] lg:mt-[clamp(60px,5.5vw,105px)] lg:max-w-[clamp(380px,25.26vw,485px)]">
-        <div className="mx-auto w-fit text-left">
-          <p className="inline-flex items-center gap-[10px] whitespace-nowrap text-[18px] leading-[31px] text-black lg:gap-[clamp(8px,0.6vw,12px)] lg:text-[clamp(22px,1.5625vw,30px)]">
-            {stars} MM✦STARS <StarBadge className="h-[24px] w-[24px] lg:h-[clamp(30px,1.98vw,38px)] lg:w-[clamp(30px,1.98vw,38px)]" />
+      <div className="mt-[52px] w-full max-w-[229px] lg:mt-[var(--m)] lg:w-[var(--w)] lg:max-w-none" style={{ "--m": u(103), "--w": u(485) }}>
+        {/* 12 Nov 13:34 (Marta: "Great work" must sit on the centre line, ours was left-aligned and the composition
+            looked uneven): the MM✦STARS line and its text are centred, in every game */}
+        <div className="mx-auto w-fit text-center lg:w-[var(--w)]" style={{ "--w": u(271) }}>
+          <p className="inline-flex items-center gap-[10px] whitespace-nowrap text-[18px] leading-[31px] tracking-[-0.04em] text-black lg:gap-[var(--g)] lg:text-[length:var(--t)] lg:leading-[var(--l)]" style={{ "--g": u(12), "--t": u(30), "--l": u(38), "--i": u(38) }}>
+            {stars} MM✦STARS <StarBadge className="h-[24px] w-[24px] lg:h-[var(--i)] lg:w-[var(--i)]" />
           </p>
-          {/* her Desktop_Score: this text sits in the 271 px column of the MM✦STARS line at 16/20, two lines. Its
-              width is now in em (271 / 16), so it wraps exactly as hers on every screen; in px it hit its minimum
-              before the type did and broke into three lines (Marta, 11 Nov 19:46) */}
-          <p className="mt-[4px] max-w-[229px] text-[12px] leading-[20px] text-black/60 lg:mt-[clamp(10px,1vw,20px)] lg:max-w-[18.2em] lg:text-[clamp(14px,0.833vw,16px)] lg:leading-[1.25] lg:tracking-[-0.01em] lg:text-black/[0.69]">
+          {/* her text box is 271 x 40 at 16/20, two lines; its width in em so it wraps as hers on every screen */}
+          <p className="mt-[4px] max-w-[229px] text-[12px] leading-[20px] text-black/60 tracking-[-0.04em] lg:mt-[var(--m)] lg:w-[17em] lg:max-w-none lg:text-[length:var(--t)] lg:leading-[var(--l)] lg:text-black/[0.69]" style={{ "--m": u(17), "--t": u(16), "--l": u(20) }}>
             Great work! Your Stars can unlock a discount on your next design project.
           </p>
         </div>
-        <div className="relative mt-[22px] h-[2px] w-full bg-black/[0.17] lg:mt-[clamp(28px,2.4vw,46px)]" aria-hidden="true">
+        <div className="relative mt-[22px] h-[2px] w-full bg-black/[0.17] lg:mt-[var(--m)]" style={{ "--m": u(46) }} aria-hidden="true">
           <span
             className="absolute inset-y-0 left-0 block"
             style={{ background: PINK, width: still ? "100%" : 0, animation: still ? "none" : `mm-entry-timer ${ms}ms linear forwards` }}
@@ -297,9 +317,19 @@ export function Completion({ quote, onPlayAgain }) {
 // game: the light grey game panel with the music button and MM✦ (her 11 Nov frames); the forms keep the white panel.
 // stars: the round's MM✦ so far (null hides it); confirm: "game" asks before leaving a round,
 // "completed" asks only when MM✦STARS are not saved yet.
+// stage (12 Nov, Marta: "the game's height doesn't match the screen, it's smaller than in my designs"): her game
+// frames are 1920 x 1019 with the panel 1400 x 1019, the whole height of the screen. Sizing the play area by the
+// width alone (vw) left it small on any screen less wide than hers (a laptop: 1440 x 900 drew the board at 394 of
+// 900 px, hers is 525 of 1019). On the computer the panel now carries --mm-u, one of her frame's px measured
+// against the screen's height (100vh / 1019), held back by the width (100vw / 1280) so a tall, narrow screen
+// can't push the play area into the text or the sides. A game that passes stage draws its play area at her
+// frame's place: absolute in the panel, its top and size in --mm-u (Tic-Tac-Toe 525 at 247, Word Hunt 739 at 178,
+// ...). So on every screen it takes the share of the height her frame gives it; the text row above stays in vw.
+export const STAGE_UNIT = "min(100vh / 1019, 100vw / 1280)";
 export default function GameModal({
   open, onClose, instructions, counter, label, children, phoneCounter = "mt-3",
-  game = false, stars = null, hud = true, confirm = null, onBack = null,
+  game = false, stars = null, hud = true, confirm = null, onBack = null, stage = false,
+  textBox = [356, 608],
 }) {
   const panelRef = useRef(null);
   const returnFocus = useRef(null);
@@ -320,17 +350,21 @@ export default function GameModal({
   // and the panel is drawn in vw, so on a wide, short screen (a laptop with the browser's bars) it grew taller
   // than the screen. On the computer the panel's content is zoomed down by how much shorter the screen is than
   // her frame's shape (1060 tall leaves a little air), so the whole game always fits; phones are unchanged.
+  // The top row of a game is zoomed exactly as its panel shrinks (1019, her frame's height), so the Back, the text
+  // and the music button keep their places in her frame when the panel follows the height.
   const [fit, setFit] = useState(1);
+  const [fitTop, setFitTop] = useState(1);
   useEffect(() => {
     if (!open) return;
     const measure = () => {
       const w = window.innerWidth, h = window.innerHeight;
       setFit(w >= 1024 ? Math.min(1, (h / 1060) / (w / 1920)) : 1);
+      setFitTop(w >= 1024 ? Math.min(1, (h / (game ? 1019 : 1060)) / (w / 1920)) : 1);
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, [open]);
+  }, [open, game]);
 
   useEffect(() => {
     if (!open) return;
@@ -380,17 +414,44 @@ export default function GameModal({
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={`absolute inset-x-[20px] top-[28px] bottom-[28px] flex flex-col overflow-y-auto outline-none lg:inset-x-[13.5%] lg:top-0 lg:bottom-0 ${game ? "bg-[#F0F0F0]" : "bg-white"}`}
+        className={`absolute inset-x-[20px] top-[28px] bottom-[28px] flex flex-col overflow-y-auto outline-none lg:top-0 lg:bottom-0 ${game ? `bg-white lg:bg-[#F0F0F0] ${GAME_PANEL_X}` : "bg-white lg:inset-x-[13.542%]"}`}
+        style={{ "--mm-u": STAGE_UNIT, "--mm-p": "min(100vw / 1920, 100vh / 1019)" }}
       >
+        {/* A game's text on the computer (12 Nov 13:35, Marta: the top text "looks uneven" against the board, in
+            every game). In her frames it starts at the play area's left edge: Word Hunt and Memory Match 333 px from
+            the panel's left, Tic-Tac-Toe, The Art of Moving and Connect the Path 356; 608 px wide (Tic-Tac-Toe
+            689), 22/31, -4%, 63 px down like Back. The board is drawn around the panel's middle in --mm-u, so the
+            text is too: its left is the middle minus (700 - x) in --mm-u and its type in --mm-u, so it keeps its
+            place over the board and its two lines on every screen. Its top follows Back (--mm-p, the panel's scale). */}
+        {game && instructions && (
+          <p
+            className="pointer-events-none absolute hidden whitespace-pre-wrap font-normal text-black/[0.69] lg:block lg:left-[var(--tx)] lg:top-[var(--ty)] lg:w-[var(--tw)] lg:text-[length:var(--tt)] lg:leading-[var(--tl)] lg:tracking-[-0.04em]"
+            style={{
+              "--tx": `calc(50% - ${700 - textBox[0]}*var(--mm-u))`,
+              "--ty": "calc(63*var(--mm-p))",
+              "--tw": `calc(${textBox[1]}*var(--mm-u))`,
+              "--tt": "calc(22*var(--mm-u))",
+              "--tl": "calc(31*var(--mm-u))",
+            }}
+          >
+            {instructions}
+          </p>
+        )}
         {/* top row: Back (desktop), instructions, counter */}
-        <div className="relative flex items-start gap-6 px-[15px] pt-[22px] lg:px-[3.2vw] lg:pt-[3.1vw]" style={fit < 1 ? { zoom: fit } : undefined}>
+        <div className={`relative flex items-start gap-6 px-[15px] pt-[22px] lg:px-[3.2vw] ${game ? "lg:gap-0 lg:pt-[3.28vw]" : "lg:pt-[3.1vw]"}`} style={fitTop < 1 ? { zoom: fitTop } : undefined}>
           {/* measured on the 2x frames (MM-G01…G05 Default): text from 615 px, Inter 400 ~20.5/31 px, lines break as in the frames.
               11 Nov 20:10, Marta: "take the design from my Figma". Her current game frames (kept Figma copy): the text box is
               608 x 62 at 22/31 with letter spacing -0.88 px (-0.04em), two lines, in every game. We had normal spacing, so
               the text ran wider and broke into three lines. Now her spacing, and the width in em of its own type
-              (608/22 = 27.6em), so it breaks as hers on every screen, not by the window width. */}
-          <BackLink onClick={requestClose} className={`hidden lg:block ${game ? "lg:w-[12.9vw]" : "lg:w-[14.1vw]"} shrink-0 text-left`} />
-          <p className={`flex-1 ${game ? "text-[14px] text-black/60 lg:max-w-[27.7em] lg:text-[clamp(15px,1.146vw,22px)] lg:leading-[1.41] lg:tracking-[-0.04em] lg:text-black/[0.69]" : "text-[15px] text-black/70 lg:max-w-[35.8vw] lg:text-[clamp(15px,1.06vw,21px)] lg:leading-[1.5] lg:text-black/70 lg:tracking-normal"} leading-[20px] tracking-[-0.02em] lg:whitespace-pre-wrap font-normal`}>
+              (608/22 = 27.6em), so it breaks as hers on every screen, not by the window width.
+              12 Nov (Marta: "the text everywhere stands unevenly; in all games the text has a set width and only 2 lines"):
+              one place and one width for every game, from her frames MM-G03…G05: the box starts 355 px from the panel's
+              left and 63 px from its top, 608 px wide (27.64em of its 22 px type), so it always breaks into the same two
+              lines. It was 333 px in (her two older frames) and only capped at its width, not set to it. */}
+          {/* her Back: 22 px type in a 21 px line from 63 px down (her line is tighter than ours, so the word sat 6 px low) */}
+          <BackLink onClick={requestClose} className={`hidden lg:block ${game ? "lg:w-[15.31vw] lg:leading-[0.955]" : "lg:w-[14.1vw]"} shrink-0 text-left`} />
+          {/* on the computer a game's text is drawn below, against the board (textBox) */}
+          <p className={`flex-1 ${game ? "text-[14px] text-black/60 lg:hidden" : "text-[15px] text-black/70 lg:max-w-[35.8vw] lg:text-[clamp(15px,1.06vw,21px)] lg:leading-[1.5] lg:text-black/70 lg:tracking-normal"} leading-[20px] tracking-[-0.02em] lg:whitespace-pre-wrap font-normal`}>
             {instructions}
           </p>
           {showHud ? (
@@ -422,7 +483,8 @@ export default function GameModal({
             <span className={`${phoneCounter} self-end px-[15px] text-[16px] leading-[20px] font-normal text-black/70 lg:hidden`} aria-live="polite">{counter}</span>
           )
         )}
-        <div className="flex flex-1 flex-col" style={fit < 1 ? { zoom: fit } : undefined}>{children}</div>
+        {/* a stage game sizes its play area by --mm-u itself, so only the other screens are zoomed down */}
+        <div className="flex flex-1 flex-col" style={fit < 1 && !stage ? { zoom: fit } : undefined}>{children}</div>
         <div className="flex justify-center pb-[20px] pt-6 lg:hidden">
           <BackLink onClick={requestClose} game={game} />
         </div>

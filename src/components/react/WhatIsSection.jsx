@@ -13,42 +13,13 @@ import ArrowIcon from "./ArrowIcon";
 
 const PINK = "#fcd2f0";
 
-// Her pink "?" on its side, taken from her heading picture (whatIs.webp, 1200x633, lines 200 px apart,
-// type about 213 px): only the corner where the "?" is, so nothing of the letters comes with it.
-// Its dot is drawn here (it sits too close to the "e" to cut cleanly), its hook comes from the picture.
-// 12 Nov, Marta sent the "?" itself, 68 x 38 in her 1920 frame and then at four times that (271 x 152): her
-// pink Inter "?" lying on its side, the dot on the left. Her own picture is used, at her size (68 x 38 of the
-// heading's 150 px); at four times the size it stays sharp on every screen. The dot sits where she placed it,
-// on the end of the e's tail (11 Nov 20:00).
-const Squiggle = () => (
-  <img
-    src="/assets/what-is-question.png"
-    width={271}
-    height={152}
-    alt=""
-    aria-hidden="true"
-    className="inline-block max-w-none"
-    style={{ width: `${68 / 150}em`, height: `${38 / 150}em`, marginLeft: "-0.085em", verticalAlign: "-0.03em" }}
-  />
-);
-
-// Her current computer frame (kept Figma copy, 12 Nov) reads "What’s"; her phone frame still "What is".
-const Heading = ({ className = "", inlineMark = true, first = "What is" }) => (
-  <h2 className={className}>
-    {first}
-    <br />
-    an amazing
-    <br />
-    <em className="font-normal italic">experience</em>
-    {inlineMark && <Squiggle />}
-    <span className="sr-only">?</span>
-  </h2>
-);
-
-// Computer: her "?" exactly where her Figma has it (12 Nov 02:05, Marta: "put it as it is in my design"). The
-// kept Figma copy gives its drawn ink 69 x 41 px at 682, 359 from the heading's top-left corner (her heading at
-// 1011, 148 of the 1920 frame); her picture (68 x 38 at 1x) is centred there, in vw of the 1920 frame.
-const DesktopMark = () => (
+// Her pink "?" on its side (12 Nov: her own 4x picture, 271 x 152, drawn at her 68 x 38 of the 150 px heading).
+// Marta, 12 Nov: the "?" must JOIN the last letter of "experience" on every screen, so it is placed on the word
+// itself, in em of the heading's size, never on the page. Kept Figma copy (Desktop - 39, text 1200:2885 and
+// vector "?" 1208:69): its drawn shape starts 682.3 px right of the word's start and 360.5 px below the heading's
+// top, i.e. 98.8 px below the top of the word's letters (baseline 407 px with her 150/141 lines, ascent 0.96875em).
+// In em of 150: left 4.5487, top 0.6587, size 0.4533 x 0.2533. The dot lands on the end of the e's tail.
+const Mark = () => (
   <img
     src="/assets/what-is-question.png"
     width={271}
@@ -56,8 +27,26 @@ const DesktopMark = () => (
     alt=""
     aria-hidden="true"
     className="pointer-events-none absolute max-w-none"
-    style={{ left: `${682.3 / 19.2}vw`, top: `${360.5 / 19.2}vw`, width: `${68 / 19.2}vw`, height: `${38 / 19.2}vw` }}
+    style={{ left: `${682.3 / 150}em`, top: `${98.8 / 150}em`, width: `${68 / 150}em`, height: `${38 / 150}em` }}
   />
+);
+
+// Her Figma (12 Nov): "What’s" with her typographic apostrophe (U+2019), on the computer and the phone.
+// "experience" is her Figma's own "Inter Italic" 400 (Figma's Inter is 3.19, whose italic keeps the upright
+// letters' flat e and c endings); the site's other Inter is 4.x, whose italic is drawn differently. global.css
+// (.mm-exp) loads Inter 3.19 Italic for this one word.
+const Heading = ({ className = "" }) => (
+  <h2 className={className}>
+    What’s
+    <br />
+    an amazing
+    <br />
+    <em className="mm-exp relative">
+      experience
+      <Mark />
+    </em>
+    <span className="sr-only">?</span>
+  </h2>
 );
 
 const BODY = "It is never accidental. It is the decisions people never notice, but always feel.";
@@ -79,22 +68,14 @@ const PinkM = ({ className = "", style }) => (
   </div>
 );
 
-// Her cable (12 Nov 01:46, Marta: "no appearing animation; keep the pink light; it may only sway, the right and
-// the left part; the ends stay fixed; nothing else"). The picture is laid twice: the left part (up to the joint
-// behind the button, 64.5% across) swings a little around its left end on the screen's edge, the right part
-// around its right end in the bottom corner; the two meet behind the button with a soft seam. The pink light
-// runs inside each part, so it moves with it.
+// Her cable (12 Nov, Marta: it moved as two halves and looked split; it must move as ONE piece, a single gentle
+// sway, both ends fixed, the pink light still running along it, no appearing, nothing else). One picture, one
+// motion (global.css .mm-wire-sway); the pink light runs inside it, so it moves with it.
 const Cable = () => (
-  <>
-    <div className="mm-wire-part mm-wire-left absolute inset-0">
-      <img src="/assets/what-is-line.webp" alt="" className="block h-full w-full max-w-none" />
-      <div className="mm-wire-sheen absolute inset-0" />
-    </div>
-    <div className="mm-wire-part mm-wire-right absolute inset-0">
-      <img src="/assets/what-is-line.webp" alt="" className="block h-full w-full max-w-none" />
-      <div className="mm-wire-sheen absolute inset-0" />
-    </div>
-  </>
+  <div className="mm-wire-part mm-wire-sway absolute inset-0">
+    <img src="/assets/what-is-line.webp" alt="" className="block h-full w-full max-w-none" />
+    <div className="mm-wire-sheen absolute inset-0" />
+  </div>
 );
 
 export default function WhatIsSection() {
@@ -110,8 +91,7 @@ export default function WhatIsSection() {
         </div>
 
         <div className="absolute left-[52.7vw] top-[7.71vw] z-10">
-          <Heading inlineMark={false} first="What’s" className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
-          <DesktopMark />
+          <Heading className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
         </div>
         {/* her Figma: body 22/31, -0.04em, 658 wide at 1011, 621; button text 22 semibold -0.017em */}
         <p className="absolute left-[52.66vw] top-[32.34vw] z-10 w-[34.27vw] text-[1.146vw] leading-[1.615vw] tracking-[-0.04em] text-black/70">{BODY}</p>
@@ -132,12 +112,12 @@ export default function WhatIsSection() {
           <Cable />
         </div>
         <Heading className="absolute left-[calc(var(--q)*18)] top-[calc(var(--q)*47)] z-10 text-[length:calc(var(--q)*56)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
-        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] z-10 w-[calc(var(--q)*252)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-black/70">
+        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] z-10 w-[calc(var(--q)*260)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em] text-black/70">
           {BODY}
         </p>
         <a
           href="/what-is"
-          className="mm-gradient absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] z-10 flex h-[calc(var(--q)*46)] items-center justify-center gap-[0.3em] px-[calc(var(--q)*20)] text-[length:calc(var(--q)*15.5)] font-semibold text-white"
+          className="mm-gradient absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] z-10 flex h-[calc(var(--q)*46)] items-center justify-center gap-[0.3em] px-[calc(var(--q)*20)] text-[length:calc(var(--q)*16)] font-semibold text-white"
         >
           See what's underneath <ArrowIcon />
         </a>

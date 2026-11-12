@@ -5,13 +5,30 @@ import { pad2, shuffle, takeQuote, prefersReducedMotion, recordStars, ROUND_STAR
 import { play as playSound } from "./sound.js";
 const play = (name) => playSound(name, "word-hunt");
 
-// MM-GAME-01 Word Hunt (Marta's spec): 10x10 grid, 10 of the 20 pool words per round,
+// MM-GAME-01 Word Hunt (Marta's spec): 10x10 grid, 10 pool words per round,
 // placed across or down; swipe a row or column in either direction. No timer, counter 0/10.
 const SIZE = 10;
 const COUNT = 10;
+// 12 Nov (Marta: "the words must be new every round, on the same theme"): her word pool (MM-G01-07, the first
+// 20) and 67 more art and design words of the same kind, 87 in all, none longer than 8 letters. A round takes
+// 10 words not played yet, so no word comes back until the whole pool has been played (8 rounds); then it starts
+// over, never with the words of the round just played. No word holds another one, read either way (SKETCH
+// holds ETCH, so ETCH is not in), or the grid could never show that word exactly once.
 const POOL = [
+  // her pool
   "PAPER", "PENCIL", "PAINT", "BRUSH", "INK", "CANVAS", "COLOR", "FRAME", "PHOTO", "SHAPE",
   "LINE", "LIGHT", "ART", "DESIGN", "FORM", "CLAY", "DRAW", "PRINT", "SKETCH", "MUSE",
+  // brand, type and layout
+  "BRAND", "LOGO", "FONT", "ICON", "STYLE", "SYMBOL", "EMBLEM", "GLYPH", "SERIF", "ITALIC",
+  "BOLD", "MARGIN", "GRID", "LAYOUT", "MOCKUP", "PIXEL", "VECTOR", "LAYER", "CROP", "BLEND",
+  "GRADIENT", "RENDER", "PROOF", "DRAFT", "IDEA", "CONCEPT", "VISION", "STORY", "BOARD", "MOOD",
+  "POSTER", "STUDIO",
+  // colour, light and surface
+  "PALETTE", "HUE", "TONE", "TINT", "SHADE", "SHADOW", "MATTE", "GLOSS", "PIGMENT", "PATTERN",
+  "TEXTURE", "CONTOUR", "CURVE", "SCALE", "FOCUS", "LENS", "IMAGE",
+  // the studio's tools and works
+  "EASEL", "CHALK", "PASTEL", "CRAYON", "MARKER", "STENCIL", "COLLAGE", "MOSAIC", "MURAL", "GALLERY",
+  "STATUE", "GLAZE", "FRESCO", "CHARCOAL", "GRAPHITE", "ACRYLIC", "CRAFT", "MOTIF",
 ];
 const LETTERS = "ABCDEFGHIJKLMNOPRSTUVWY";
 const INSTRUCTIONS =
@@ -68,14 +85,26 @@ function tryPlace(words) {
   return { grid, placed };
 }
 
-let lastSet = "";
+// The words not played since the pool last ran out, and the round just played (kept while the page is open,
+// so closing and reopening the game also brings new words).
+let unplayed = [];
+let lastWords = [];
 function newRound() {
-  for (let attempt = 0; attempt < 400; attempt++) {
-    const words = shuffle(POOL).slice(0, COUNT);
-    const key = words.slice().sort().join(",");
-    if (key === lastSet) continue;
+  let carry = [];
+  if (unplayed.length < COUNT) {
+    carry = unplayed; // the last few of the pool are played first, then the pool starts over
+    unplayed = POOL.filter((w) => !lastWords.includes(w));
+  }
+  for (let attempt = 0; attempt < 600; attempt++) {
+    const rest = shuffle(unplayed.filter((w) => !carry.includes(w)));
+    // a carried word that keeps failing to fit is let go after a while rather than holding the round up
+    const words = [...(attempt < 300 ? carry : []), ...rest].slice(0, COUNT);
     const round = tryPlace(words);
-    if (round) { lastSet = key; return round; }
+    if (round) {
+      unplayed = unplayed.filter((w) => !words.includes(w));
+      lastWords = words;
+      return round;
+    }
   }
   throw new Error("Word Hunt: could not build a grid");
 }
@@ -214,6 +243,8 @@ export default function WordHunt({ open, onClose }) {
       onBack={phase === "done" ? () => setPhase("score") : null}
       label="Word Hunt"
       game
+      stage={phase !== "done"}
+      textBox={[333, 608]}
       instructions={ended ? null : INSTRUCTIONS}
       counter={counter}
       stars={ended ? null : found.length * WORD_STARS}
@@ -225,7 +256,9 @@ export default function WordHunt({ open, onClose }) {
       ) : phase === "score" ? (
         <ScoreScreen badge="Perfect find" label="All words discovered" value={`${COUNT} / ${COUNT}`} stars={ROUND_STARS} onDone={toQuote} />
       ) : (
-        <div className="flex flex-1 items-start justify-center overflow-clip px-[15px] pt-[19px] pb-8 lg:pb-[2.4vw] lg:pt-[2.9vw]">
+        <div className="flex flex-1 items-start justify-center overflow-clip px-[15px] pt-[19px] pb-8 lg:pointer-events-none lg:absolute lg:inset-0 lg:p-0 lg:pt-[calc(178*var(--mm-u))]">
+          {/* her MM-G01-01 / -03 at 1920 x 1019: ten squares of 73.9 a row (739), 178 from the panel's top, centred;
+              on the computer in her frame's px measured against the screen's height (--mm-u, GameModal), 12 Nov */}
           <div
             ref={gridRef}
             onPointerDown={onDown}
@@ -234,7 +267,7 @@ export default function WordHunt({ open, onClose }) {
             onPointerCancel={onUp}
             role="grid"
             aria-label={`Word Hunt letter grid, ${found.length} of ${COUNT} words found${found.length ? `: ${found.join(", ")}` : ""}`}
-            className={`${finish === "fade" ? "mm-fade-out" : ""} relative grid w-full max-w-[640px] select-none grid-cols-10 gap-px border [container-type:inline-size] [touch-action:none] lg:w-[min(38.5vw,calc(100vh_-_200px))] lg:max-w-none ${
+            className={`${finish === "fade" ? "mm-fade-out" : ""} relative grid w-full max-w-[640px] select-none grid-cols-10 gap-px border [container-type:inline-size] [touch-action:none] lg:pointer-events-auto lg:w-[calc(739*var(--mm-u))] lg:max-w-none ${
               Array.isArray(finish) ? "border-transparent bg-transparent" : "border-[#d4d4d4] bg-[#d4d4d4]"
             }`}
           >

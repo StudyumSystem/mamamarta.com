@@ -17,8 +17,8 @@ const RESULT = {
 
 // MM-GAME-03 Tic-Tac-Toe (Marta's spec): player is the fur X and always starts, the computer is the black Apple.
 // Balanced opponent: takes a win, usually blocks, sometimes plays loosely. Same completion screen for win, loss and draw.
-// 12 Nov (Marta): the first round is the classic 3x3; every Play again is a 4x4 board where four in a row wins
-// (rows, columns, both diagonals). Same board size, so the squares are smaller.
+// 12 Nov (Marta): the first round is the classic 3x3, the second a 4x4 board where four in a row wins (rows,
+// columns, both diagonals), then 3x3 or 4x4 by chance (playAgain). Same board size, so the squares are smaller.
 const INSTRUCTIONS = {
   3: "You're the X. The computer is Apple. Take turns placing your symbols. Get three in a row to win.",
   4: "You're the X. The computer is Apple. Take turns placing your symbols. Get four in a row to win.",
@@ -112,30 +112,67 @@ const APPLE_VIDEO = "/assets/apple.mp4";
 // her X video is 18 MB, so a new X waited for it and jumped from the still picture to the video. Now the whole
 // video is fetched once as soon as the game opens and every X plays it from memory, so it starts at once.
 // (The earlier first-frame layer is gone: the half-white X is her design, see the note to Marta.)
+// The phone (Marta, 12 Nov, her iPhone: grey boxes): iPhone Safari applies neither mix-blend-mode nor a filter to a
+// <video>, so the phone plays copies with that same whitening baked into the pixels (scripts/make-phone-videos.mjs:
+// x 1.12 then gamma 1.6, the background pure #FFFFFF), with no blend or filter; the X copy is 0.75 MB, not 18 MB.
+// Below the computer's width (lg, 1024 px), as everywhere on the site.
+const isPhone = () => typeof window !== "undefined" && !window.matchMedia?.("(min-width: 1024px)").matches;
+const PHONE_X = { video: "/assets/games/ttt-x-phone.mp4", poster: "/assets/games/ttt-x-phone-poster.webp" };
+const PHONE_APPLE = { video: "/assets/games/ttt-apple-phone.mp4", poster: "/assets/games/ttt-apple-phone-poster.webp" };
 let xVideoUrl = null;
+let xVideoPhone = false;
 let xVideoLoading = null;
 function preloadX() {
   if (xVideoUrl || xVideoLoading || typeof fetch === "undefined") return;
-  xVideoLoading = fetch(X_VIDEO)
+  const phone = isPhone();
+  xVideoLoading = fetch(phone ? PHONE_X.video : X_VIDEO)
     .then((r) => (r.ok ? r.blob() : null))
-    .then((b) => { if (b) xVideoUrl = URL.createObjectURL(b); })
+    .then((b) => { if (b) { xVideoUrl = URL.createObjectURL(b); xVideoPhone = phone; } })
     .catch(() => {});
 }
 
-// hop: a winning symbol jumps (12 Nov). The jump is on the video itself, so it still melts into the grey.
-const Symbol = ({ who, hop = null }) => (
-  <video
-    src={who === "X" ? xVideoUrl || X_VIDEO : APPLE_VIDEO}
-    poster={who === "X" ? X_SRC : APPLE_SRC}
-    aria-label={who === "X" ? "X" : "Apple"}
-    muted
-    autoPlay
-    loop
-    playsInline
-    preload="auto"
-    className={`${hop ? "mm-hop" : "mm-symbol"} object-contain mix-blend-multiply brightness-[1.04] contrast-[1.08] ${who === "X" ? "h-[80%] w-[80%]" : "h-full w-full"}`}
-    style={hop ? { clipPath: "inset(3%)", "--delay": hop } : { clipPath: "inset(3%)" }}
-  />
+// hop: a winning symbol jumps (12 Nov). The jump is on the video itself, so it still melts into the square.
+// 12 Nov 02:39 (Marta: "the square white and the figure dark") and 04:02 ("the figures have a background again!
+// a white square with the figure on it, that's all, no greyish shades"): the videos' near-white background is
+// lifted to pure white first (the mm-ttt-dark filter below), so it vanishes on the white square, and only then
+// the figure's mid-tones are deepened. (The first try only deepened, which turned that near-white grey.)
+const Symbol = ({ who, hop = null }) => {
+  const phone = isPhone();
+  const x = phone ? PHONE_X : { video: X_VIDEO, poster: X_SRC };
+  const xSrc = xVideoUrl && xVideoPhone === phone ? xVideoUrl : x.video;
+  return (
+    <video
+      src={who === "X" ? xSrc : phone ? PHONE_APPLE.video : APPLE_VIDEO}
+      poster={who === "X" ? x.poster : phone ? PHONE_APPLE.poster : APPLE_SRC}
+      aria-label={who === "X" ? "X" : "Apple"}
+      muted
+      autoPlay
+      loop
+      playsInline
+      preload="auto"
+      className={`${hop ? "mm-hop" : "mm-symbol"} object-contain ${phone ? "" : "mix-blend-multiply"} ${who === "X" ? "h-[80%] w-[80%]" : "h-full w-full"}`}
+      style={{ clipPath: "inset(3%)", ...(phone ? null : { filter: "url(#mm-ttt-dark)" }), ...(hop ? { "--delay": hop } : null) }}
+    />
+  );
+};
+
+const DarkFilter = () => (
+  <svg width="0" height="0" className="absolute" aria-hidden="true">
+    <filter id="mm-ttt-dark" colorInterpolationFilters="sRGB">
+      {/* anything from about 89% white up becomes pure white */}
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="1.12" />
+        <feFuncG type="linear" slope="1.12" />
+        <feFuncB type="linear" slope="1.12" />
+      </feComponentTransfer>
+      {/* then the figure a little darker; white stays white */}
+      <feComponentTransfer>
+        <feFuncR type="gamma" exponent="1.6" />
+        <feFuncG type="gamma" exponent="1.6" />
+        <feFuncB type="gamma" exponent="1.6" />
+      </feComponentTransfer>
+    </filter>
+  </svg>
 );
 
 // The pink line across a winning row, in board units (each square 1 x 1), a little past the outer centres.
@@ -158,6 +195,7 @@ export default function TicTacToe({ open, onClose }) {
   const [outcome, setOutcome] = useState(null); // X | O | draw
   const [fx, setFx] = useState(null); // the finish: null | hop | burst (a win) | fade (draw, loss, reduced motion)
   const boardRef = useRef(null);
+  const rounds = useRef(0); // rounds played since the game opened
   const reach = useRef(200);
   const timers = useRef([]);
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
@@ -176,7 +214,14 @@ export default function TicTacToe({ open, onClose }) {
   }, []);
 
   // Back or close resets an unfinished round; reopening starts with an empty 3x3 board.
-  useEffect(() => { if (open) { preloadX(); reset(3); } return clearTimers; }, [open, reset]);
+  useEffect(() => { if (open) { preloadX(); rounds.current = 0; reset(3); } return clearTimers; }, [open, reset]);
+
+  // 12 Nov 04:02 (Marta: "mix the grid at random, so it's more fun: first 3x3, the next round 4x4, then random"):
+  // the second round is always 4x4, every round after that 3x3 or 4x4 by chance.
+  const playAgain = () => {
+    rounds.current += 1;
+    reset(rounds.current === 1 ? 4 : Math.random() < 0.5 ? 3 : 4);
+  };
 
   // 12 Nov (Marta): a short finish before the score screen. A win: the winning symbols jump, then pink and black
   // confetti bursts from the winning line. A draw or a loss stays quiet: the board fades. Reduced motion: a fade.
@@ -234,27 +279,34 @@ export default function TicTacToe({ open, onClose }) {
       onBack={phase === "done" ? () => setPhase("score") : null}
       label="Tic-Tac-Toe"
       game
+      stage={phase !== "done"}
       instructions={ended ? null : INSTRUCTIONS[size]}
+      textBox={[356, 689]}
       stars={ended ? null : outcome ? RESULT[outcome].stars : 0}
       hud={!ended}
       confirm={ended ? "completed" : board.some(Boolean) && !outcome ? "game" : null}
     >
       {phase === "done" && quote ? (
-        <Completion quote={quote} onPlayAgain={() => reset(4)} />
+        <Completion quote={quote} onPlayAgain={playAgain} />
       ) : phase === "score" ? (
         <ScoreScreen badge="Well played" label="Round completed" value={RESULT[outcome].value} stars={RESULT[outcome].stars} onDone={toQuote} />
       ) : (
-        <div className="flex flex-1 items-center justify-center overflow-clip px-[15px] py-8 lg:items-start lg:pb-[3vw] lg:pt-[4.6vw]">
+        <div className={`flex flex-1 items-center justify-center overflow-clip px-[15px] py-8 lg:pointer-events-none lg:absolute lg:inset-0 lg:items-start lg:p-0 ${size === 4 ? "lg:pt-[calc(212*var(--mm-u))]" : "lg:pt-[calc(247*var(--mm-u))]"}`}>
           {/* MM-G03-02 (11 Nov): 175 px squares at 1920, 1 px #969696 lines; played squares stay grey (Marta, 11 Nov 19:50).
-              4x4 (12 Nov): the same board, four smaller squares a side; the board itself is square and splits
-              into equal rows, so the lines stay straight when a square comes out at a fraction of a pixel */}
+              4x4 (12 Nov): four squares a side; the board itself is square and splits into equal rows, so the lines
+              stay straight when a square comes out at a fraction of a pixel.
+              12 Nov (Marta: the board is smaller than in her design, "h?"): on the computer the board is placed as in
+              her frames, in her frame's px measured against the screen's height (--mm-u, see GameModal): 3x3 is
+              525 x 525, 247 from the panel's top (MM-G03-01); 4x4 is 700 x 700 with the same 175 squares, 212 from
+              the top (MM-G03-02 _Desktop_4*4 _Grid). On the phone both stay 310 wide, as her two phone frames. */}
           <div
             ref={boardRef}
-            className={`${fx === "fade" ? "mm-fade-out" : ""} relative grid aspect-square w-[92.8%] max-w-[420px] ${size === 4 ? "grid-cols-4 grid-rows-4" : "grid-cols-3 grid-rows-3"} gap-px border border-[#969696] bg-[#969696] lg:w-[27.4vw] lg:max-w-none`}
+            className={`${fx === "fade" ? "mm-fade-out" : ""} relative grid aspect-square w-[92.8%] max-w-[420px] ${size === 4 ? "grid-cols-4 grid-rows-4 lg:w-[calc(700*var(--mm-u))]" : "grid-cols-3 grid-rows-3 lg:w-[calc(525*var(--mm-u))]"} gap-px border border-[#969696] bg-[#969696] lg:pointer-events-auto lg:max-w-none`}
             style={fx === "fade" ? { animationDuration: "850ms" } : undefined}
             role="grid"
             aria-label={`Tic-Tac-Toe board, ${size} by ${size}`}
           >
+            <DarkFilter />
             {board.map((v, i) => {
               const k = hopping ? line.indexOf(i) : -1;
               return (
@@ -264,8 +316,8 @@ export default function TicTacToe({ open, onClose }) {
                   onClick={() => play(i)}
                   disabled={!!v || busy}
                   aria-label={v ? (v === "X" ? "X" : "Apple") : `Empty square ${i + 1}`}
-                  className={`flex min-h-0 min-w-0 items-center justify-center ${k >= 0 ? "overflow-visible" : "overflow-hidden"} bg-[#F0F0F0] transition-colors duration-300 ${
-                    !v && !busy ? "cursor-pointer hover:bg-white/60" : "cursor-default"
+                  className={`flex min-h-0 min-w-0 items-center justify-center ${k >= 0 ? "overflow-visible" : "overflow-hidden"} ${v ? "bg-white" : "bg-white lg:bg-[#F0F0F0]"} ${
+                    !v && !busy ? "cursor-pointer" : "cursor-default"
                   }`}
                 >
                   {v && <Symbol who={v} hop={k >= 0 ? `${k * 80}ms` : null} />}

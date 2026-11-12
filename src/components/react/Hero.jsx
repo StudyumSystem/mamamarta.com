@@ -160,9 +160,10 @@ export default function Hero({ initialMenuOpen = false }) {
           </ul>
         </nav>
 
-        {/* Desktop positions from her Desktop.jpg (1920x1080): logo top 307 px, tagline 43/55 at 470, the two lines
-            22/30 at 541, button 312x68 at 709. */}
-        <div className="max-md:hidden flex flex-1 flex-col items-center text-center justify-center lg:justify-start rounded-lg lg:py-0 lg:pt-[calc(var(--h)*159)] max-h-screen py-[5em]">
+        {/* 12 Nov, from her current Figma hero (kept copy, frame at -12851, 29839): menu text at 126, logo 832 x 123 at
+            310, tagline 43/55 at 468, the two lines Inter Medium 28/38 at 581 (676 x 76), button 312 x 68 at 712.
+            Gaps between the blocks: 35 / 58 / 55 px of her 1920. Earlier values were measured on an old Desktop.jpg. */}
+        <div className="max-md:hidden flex flex-1 flex-col items-center text-center justify-center lg:justify-start rounded-lg lg:py-0 lg:pt-[calc(var(--h)*162)] max-h-screen py-[5em]">
 
           <div className="items-center justify-center flex flex-col">
             <h1 className="contents">
@@ -175,17 +176,17 @@ export default function Hero({ initialMenuOpen = false }) {
               />
             </h1>
 
-            <p className="lg:mt-[calc(var(--h)*40)] mt-4 text-[18px] font-normal tracking-[-0.01em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] lg:tracking-[-0.03em] text-white">
+            <p className="lg:mt-[calc(var(--h)*35.4)] mt-4 text-[18px] font-normal tracking-[-0.01em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] lg:tracking-[-0.03em] text-white">
               {TAGLINE}
             </p>
-            <p className="mt-2 lg:mt-[calc(var(--h)*16)] text-[13px] font-normal text-white lg:text-[clamp(16px,1.146vw,22px)] lg:leading-[1.364] lg:tracking-[-0.015em]">
+            <p className="mt-2 lg:mt-[calc(var(--h)*58)] text-[13px] font-normal text-white lg:font-medium lg:text-[clamp(18px,1.458vw,28px)] lg:leading-[1.357] lg:tracking-[-0.0134em]">
               {FOR_WHOM}
               <br />
               {WHAT}
             </p>
           </div>
 
-          <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[calc(var(--h)*108)] lg:max-w-none">
+          <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[calc(var(--h)*55)] lg:max-w-none">
             <div className="flex flex-wrap justify-center">
               <a
                 href={WHATSAPP_URL}

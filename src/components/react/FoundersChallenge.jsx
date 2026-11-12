@@ -26,7 +26,9 @@ const px = (n) => `${+(n / 19.2).toFixed(4)}vw`;
 const SLIDE = {
   "word-hunt": { w: 726, h: 787, y: 177, gap: 51 },
   "memory-match": { w: 420, h: 540, y: 287, gap: 59 },
-  "tic-tac-toe": { w: 532, h: 587, y: 237, gap: 58 },
+  // the apple's box is larger than her 532 (its video has wide white sides) so the apple itself has the weight
+  // of the M and the cards; it sits closer to the next entry for the same visible gap
+  "tic-tac-toe": { w: 680, h: 750, y: 155, gap: -50 },
   "art-of-moving": { w: 420, h: 540, y: 287, gap: 69 },
   // the glove's picture and the key's have wide white sides, so their boxes sit closer for the same look
   "connect-the-path": { w: 577, h: 579, y: 251, gap: -20 },
@@ -284,13 +286,13 @@ function Visual({ entry, active }) {
   const size = { width: px(s.w), height: px(s.h) };
   if (v.kind === "video") {
     const video = <LoopVideo src={v.src} poster={v.poster} alt={v.alt} active={active} className="block h-full w-full object-cover mix-blend-multiply brightness-[1.04] contrast-[1.08]" />;
-    // the apple's video has wide white around it, so it is drawn a third larger and cut to its box: the apple
-    // then has the weight of the M and the cards next to it (Marta, 11 Nov 19:23: "the apple is too small").
-    // No transform here: it would stop the video melting into the white page.
+    // The apple (Marta, 11 Nov 19:23 "too small", 19:42 "cut on the left"): its video has wide white around it,
+    // so its box is larger (SLIDE) and the whole video is shown, never cut; the box's white melts into the page.
     if (entry.id === "tic-tac-toe")
       return (
-        <div className="relative overflow-hidden" style={size}>
-          <div className="absolute" style={{ top: "-16%", bottom: "-16%", left: "-16%", right: "-16%" }}>{video}</div>
+        <div style={size}>
+          {/* its white right margin is cut off (the apple ends at 83% of the box), so the box never lies over the next card */}
+          <LoopVideo src={v.src} poster={v.poster} alt={v.alt} active={active} className="block h-full w-full object-contain mix-blend-multiply brightness-[1.04] contrast-[1.08] [clip-path:inset(0_12%_0_0)]" />
         </div>
       );
     if (entry.id !== "connect-the-path") return <div style={size}>{video}</div>;

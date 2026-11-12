@@ -123,11 +123,13 @@ export default function MethodPage() {
           className={`bg-black px-[20px] text-center tracking-[-0.04em] pt-[109.2px] pb-[43.9px] md:pt-[calc(var(--u)*251.1)] md:pb-[calc(var(--u)*257.2)] ${gapClass}`}
           style={gap(60.4, 208.5)}
         >
-          {/* Both frames: regular weight, very tight, "Four stages." on one line */}
-          <h2 className="font-normal tracking-[-0.075em] text-white text-[64px] leading-[64px] md:text-[length:calc(var(--u)*150)] md:leading-[calc(var(--u)*165)]">
+          {/* Her current MM-METHOD (kept Figma copy, 12 Nov, "the font is different, above all the italic"): the words
+              are Inter Medium 500 and only "One" is Inter Italic 400, letter spacing -0.06em on both, lines 167 / 65 px
+              apart. Ours was all regular at -0.075em, which thinned the words and squeezed the italic. */}
+          <h2 className="font-medium tracking-[-0.06em] text-white text-[64px] leading-[65px] md:text-[length:calc(var(--u)*150)] md:leading-[calc(var(--u)*167)]">
             <span className="whitespace-nowrap">Four stages.</span>
             <br />
-            <em>One</em>
+            <em className="font-normal italic">One</em>
             <br />
             foundation.
           </h2>

@@ -28,3 +28,21 @@ import CollaborateForms from '../components/react/forms/CollaborateForms.jsx';
 
 </Layout>
 
+<script>
+	// Marta's cable in What is (11 Nov 19:27): it draws itself in when the block comes into view (CSS in
+	// global.css, .mm-wire-draw / .mm-wire-sheen). Without this script the cable is simply there.
+	document.documentElement.classList.add('mm-js');
+	const whatIs = document.getElementById('what-is');
+	if (whatIs && 'IntersectionObserver' in window) {
+		const io = new IntersectionObserver(([e]) => {
+			if (e.isIntersecting) {
+				whatIs.classList.add('mm-in');
+				io.disconnect();
+			}
+		}, { threshold: 0.3 });
+		io.observe(whatIs);
+	} else if (whatIs) {
+		whatIs.classList.add('mm-in');
+	}
+</script>
+

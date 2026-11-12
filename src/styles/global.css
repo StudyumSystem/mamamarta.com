@@ -181,27 +181,39 @@ body {
 	to { stroke-dashoffset: 0; }
 }
 
-/* Marta's cable in What is (11 Nov 17:51, "a light animation for the cord"): it floats a few px, slowly,
-   always; where the browser can tie an animation to scrolling, it also draws itself in from the left as the
-   block comes into view. Small enough that its joint stays behind the button. */
-.mm-wire-float {
-	animation: mm-wire-float 9s ease-in-out infinite;
-	will-change: transform;
+/* Marta's cable in What is. 11 Nov 19:27, replacing the 17:51 float: the cable's ends stay fixed to the
+   edges of the screen (the float moved them and showed a cut end), and the motion must be clearly visible.
+   1) When the block comes into view (class mm-in, set by the script in index.astro), the cable draws itself
+      from left to right in 2.4 s and stays whole after that. Without the script it is simply there.
+   2) Then a pink light runs along it from left to right every 7 s, inside the cable's own shape (the picture
+      is the mask), so nothing moves the cable itself. */
+html.mm-js .mm-wire-draw {
+	clip-path: inset(0 100% 0 0);
 }
-@keyframes mm-wire-float {
-	0%, 100% { transform: translate(0, 0) rotate(0deg); }
-	50% { transform: translate(6px, -5px) rotate(0.35deg); }
+html.mm-js .mm-in .mm-wire-draw {
+	clip-path: inset(0 0 0 0);
+	transition: clip-path 2.4s cubic-bezier(0.65, 0, 0.35, 1);
 }
-@supports (animation-timeline: view()) {
-	.mm-wire-draw {
-		animation: mm-wire-draw linear both;
-		animation-timeline: view();
-		animation-range: entry 5% cover 40%;
-	}
+.mm-wire-sheen {
+	-webkit-mask-image: url(/assets/what-is-line.webp);
+	mask-image: url(/assets/what-is-line.webp);
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	background-image: linear-gradient(105deg, rgba(246, 0, 169, 0) 46%, rgba(246, 0, 169, 0.9) 50%, rgba(246, 0, 169, 0) 54%);
+	background-size: 250% 100%;
+	background-repeat: no-repeat;
+	background-position: 100% 0;
+	opacity: 0;
 }
-@keyframes mm-wire-draw {
-	from { clip-path: inset(0 100% 0 0); }
-	to { clip-path: inset(0 0 0 0); }
+.mm-in .mm-wire-sheen {
+	animation: mm-wire-sheen 7s ease-in-out 2.4s infinite;
+}
+@keyframes mm-wire-sheen {
+	0% { background-position: 100% 0; opacity: 1; }
+	38% { background-position: 0% 0; opacity: 1; }
+	39%, 100% { background-position: 0% 0; opacity: 0; }
 }
 
 /* The memory card's number (Marta, 11 Nov 19:23): the old number fades up and away, the new one fades in from
@@ -224,9 +236,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
 	.mm-num-in,
 	.mm-num-out,
-	.mm-wire-float,
-	.mm-wire-draw {
-		animation: none;
+	.mm-wire-sheen {
+		animation: none !important;
+	}
+	html.mm-js .mm-wire-draw {
+		clip-path: none !important;
+		transition: none !important;
 	}
 	.mm-fly,
 	.mm-spark {

@@ -77,8 +77,10 @@ export default function WhatIsSection() {
         <PinkM style={{ left: "-2.08vw", top: "-2.08vw", width: "62.24vw", height: "57.29vw" }} />
         {/* Her cable layer (Line.png, 11 Nov 17:44): the whole 1920x1080 frame at 2x, cable and its grey slabs on
             transparent, so it lies over the frame exactly as in her design */}
-        <div className="mm-wire-float pointer-events-none absolute left-0 top-0 h-[56.25vw] w-[100vw]" aria-hidden="true">
+        {/* fixed in place (its ends stay on the screen's edges); it draws in and a pink light runs along it */}
+        <div className="pointer-events-none absolute left-0 top-0 h-[56.25vw] w-[100vw]" aria-hidden="true">
           <img src="/assets/what-is-line.webp" alt="" className="mm-wire-draw h-full w-full max-w-none" />
+          <div className="mm-wire-sheen absolute inset-0" />
         </div>
 
         <div className="absolute left-[52.7vw] top-[7.81vw] z-10">
@@ -98,8 +100,9 @@ export default function WhatIsSection() {
         <PinkM
           className="left-[calc(var(--q)*-24)] top-[calc(var(--q)*441)] h-[calc(var(--q)*455)] w-[calc(var(--q)*380)]"
         />
-        <div className="mm-wire-float pointer-events-none absolute left-[calc(var(--q)*-40)] top-[calc(var(--q)*430)] w-[calc(var(--q)*820)]" aria-hidden="true">
+        <div className="pointer-events-none absolute left-[calc(var(--q)*-40)] top-[calc(var(--q)*430)] w-[calc(var(--q)*820)]" aria-hidden="true">
           <img src="/assets/what-is-line.webp" alt="" className="mm-wire-draw block w-full max-w-none" />
+          <div className="mm-wire-sheen absolute inset-0" />
         </div>
         <Heading className="absolute left-[calc(var(--q)*18)] top-[calc(var(--q)*47)] z-10 text-[length:calc(var(--q)*56)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
         <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] z-10 w-[calc(var(--q)*252)] text-[length:calc(var(--q)*13.5)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.02em] text-black/70">

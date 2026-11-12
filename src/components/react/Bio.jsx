@@ -10,9 +10,9 @@ import InnerNav, { PhoneBack, BottomBack } from "./InnerNav";
 const story = [
   // Line breaks marked md:hidden are the ones in her phone frame (MM-BIO-02)
   <>
-    A dark room. Her mother switches on an old projector,<br className="md:hidden" /> and a square<br className="hidden md:inline" /> of light appears on<br className="md:hidden" /> the wall. It felt like light itself could tell stories.
+    A dark room. Her mother switches on an old projector,<br className="md:hidden" /> and a square of light appears on<br className="md:hidden" /> the wall. It felt like light itself could tell stories.
   </>,
-  // Breaks with "hidden md:inline" are the ones in her computer frame (MM-BIO-01)
+  // The break with "hidden md:inline" is the one in her computer frame (MM-BIO-01)
   <>
     She grew up in Lviv, in a family of artists. Painting, photography, composition, these were words she heard before she could read. Balance, proportion, color, these were never a course she took.<br className="hidden md:inline" /> They are the language she thinks in.
   </>,
@@ -25,14 +25,15 @@ const story = [
   </>,
 ];
 
+// Texts and sizes from her current frames MM-BIO-01 / MM-BIO-02 (Figma node 1053:359, 12 Nov)
 const partners = [
-  "The strongest brands in the world already think this way. Their design systems evolve while their identity stays intact. That's the thinking Marta brings into every partnership. She works best with ambitious startups, universities, investment funds, founders, and high-net-worth individuals who need more than something beautiful. They need clarity, trust, and a story people can follow.",
-  "She has a particular affinity for women founders and women-led ventures, builders reshaping their industries who need a visual language as bold as the work itself.",
+  "The strongest brands evolve without losing what makes them recognizable. Marta brings that same thinking into every partnership. She works with people who value clarity, trust, and a visual language that can grow with their ambitions.",
+  "She has a particular affinity for women founders and women-led ventures, especially those challenging established ways of thinking.",
 ];
 
-// Measured side by side with her 2x frames (28 Oct): 20.5/34 at 1920 and 14/20 on the phone, both set
-// tighter than the font's own spacing, so every line breaks where hers does.
-const body = "text-[14px] leading-[20px] tracking-[-0.04em] text-[#4f4f4f] md:text-[length:calc(var(--u)*20.5)] md:leading-[calc(var(--u)*34)] md:tracking-[-0.01em] md:text-[#5c5c5c]";
+// MM-BIO: 22/34 at 1920 and 14/20 on the phone, black at 69-70 percent (#4f4f4f); the phone set
+// tighter than the font's own spacing, so its lines break where hers do (28 Oct).
+const body = "text-[14px] leading-[20px] tracking-[-0.04em] text-[#4f4f4f] md:text-[length:calc(var(--u)*22)] md:leading-[calc(var(--u)*34)] md:tracking-[-0.01em]";
 
 function Paragraphs({ items }) {
   return (
@@ -61,14 +62,14 @@ export default function Bio() {
           className="w-full aspect-[348/499] md:aspect-[709/1010] object-cover"
         />
 
-        <p className="mt-[26px] md:mt-[calc(var(--u)*52)] text-center uppercase text-[12.5px] md:text-[length:calc(var(--u)*20.5)] tracking-[0.02em] text-[#555] md:text-[#7d7d7d]">
+        <p className="mt-[26px] md:mt-[calc(var(--u)*52)] text-center uppercase text-[14px] md:text-[length:calc(var(--u)*22)] tracking-[0.02em] text-[#666] md:text-[#808080]">
           Mamamarta — The person behind
         </p>
 
-        <h1 className="mt-[28px] md:mt-[calc(var(--u)*66)] text-center text-[30px] md:text-[length:calc(var(--u)*45)] leading-none font-normal text-black">
+        <h1 className="mt-[28px] md:mt-[calc(var(--u)*66)] text-center text-[32px] md:text-[length:calc(var(--u)*50)] leading-none font-normal text-black">
           M’s Lens
         </h1>
-        <p className="mt-[16px] md:mt-[calc(var(--u)*30)] text-center text-[11px] md:text-[length:calc(var(--u)*16.5)] text-[#555] md:text-[#444]">
+        <p className="mt-[16px] md:mt-[calc(var(--u)*30)] text-center text-[12px] md:text-[length:calc(var(--u)*18)] text-[#666] md:text-[#4f4f4f]">
           A story shaped by light, art, and intuition.
         </p>
 
@@ -98,12 +99,13 @@ export default function Bio() {
         </div>
 
         <div className="mt-[34px] md:mt-[calc(var(--u)*70)] md:ml-[calc(var(--u)*30)]">
-          <p className="text-[15.5px] md:text-[length:calc(var(--u)*28)] leading-snug text-[#4f4f4f] md:text-[#222]">
+          {/* MM-BIO-01 sets this line like the text below it (22/34); her phone frame at 17 px */}
+          <p className="text-[17px] leading-[20px] md:leading-[calc(var(--u)*34)] text-[#4d4d4d] md:text-[length:calc(var(--u)*22)] md:text-[#4f4f4f]">
             {/* "Care." in italic on the computer only, as in her two frames */}
             MAMAMARTA is built on one idea. <span className="md:italic">Care.</span>
           </p>
           <p className={`mt-[32px] md:mt-[calc(var(--u)*35)] ${body}`}>
-            A space where ideas are understood before they’re shaped, where<br className="hidden md:inline" /> the light goes on before anyone reaches for a pen.
+            A space where ideas are understood before they’re shaped. Where the light goes on before anyone reaches for a pen.
           </p>
         </div>
 

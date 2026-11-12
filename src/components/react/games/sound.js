@@ -42,46 +42,72 @@ function tone(ac, { freq, to, type = "sine", start = 0, dur = 0.1, gain = 0.1 })
   o.stop(t0 + dur + 0.03);
 }
 
-// Each game has its own set (Marta, 11 Nov 19:52: "the sounds must be different for every game"), all soft and
-// short. flip = a move lands, back = a wrong try / a step back, win = the end of a round.
+// A short burst of filtered noise: paper, wood, a soft swish (no file, made in the browser).
+let noiseBuf = null;
+function noise(ac, { freq = 2000, q = 1, type = "bandpass", start = 0, dur = 0.08, gain = 0.1 }) {
+  if (!noiseBuf) {
+    noiseBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.5), ac.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  const t0 = ac.currentTime + start;
+  const src = ac.createBufferSource();
+  src.buffer = noiseBuf;
+  const f = ac.createBiquadFilter();
+  f.type = type;
+  f.frequency.setValueAtTime(freq, t0);
+  f.Q.value = q;
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(gain, t0 + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(f); f.connect(g); g.connect(ac.destination);
+  src.start(t0);
+  src.stop(t0 + dur + 0.03);
+}
+
+// Each game has its own sound world (Marta, 11 Nov 19:52 and again 12 Nov 01:51: "the sounds must be different
+// for every game"; the first sets were all soft pure tones and sounded alike). Each game now has its own
+// material: Memory Match paper cards, Word Hunt a marimba, Tic-Tac-Toe wood, Connect the Path water drops,
+// The Art of Moving retro coins. flip = a move lands, back = a wrong try, win = the end of a round.
 const SETS = {
-  // Memory Match: card-like ticks that rise and fall, a small rising chord (C E G C)
+  // Memory Match: the swish of a paper card turning, a small music-box chord (C E G C)
   "memory-match": {
-    flip: (ac) => tone(ac, { freq: 760, to: 1180, type: "triangle", dur: 0.08, gain: 0.07 }),
-    back: (ac) => tone(ac, { freq: 520, to: 300, type: "triangle", dur: 0.13, gain: 0.06 }),
-    win: (ac) => [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => tone(ac, { freq, start: i * 0.09, dur: 0.42, gain: 0.07 })),
+    flip: (ac) => noise(ac, { freq: 3200, q: 0.8, dur: 0.07, gain: 0.12 }),
+    back: (ac) => { noise(ac, { freq: 1800, q: 0.8, dur: 0.06, gain: 0.09 }); noise(ac, { freq: 1500, q: 0.8, start: 0.08, dur: 0.06, gain: 0.07 }); },
+    win: (ac) => [1046.5, 1318.5, 1567.98, 2093].forEach((freq, i) => tone(ac, { freq, start: i * 0.11, dur: 0.5, gain: 0.05 })),
   },
-  // Word Hunt: a marimba-like pluck for a found word, a low soft thud for a miss, a pentatonic run
+  // Word Hunt: a wooden marimba (a low note with its bright overtone), a dull thud for a miss, a marimba run
   "word-hunt": {
-    flip: (ac) => { tone(ac, { freq: 880, dur: 0.16, gain: 0.07 }); tone(ac, { freq: 1760, dur: 0.07, gain: 0.025 }); },
-    back: (ac) => tone(ac, { freq: 220, to: 170, dur: 0.14, gain: 0.08 }),
-    win: (ac) => [587.33, 659.25, 783.99, 880, 1174.66].forEach((freq, i) => tone(ac, { freq, start: i * 0.07, dur: 0.3, gain: 0.06 })),
+    flip: (ac) => { tone(ac, { freq: 523.25, dur: 0.22, gain: 0.09 }); tone(ac, { freq: 2093, dur: 0.05, gain: 0.03 }); },
+    back: (ac) => { tone(ac, { freq: 140, to: 110, dur: 0.16, gain: 0.12 }); noise(ac, { freq: 300, q: 0.7, type: "lowpass", dur: 0.08, gain: 0.08 }); },
+    win: (ac) => [392, 440, 523.25, 587.33, 659.25, 783.99].forEach((freq, i) => { tone(ac, { freq, start: i * 0.08, dur: 0.25, gain: 0.08 }); tone(ac, { freq: freq * 4, start: i * 0.08, dur: 0.04, gain: 0.02 }); }),
   },
-  // Tic-Tac-Toe: a wooden knock for each move, two falling notes when Apple wins, a bell when you win
+  // Tic-Tac-Toe: a hollow wooden knock for each move, a low falling "boo" when Apple wins, a wooden fanfare
   "tic-tac-toe": {
-    flip: (ac) => { tone(ac, { freq: 330, to: 240, dur: 0.09, gain: 0.1 }); tone(ac, { freq: 990, type: "triangle", dur: 0.03, gain: 0.02 }); },
-    back: (ac) => { tone(ac, { freq: 659.25, dur: 0.22, gain: 0.06 }); tone(ac, { freq: 523.25, start: 0.18, dur: 0.34, gain: 0.06 }); },
-    win: (ac) => { tone(ac, { freq: 1046.5, dur: 0.9, gain: 0.06 }); tone(ac, { freq: 1318.5, start: 0.06, dur: 0.9, gain: 0.04 }); },
+    flip: (ac) => { noise(ac, { freq: 900, q: 6, dur: 0.06, gain: 0.25 }); tone(ac, { freq: 180, to: 120, dur: 0.07, gain: 0.12 }); },
+    back: (ac) => { tone(ac, { freq: 300, to: 150, type: "sawtooth", dur: 0.5, gain: 0.03 }); },
+    win: (ac) => [0, 0.12, 0.24, 0.42].forEach((start, i) => noise(ac, { freq: [900, 1100, 1300, 1600][i], q: 6, start, dur: 0.07, gain: 0.25 })),
   },
-  // Connect the Path: a small water-drop blip for each dot, a soft step back, a rising sweep to a chord
+  // Connect the Path: a water drop for each dot (a quick rising bloop), a soft drip back, a little bubbling run
   "connect-the-path": {
-    flip: (ac) => tone(ac, { freq: 1200, to: 640, dur: 0.07, gain: 0.06 }),
-    back: (ac) => tone(ac, { freq: 600, to: 420, type: "triangle", dur: 0.09, gain: 0.05 }),
-    win: (ac) => { tone(ac, { freq: 400, to: 1600, dur: 0.45, gain: 0.04 }); [783.99, 987.77, 1174.66].forEach((freq) => tone(ac, { freq, start: 0.42, dur: 0.6, gain: 0.04 })); },
+    flip: (ac) => tone(ac, { freq: 500, to: 1400, dur: 0.09, gain: 0.08 }),
+    back: (ac) => tone(ac, { freq: 900, to: 350, dur: 0.12, gain: 0.06 }),
+    win: (ac) => Array.from({ length: 7 }, (_, i) => tone(ac, { freq: 450 + i * 120, to: 1300 + i * 180, start: i * 0.07, dur: 0.09, gain: 0.07 })),
   },
-  // The Art of Moving: a two-step coin chime, and a short three-note phrase when the run ends
+  // The Art of Moving: a retro game coin (two square-wave notes), a short buzz for a fall, a retro jingle
   "art-of-moving": {
-    flip: (ac) => { tone(ac, { freq: 987.77, type: "triangle", dur: 0.06, gain: 0.05 }); tone(ac, { freq: 1318.5, type: "triangle", start: 0.06, dur: 0.12, gain: 0.05 }); },
-    back: (ac) => tone(ac, { freq: 440, to: 330, type: "triangle", dur: 0.12, gain: 0.05 }),
-    win: (ac) => [659.25, 587.33, 783.99].forEach((freq, i) => tone(ac, { freq, type: "triangle", start: i * 0.12, dur: 0.35, gain: 0.05 })),
+    flip: (ac) => { tone(ac, { freq: 987.77, type: "square", dur: 0.06, gain: 0.03 }); tone(ac, { freq: 1318.5, type: "square", start: 0.06, dur: 0.18, gain: 0.03 }); },
+    back: (ac) => tone(ac, { freq: 220, to: 90, type: "square", dur: 0.35, gain: 0.03 }),
+    win: (ac) => [659.25, 783.99, 1046.5, 1318.5].forEach((freq, i) => tone(ac, { freq, type: "square", start: i * 0.1, dur: 0.14, gain: 0.03 })),
   },
 };
 
 // Marta, 11 Nov 19:56: "also a sound for found elements in the games, and for the coins being credited".
 // match = a pair / a word found (its own per game); coin = a coin taken in The Art of Moving;
 // coins = MM✦ credited (a small sparkle, the same in every game); count = the MM✦STARS counted on the score screen.
-SETS["memory-match"].match = (ac) => { tone(ac, { freq: 1318.5, dur: 0.12, gain: 0.06 }); tone(ac, { freq: 1567.98, start: 0.08, dur: 0.22, gain: 0.06 }); };
-SETS["word-hunt"].match = (ac) => [783.99, 987.77, 1174.66].forEach((freq, i) => tone(ac, { freq, start: i * 0.06, dur: 0.22, gain: 0.055 }));
+SETS["memory-match"].match = (ac) => { tone(ac, { freq: 1567.98, dur: 0.3, gain: 0.05 }); tone(ac, { freq: 2093, start: 0.09, dur: 0.35, gain: 0.05 }); };
+SETS["word-hunt"].match = (ac) => [523.25, 659.25, 783.99].forEach((freq, i) => { tone(ac, { freq, start: i * 0.07, dur: 0.22, gain: 0.08 }); tone(ac, { freq: freq * 4, start: i * 0.07, dur: 0.04, gain: 0.02 }); });
 SETS["art-of-moving"].coin = SETS["art-of-moving"].flip;
 const SHARED = {
   coins: (ac) => [1567.98, 2093, 2637].forEach((freq, i) => tone(ac, { freq, type: "triangle", start: i * 0.045, dur: 0.08, gain: 0.03 })),

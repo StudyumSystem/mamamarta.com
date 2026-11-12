@@ -81,7 +81,11 @@ export default function Hero({ initialMenuOpen = false }) {
   const closeMenu = React.useCallback(() => setIsMenuOpen(false), []);
 
   return (
-    <section id="hero" className="relative max-h-screen overflow-hidden bg-slate-950 text-white">
+    // --h = one pixel of her 1920 x 1080 hero, fitted to the screen (the smaller of width and height). Every
+    // desktop size and gap below is her px times --h, so the hero keeps her proportions on any window (Marta,
+    // 11 Nov 19:54: "the spacing is wrong": gaps were in vh and sizes in vw, so on a wide, short window the gaps
+    // shrank while the type didn't).
+    <section id="hero" className="relative max-h-screen overflow-hidden bg-slate-950 text-white" style={{ "--h": "min(calc(100vw / 1920), calc(100dvh / 1080))" }}>
       {isMenuOpen && <MobileMenu onClose={closeMenu} />}
 
       {/* Marta, 28 Oct 16:45: the fur looked washed out next to MM-HOME-001; richer, brighter raspberry as in her frame. */}
@@ -144,11 +148,11 @@ export default function Hero({ initialMenuOpen = false }) {
 
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex justify-center rounded-lg h-[10vh] lg:h-[13.7vh] items-end">
-          <ul className="flex flex-wrap justify-center font-light lg:font-normal text-white gap-x-6 lg:gap-x-[clamp(20px,1.4vw,27px)]">
+        <nav className="hidden md:flex justify-center rounded-lg h-[10vh] lg:h-[calc(var(--h)*148)] items-end">
+          <ul className="flex flex-wrap justify-center font-light lg:font-normal text-white gap-x-6 lg:gap-x-[calc(var(--h)*27)]">
             {navLinks.map((link, index) => (
               <li key={index}>
-                <a className="sm:text-lg lg:text-[clamp(16px,1.146vw,22px)] transition-all duration-300 hover:font-bold hover:text-white" href={link.href}>
+                <a className="sm:text-lg lg:text-[length:calc(var(--h)*22)] transition-all duration-300 hover:font-bold hover:text-white" href={link.href}>
                   {link.label}
                 </a>
               </li>
@@ -158,12 +162,12 @@ export default function Hero({ initialMenuOpen = false }) {
 
         {/* Desktop positions from her Desktop.jpg (1920x1080): logo top 307 px, tagline 43/55 at 470, the two lines
             22/30 at 541, button 312x68 at 709. */}
-        <div className="max-md:hidden flex flex-1 flex-col items-center text-center justify-center lg:justify-start rounded-lg lg:py-0 lg:pt-[14.7vh] max-h-screen py-[5em]">
+        <div className="max-md:hidden flex flex-1 flex-col items-center text-center justify-center lg:justify-start rounded-lg lg:py-0 lg:pt-[calc(var(--h)*159)] max-h-screen py-[5em]">
 
           <div className="items-center justify-center flex flex-col">
             <h1 className="contents">
               <img
-                className="w-[80vw] lg:w-[clamp(480px,43.4vw,832px)] h-auto object-contain"
+                className="w-[80vw] lg:w-[calc(var(--h)*832)] h-auto object-contain"
                 src={'/assets/brand/main-logo.png'}
                 width="832"
                 height="123"
@@ -171,23 +175,23 @@ export default function Hero({ initialMenuOpen = false }) {
               />
             </h1>
 
-            <p className="lg:mt-[3.7vh] mt-4 text-[18px] font-normal tracking-[-0.01em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] lg:tracking-[-0.03em] text-white">
+            <p className="lg:mt-[calc(var(--h)*40)] mt-4 text-[18px] font-normal tracking-[-0.01em] lg:text-[length:calc(var(--h)*43)] lg:leading-[1.28] lg:tracking-[-0.03em] text-white">
               {TAGLINE}
             </p>
-            <p className="mt-2 lg:mt-[1.5vh] text-[13px] font-normal text-white lg:text-[clamp(16px,1.146vw,22px)] lg:leading-[1.364] lg:tracking-[-0.015em]">
+            <p className="mt-2 lg:mt-[calc(var(--h)*16)] text-[13px] font-normal text-white lg:text-[length:calc(var(--h)*22)] lg:leading-[1.364] lg:tracking-[-0.015em]">
               {FOR_WHOM}
               <br />
               {WHAT}
             </p>
           </div>
 
-          <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[10vh] lg:max-w-none">
+          <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[calc(var(--h)*108)] lg:max-w-none">
             <div className="flex flex-wrap justify-center">
               <a
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="px-4 py-3 lg:px-6 lg:py-0 lg:justify-center lg:min-w-[clamp(220px,16.25vw,312px)] lg:min-h-[clamp(50px,3.54vw,68px)] lg:text-[clamp(16px,1.146vw,22px)] lg:font-semibold group flex items-center rounded-xs border border-white/20 font-medium backdrop-blur-md transition-all duration-300"
+                className="px-4 py-3 lg:px-6 lg:py-0 lg:justify-center lg:min-w-[calc(var(--h)*312)] lg:min-h-[calc(var(--h)*68)] lg:text-[length:calc(var(--h)*22)] lg:font-semibold group flex items-center rounded-xs border border-white/20 font-medium backdrop-blur-md transition-all duration-300"
                 onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}
                 style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import GameModal, { Completion, ScoreScreen, PINK } from "./GameModal.jsx";
 import { takeQuote, recordStars, ROUND_STARS } from "./shared.js";
-import { play as sound } from "./sound.js";
+import { play as playSound } from "./sound.js";
+const sound = (name) => playSound(name, "tic-tac-toe");
 
 // 11 Nov (her MM-G03-02 / -04 frames): grey #969696 lines on the light grey panel, a played square turns white,
 // a three-in-a-row gets a thin pink line across it; the round ends on the score screen ("Well played",

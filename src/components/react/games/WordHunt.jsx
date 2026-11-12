@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
 import { pad2, shuffle, takeQuote, recordStars, ROUND_STARS } from "./shared.js";
-import { play } from "./sound.js";
+import { play as playSound } from "./sound.js";
+const play = (name) => playSound(name, "word-hunt");
 
 // MM-GAME-01 Word Hunt (Marta's spec): 10x10 grid, 10 of the 20 pool words per round,
 // placed across or down; swipe a row or column in either direction. No timer, counter 0/10.

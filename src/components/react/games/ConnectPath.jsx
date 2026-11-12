@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import GameModal, { Completion, ScoreScreen } from "./GameModal.jsx";
 import { pad2, takeQuote, recordStars, ROUND_STARS } from "./shared.js";
-import { play } from "./sound.js";
+import { play as playSound } from "./sound.js";
+const play = (name) => playSound(name, "connect-the-path");
 
 // MM-GAME-05 Connect the Path (Marta's spec): 15 dots on an invisible grid, one pink start.
 // Each round is a random self-avoiding path of 15 cells (so it always has a solution); only the dots are shown.

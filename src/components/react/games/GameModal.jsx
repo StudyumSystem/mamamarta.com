@@ -384,9 +384,13 @@ export default function GameModal({
       >
         {/* top row: Back (desktop), instructions, counter */}
         <div className="relative flex items-start gap-6 px-[15px] pt-[22px] lg:px-[3.2vw] lg:pt-[3.1vw]" style={fit < 1 ? { zoom: fit } : undefined}>
-          {/* measured on the 2x frames (MM-G01…G05 Default): text from 615 px, Inter 400 ~20.5/31 px, lines break as in the frames */}
+          {/* measured on the 2x frames (MM-G01…G05 Default): text from 615 px, Inter 400 ~20.5/31 px, lines break as in the frames.
+              11 Nov 20:10, Marta: "take the design from my Figma". Her current game frames (kept Figma copy): the text box is
+              608 x 62 at 22/31 with letter spacing -0.88 px (-0.04em), two lines, in every game. We had normal spacing, so
+              the text ran wider and broke into three lines. Now her spacing, and the width in em of its own type
+              (608/22 = 27.6em), so it breaks as hers on every screen, not by the window width. */}
           <BackLink onClick={requestClose} className={`hidden lg:block ${game ? "lg:w-[12.9vw]" : "lg:w-[14.1vw]"} shrink-0 text-left`} />
-          <p className={`flex-1 ${game ? "text-[14px] text-black/60 lg:max-w-[33.6vw] lg:text-[clamp(15px,1.146vw,22px)] lg:leading-[1.41] lg:text-black/[0.69]" : "text-[15px] text-black/70 lg:max-w-[35.8vw] lg:text-[clamp(15px,1.06vw,21px)] lg:leading-[1.5] lg:text-black/70"} leading-[20px] tracking-[-0.02em] lg:tracking-normal lg:whitespace-pre-wrap font-normal`}>
+          <p className={`flex-1 ${game ? "text-[14px] text-black/60 lg:max-w-[27.7em] lg:text-[clamp(15px,1.146vw,22px)] lg:leading-[1.41] lg:tracking-[-0.04em] lg:text-black/[0.69]" : "text-[15px] text-black/70 lg:max-w-[35.8vw] lg:text-[clamp(15px,1.06vw,21px)] lg:leading-[1.5] lg:text-black/70 lg:tracking-normal"} leading-[20px] tracking-[-0.02em] lg:whitespace-pre-wrap font-normal`}>
             {instructions}
           </p>
           {showHud ? (

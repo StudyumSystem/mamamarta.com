@@ -46,9 +46,9 @@ const ENTRIES = [
   {
     id: "word-hunt",
     label: "01 / 05 WORD HUNT",
-    // her Desktop.jpg (11 Nov); on the computer it breaks after "them" as in hers (textW)
+    // her current Figma (12 Nov): the text box is 528 px wide on the computer (textW)
     text: "Some things are hiding in plain sight. You will find them fast, and then wonder how long they were there.",
-    textW: "30.5vw",
+    textW: "27.5vw",
     visual: { kind: "video", src: "/assets/m.mp4", poster: "/assets/m-poster.webp", alt: "Letter M" },
   },
   {
@@ -337,7 +337,8 @@ function PhoneVisual({ entry }) {
 }
 
 function Ctas({ entry, onPlay }) {
-  const base = "inline-flex items-center justify-center gap-[0.45em] font-semibold transition-colors h-[3.5vw] text-[1.2vw]";
+  // her Figma: buttons 312 x 68, text 22 semibold -0.017em
+  const base = "inline-flex items-center justify-center gap-[0.45em] font-semibold tracking-[-0.017em] transition-colors h-[3.54vw] text-[1.146vw]";
   if (entry.id === "collaborate")
     return (
       <div className="flex gap-[1.1vw]">
@@ -460,20 +461,20 @@ export default function FoundersChallenge({ start = 0, still = false }) {
 
       {/* Desktop */}
       <div className="hidden lg:grid lg:min-h-[56.25vw] lg:grid-cols-[50%_50%] lg:items-center">
-        <div className="pl-[8.85vw] py-[6vw]">
-          {/* Type measured on her 2x frames (MM-C06 _Entry, 3840 px = 1920): label 17 px, heading 154 px tight,
-              body and entry text 21/34 regular dark grey, entry label 21 px caps grey. */}
-          {/* Marta's reworked home (her Desktop.jpg, 11 Nov): heading 150/141, intro 22/34 black 69%. */}
-          <h2 className="relative z-20 mt-[1.9vw] -ml-[0.5vw] whitespace-nowrap text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.07em]">{HEADING_LINES[0]}<br />{HEADING_LINES[1]}</h2>
-          <p className="mt-[2.9vw] max-w-[33.5vw] text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.02em] text-black/70">{INTRO}</p>
+        {/* Her current Figma (kept copy, 12 Nov, frame at 31999, 1920 x 1080), every place from the frame's top:
+            heading 150/141 -0.06em at 158, 182; intro 22/34 -0.04em, 630 wide at 524; label 22/21 caps at 660;
+            entry text 22/34 at 701; the two lines at 797; Play 312 x 68 at 839. */}
+        <div className="self-start pl-[8.85vw] pt-[9.48vw] pb-[6vw]">
+          <h2 className="relative z-20 -ml-[0.625vw] whitespace-nowrap text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]">{HEADING_LINES[0]}<br />{HEADING_LINES[1]}</h2>
+          <p className="mt-[3.125vw] max-w-[32.81vw] text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.04em] text-black/70">{INTRO}</p>
           {/* The description always takes exactly 2 lines, so the progress line and buttons never move. */}
-          <div key={active} className="mm-slide-in mt-[3.2vw]">
-            <p className="text-[1.146vw] font-normal uppercase tracking-[-0.01em] text-black/50">{entry.label}</p>
-            <p className="mt-[0.9vw] h-[3.54vw] max-w-[37vw] overflow-hidden text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.02em] text-black/70 line-clamp-2" style={entry.textW ? { maxWidth: entry.textW } : undefined}><EntryText text={entry.text} /></p>
+          <div key={active} className="mm-slide-in mt-[3.54vw]">
+            <p className="text-[1.146vw] font-normal uppercase leading-[1.094vw] tracking-[-0.017em] text-black/50">{entry.label}</p>
+            <p className="mt-[1.04vw] h-[3.54vw] max-w-[37vw] overflow-hidden text-[1.146vw] font-normal leading-[1.77vw] tracking-[-0.04em] text-black/70 line-clamp-2" style={entry.textW ? { maxWidth: entry.textW } : undefined}><EntryText text={entry.text} /></p>
           </div>
           {/* her Desktop.jpg (11 Nov): two lines, back (grey, arrow left) and next (light pink, arrow right);
               the next line fills with pink over the entry's reading time, so it shows when the slider moves on */}
-          <div className="relative mt-[0.7vw] flex w-[26.7vw] gap-[1.3vw]">
+          <div className="relative mt-[0.76vw] flex w-[26.7vw] gap-[1.3vw]">
             <button
               type="button"
               aria-label="Previous game"
@@ -499,7 +500,7 @@ export default function FoundersChallenge({ start = 0, still = false }) {
               <span className="absolute right-0 top-1/2 h-0 w-0 -translate-y-1/2 border-y-[0.22vw] border-l-[0.42vw] border-y-transparent border-l-[#f48fcf] transition-colors duration-300 group-hover:border-l-[#e3009c]" />
             </button>
           </div>
-          <div className="mt-[1.6vw]">
+          <div className="mt-[1.484vw]">
             <Ctas entry={entry} onPlay={onPlay} />
           </div>
         </div>

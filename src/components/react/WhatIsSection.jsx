@@ -32,9 +32,10 @@ const Squiggle = () => (
   />
 );
 
-const Heading = ({ className = "", inlineMark = true }) => (
+// Her current computer frame (kept Figma copy, 12 Nov) reads "What’s"; her phone frame still "What is".
+const Heading = ({ className = "", inlineMark = true, first = "What is" }) => (
   <h2 className={className}>
-    What is
+    {first}
     <br />
     an amazing
     <br />
@@ -109,13 +110,14 @@ export default function WhatIsSection() {
         </div>
 
         <div className="absolute left-[52.7vw] top-[7.71vw] z-10">
-          <Heading inlineMark={false} className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
+          <Heading inlineMark={false} first="What’s" className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
           <DesktopMark />
         </div>
-        <p className="absolute left-[52.7vw] top-[32.35vw] z-10 w-[30.5vw] text-[1.094vw] leading-[1.615vw] tracking-[-0.02em] text-black/70">{BODY}</p>
+        {/* her Figma: body 22/31, -0.04em, 658 wide at 1011, 621; button text 22 semibold -0.017em */}
+        <p className="absolute left-[52.66vw] top-[32.34vw] z-10 w-[34.27vw] text-[1.146vw] leading-[1.615vw] tracking-[-0.04em] text-black/70">{BODY}</p>
         <a
           href="/what-is"
-          className="mm-gradient group absolute left-[52.66vw] top-[39.95vw] z-10 inline-flex h-[3.54vw] w-[16.25vw] items-center justify-center gap-[0.3em] text-[1.146vw] font-semibold text-white"
+          className="mm-gradient group absolute left-[52.66vw] top-[39.95vw] z-10 inline-flex h-[3.54vw] w-[16.25vw] items-center justify-center gap-[0.3em] text-[1.146vw] font-semibold tracking-[-0.017em] text-white"
         >
           See what's underneath <ArrowIcon />
         </a>

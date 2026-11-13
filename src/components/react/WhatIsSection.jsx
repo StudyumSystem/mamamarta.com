@@ -104,22 +104,23 @@ export default function WhatIsSection() {
       </div>
 
       {/* Phone */}
-      <div className="relative h-[calc(var(--q)*893)] sm:hidden">
+      <div className="relative h-[calc(var(--q)*844)] sm:hidden">
         <PinkM
           className="left-[calc(var(--q)*-24)] top-[calc(var(--q)*441)] h-[calc(var(--q)*455)] w-[calc(var(--q)*380)]"
         />
         <div className="pointer-events-none absolute left-[calc(var(--q)*-40)] top-[calc(var(--q)*430)] aspect-[16/9] w-[calc(var(--q)*820)]" aria-hidden="true">
           <Cable />
         </div>
-        {/* MM-HOME-002 (13 Nov): heading Inter Medium 64/65 -0.06em at 14, 40 ("experience" stays her italic 400);
-            body 14/20 -0.04em 260 wide at 20, 265; button 46 tall at 20, 378, at least her 199 wide, 16 semibold -0.023em */}
-        <Heading className="absolute left-[calc(var(--q)*14)] top-[calc(var(--q)*40)] z-10 text-[length:calc(var(--q)*64)] font-medium leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
-        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*265)] z-10 w-[calc(var(--q)*260)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/70">
-          {BODY}
+        {/* MM-HOME-002, 13 Nov 21:46 UTC (iPhone 16 & 17 Pro - 8, one 844 screen, right after the first screen):
+            heading Inter Medium 64/65 -0.06em at 14, 65 ("experience" stays her italic 400); body 14/20 -0.04em
+            black 70% at 20, 280 in her three lines; button the full 350 x 46 at 20, 375, 16 semibold -0.023em */}
+        <Heading className="absolute left-[calc(var(--q)*14)] top-[calc(var(--q)*65)] z-10 text-[length:calc(var(--q)*64)] font-medium leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
+        <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*280)] z-10 whitespace-nowrap text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/70">
+          It is never accidental.<br />It is the decisions people<br />never notice, but always feel.
         </p>
         <a
           href="/what-is"
-          className="mm-gradient absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*378)] z-10 flex h-[calc(var(--q)*46)] min-w-[calc(var(--q)*199)] items-center justify-center gap-[0.3em] px-[calc(var(--q)*13)] text-[length:calc(var(--q)*16)] font-semibold tracking-[-0.023em] text-white"
+          className="mm-gradient absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*375)] z-10 flex h-[calc(var(--q)*46)] w-[calc(var(--q)*350)] items-center justify-center gap-[0.3em] text-[length:calc(var(--q)*16)] font-semibold tracking-[-0.023em] text-white"
         >
           See what's underneath <ArrowIcon />
         </a>

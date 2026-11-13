@@ -42,6 +42,8 @@ const PEEK = 257 / 420;
 const COLUMN_X = 960;
 const nextX = (s) => Math.max(NEXT_X, 1920 - PEEK * s.w);
 
+// The phone has her own labels and texts (MM-HOME-002, 13 Nov 21:46 UTC, iPhone 16 & 17 Pro - 2): phoneLabel /
+// phoneText where they differ from the computer's.
 const ENTRIES = [
   {
     id: "word-hunt",
@@ -64,6 +66,8 @@ const ENTRIES = [
     id: "tic-tac-toe",
     label: "03 / 05 TIC-TAC-TOE",
     text: "Every move closes a door. You will feel the cost of a move you did not think about.",
+    phoneLabel: "03 / Tic-tac-toe",
+    phoneText: ["Every move is a decision. Three in a row sounds easy. But can you outsmart your opponent?", "Your move."],
     textW: px(617),
     visual: { kind: "video", src: "/assets/apple.mp4", poster: "/assets/apple-poster.webp", alt: "Black apple" },
   },
@@ -71,6 +75,8 @@ const ENTRIES = [
     id: "art-of-moving",
     label: "04 / 05 THE ART OF MOVING",
     text: "Keep moving and collect the pink. Small steps, on time, build the whole run.",
+    phoneLabel: "04 / The Art of Moving",
+    phoneText: ["Momentum. Keep moving, collect the pink.", "Growth is a series of small, well-timed steps."],
     textW: px(598),
     visual: { kind: "walking-card" },
   },
@@ -78,6 +84,8 @@ const ENTRIES = [
     id: "connect-the-path",
     label: "05 / 05 CONNECT THE PATH",
     text: "Every point matters. A good product leads people there without a map.",
+    phoneLabel: "05 / Connect the Path",
+    phoneText: "Every point has a purpose. A good product leads people there without a map. Can you complete it?",
     textW: px(617),
     visual: { kind: "video", src: "/assets/google.mp4", poster: "/assets/google-poster.webp", alt: "Glove in the shape of a G" },
   },
@@ -85,6 +93,7 @@ const ENTRIES = [
     id: "collaborate",
     label: "WHAT IF YOUR BRAND HAD ITS OWN GAME?",
     text: "Bring your idea, or let us shape one together. Turn your brand into an interactive experience your audience can play with.",
+    phoneText: "Turn your idea into something people can play with. Suggest a game for MamaMarta or create a custom interactive experience for your brand.",
     textW: px(617),
     // Her jelly key animation (Marta, 10 Nov); the still key is its poster until the video plays.
     visual: { kind: "image", src: "/assets/games/plus-key.png", video: "/assets/games/plus-key.mp4", alt: "Black key with a plus sign" },
@@ -262,22 +271,18 @@ function MemoryCardPhone() {
   );
 }
 
-// Phone walking card, MM-HOME-002 (kept Figma copy, 13 Nov): black 350 x 450, picture 326 x 370 inset 12 px,
-// "THE ART OF MOVING" Inter 400 14/20 white, "Keep moving. Collect the pink stars." Inter 400 12/20 white 70%,
-// the pink round arrow 30 x 30 #F600A9 on the right.
-function WalkingCardPhone({ active }) {
+// Phone walking card, MM-HOME-002 (13 Nov 21:46 UTC, smaller than before): black 278 x 357, picture 256 x 292 inset
+// 11 px, "THE ART OF MOVING" Inter 400 14/20 white at 308, "Keep moving. Collect the pink stars." Inter 400 12/20
+// white 70% at 328, both -0.04em, the pink round arrow 30 x 30 #F600A9 on the right.
+function WalkingCardPhone() {
   return (
-    <div className="flex h-[calc(var(--q)*450)] w-[calc(var(--q)*350)] flex-col overflow-hidden rounded-[calc(var(--q)*24)] bg-black p-[calc(var(--q)*12)] text-white">
-      <div className="w-full overflow-hidden rounded-[calc(var(--q)*16)] bg-white">
-        <MovingFigure pos="50% 20%" phone className="h-[calc(var(--q)*370)] w-full" />
+    <div className="relative h-[calc(var(--q)*357)] w-[calc(var(--q)*278)] overflow-hidden rounded-[calc(var(--q)*19)] bg-black text-white">
+      <div className="absolute left-[calc(var(--q)*11)] top-[calc(var(--q)*11)] w-[calc(var(--q)*256)] overflow-hidden rounded-[calc(var(--q)*13)] bg-white">
+        <MovingFigure pos="50% 20%" phone className="h-[calc(var(--q)*292)] w-full" />
       </div>
-      <div className="flex flex-1 items-center justify-between">
-        <div>
-          <p className="text-[length:calc(var(--q)*14)] font-normal uppercase leading-[calc(var(--q)*20)]">The Art of Moving</p>
-          <p className="text-[length:calc(var(--q)*12)] font-normal leading-[calc(var(--q)*20)] text-white/70">Keep moving. Collect the pink stars.</p>
-        </div>
-        <span className="grid h-[calc(var(--q)*30)] w-[calc(var(--q)*30)] shrink-0 place-items-center rounded-full bg-[#F600A9] text-[length:calc(var(--q)*11)] text-white" aria-hidden="true"><ArrowIcon dir="up-right" /></span>
-      </div>
+      <p className="absolute left-[calc(var(--q)*11)] top-[calc(var(--q)*308)] whitespace-nowrap text-[length:calc(var(--q)*14)] font-normal uppercase leading-[calc(var(--q)*20)] tracking-[-0.04em]">The Art of Moving</p>
+      <p className="absolute left-[calc(var(--q)*11)] top-[calc(var(--q)*328)] whitespace-nowrap text-[length:calc(var(--q)*12)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-white/70">Keep moving. Collect the pink stars.</p>
+      <span className="absolute right-[calc(var(--q)*11)] top-[calc(var(--q)*313)] grid h-[calc(var(--q)*30)] w-[calc(var(--q)*30)] place-items-center rounded-full bg-[#F600A9] text-[length:calc(var(--q)*11)] text-white" aria-hidden="true"><ArrowIcon dir="up-right" /></span>
     </div>
   );
 }
@@ -354,24 +359,40 @@ function Visual({ entry, active }) {
 // fills it, the flat top on the window's top edge and the dots ending on its bottom, 278 wide, its middle at 190 of
 // 390 (x moves it from the middle). In the video's frame the M runs 121-665 of 782 down and 87-635 of 720 across,
 // so 368 wide puts it at her size and -61 its top on the window's edge.
+// 13 Nov 21:46 UTC (her new MM-HOME-002): every picture is smaller and has its own space above (top, from the
+// text) and below (bottom, to Play). Her boxes: the M 339 x 242 at x 23, Memory Match 278 x 357 at 50, the apple
+// 303 x 341 at 40, The Art of Moving 278 x 357 at 52, the glove 288 x 289 at 48, the key 268 x 283 at 61. Each
+// video keeps the place it had in her earlier boxes (M 389 x 278, apple 350 x 393, glove 328 x 329, key the same),
+// scaled to the new box: box = her box's height, y = the video's top from the box's top, x = the middle's shift.
 const PHONE_PICTURE = {
-  "word-hunt": { w: 368, h: 278, y: -61, x: -5, pad: 32, ar: "720 / 782" },
-  "tic-tac-toe": { w: 466, h: 466, y: -15, ar: "720 / 794" },
-  "connect-the-path": { w: 435, h: 389, y: -58, ar: "720 / 794" },
-  // her key video has more white around the key than the still, so it is drawn narrower to keep the key's size
-  collaborate: { w: 275, h: 357, y: 36, ar: "640 / 706" },
+  "word-hunt": { w: 320.7, box: 242, y: -53.2, x: -2.5, top: 36, bottom: 46, ar: "720 / 782" },
+  "tic-tac-toe": { w: 403.5, box: 341, y: -40.7, x: -3.5, top: 22, bottom: 57, ar: "720 / 794" },
+  "connect-the-path": { w: 382, box: 289, y: -61.5, x: -3, top: 42, bottom: 42, ar: "720 / 794" },
+  // her key video has more white around the key than the still, so it is drawn a little wider than the key's box
+  collaborate: { w: 275, box: 283, y: 4, top: 32, bottom: 45, ar: "640 / 706" },
+};
+// the two cards: space above and below, and the shift of the card's middle from the page's
+const PHONE_CARD = {
+  "memory-match": { top: 37, bottom: 46, x: -6 },
+  "art-of-moving": { top: 36, bottom: 46, x: -4 },
 };
 const phoneCopy = (src, ext) => src.replace(/\.mp4$/, ext);
+const q = (n) => `calc(var(--q) * ${n})`;
 
 function PhoneVisual({ entry }) {
   const v = entry.visual;
-  if (v.kind === "memory-card") return <div className="flex justify-center pt-[calc(var(--q)*31)] pb-[calc(var(--q)*33)]"><MemoryCardPhone /></div>;
-  if (v.kind === "walking-card") return <div className="flex justify-center pt-[calc(var(--q)*32)] pb-[calc(var(--q)*33)]"><WalkingCardPhone /></div>;
+  const c = PHONE_CARD[entry.id];
+  if (c)
+    return (
+      <div className="flex justify-center" style={{ paddingTop: q(c.top), paddingBottom: q(c.bottom), transform: `translateX(${q(c.x)})` }}>
+        {/* her Memory Match is the 350 x 450 card drawn at 278 x 357 */}
+        {v.kind === "memory-card" ? <div style={{ "--q": "calc(100vw / 390 * 0.7943)" }}><MemoryCardPhone /></div> : <WalkingCardPhone />}
+      </div>
+    );
   const p = PHONE_PICTURE[entry.id];
-  const style = { width: `calc(var(--q) * ${p.w})`, top: `calc(var(--q) * ${p.y})`, aspectRatio: p.ar };
-  if (p.x) style.marginLeft = `calc(var(--q) * ${p.x})`;
-  const box = { height: `calc(var(--q) * ${p.h})` };
-  if (p.pad) box.marginTop = box.marginBottom = `calc(var(--q) * ${p.pad})`;
+  const style = { width: q(p.w), top: q(p.top + p.y), aspectRatio: p.ar };
+  if (p.x) style.marginLeft = q(p.x);
+  const box = { height: q(p.top + p.box + p.bottom) };
   const src = v.kind === "video" ? v.src : v.video;
   // active={false}: the lazy loader (scripts/lazy-videos.js) fetches and plays it when it comes near
   return (
@@ -402,28 +423,21 @@ function Ctas({ entry, onPlay }) {
   );
 }
 
-// Phone buttons (MM-HOME-002): Play 199x46 in the middle, the two collaborate buttons 300 x 47 / 46, 15 px
-// apart, text Inter 16 semibold. "Suggest a game" with her controller icon, "Create for my brand" with her arrow
-// (Icon_Arrow_Right_Outline_18, as in her phone frame).
+// Phone buttons (MM-HOME-002, 13 Nov 21:46 UTC): every button the full 350 x 46, text Inter 16 semibold
+// -0.023em. Play →; under the last entry one button, "Make a game for my brand" with her arrow
+// (Icon_Arrow_Right_Outline_18), which opens the brand form.
 function PhoneCtas({ entry, onPlay }) {
-  const base = "flex items-center justify-center gap-[0.4em] font-semibold h-[calc(var(--q)*46)] text-[length:calc(var(--q)*16)]";
+  const base = "mm-gradient flex w-full items-center justify-center gap-[0.4em] font-semibold tracking-[-0.023em] text-white h-[calc(var(--q)*46)] text-[length:calc(var(--q)*16)]";
   if (entry.id === "collaborate")
     return (
-      <div className="flex flex-col items-center gap-[calc(var(--q)*15)]">
-        <button type="button" onClick={() => openForm("suggest")} className={`${base} h-[calc(var(--q)*47)] w-[calc(var(--q)*300)] border border-black bg-white text-black`}>
-          Suggest a game <ControllerIcon />
-        </button>
-        <button type="button" onClick={() => openForm("brand")} className={`${base} mm-gradient w-[calc(var(--q)*300)] text-white`}>
-          Create for my brand <ArrowIcon />
-        </button>
-      </div>
+      <button type="button" onClick={() => openForm("brand")} className={base}>
+        Make a game for my brand <ArrowIcon />
+      </button>
     );
   return (
-    <div className="flex justify-center">
-      <button type="button" onClick={() => onPlay(entry.id)} className={`${base} mm-gradient w-[calc(var(--q)*199)] text-white`}>
-        Play <ArrowIcon />
-      </button>
-    </div>
+    <button type="button" onClick={() => onPlay(entry.id)} className={base}>
+      Play <ArrowIcon />
+    </button>
   );
 }
 
@@ -586,15 +600,17 @@ export default function FoundersChallenge({ start = 0, still = false }) {
       {/* Phone, measured line by line on MM-HOME-002 (px of the 390 frame in --q): her type is set tighter
           than plain Inter (Marta, 2 Nov: wider letter spacing and other weights on the site), and every text
           box is her width, so each paragraph breaks into the same lines as hers. */}
-      <div className="mm-phone-w px-[calc(var(--q)*20)] pt-[calc(var(--q)*42)] pb-[calc(var(--q)*60)] lg:hidden">
-        {/* the computer's copy, at her phone heading size (62/65) */}
-        <h2 className="-ml-[calc(var(--q)*2)] whitespace-nowrap text-[length:calc(var(--q)*62)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.07em]">{HEADING_LINES[0]}<br />{HEADING_LINES[1]}</h2>
-        {/* her phone type (12 Nov): intro and label Inter 14/20 black 60%, entry text 14/20 black 70%, 325 wide */}
-        <p className="mt-[calc(var(--q)*24)] w-[calc(var(--q)*325)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em] text-black/60">{INTRO}</p>
+      {/* 13 Nov 21:46 UTC, her new phone frame (iPhone 16 & 17 Pro - 2, 390 x 3811): heading 64/60 -0.06em at
+          16, 65; intro 303 wide 20 below it; the first label 36 below the intro, every next label 70 below the Play
+          before it; text 12 below its label (Word Hunt 333 wide, the rest 325); all text Inter 14/20 -0.04em, labels
+          and intro black 60%, entry text black 70%; 56 below the last button. */}
+      <div className="mm-phone-w px-[calc(var(--q)*20)] pt-[calc(var(--q)*65)] pb-[calc(var(--q)*56)] lg:hidden">
+        <h2 className="-ml-[calc(var(--q)*4)] whitespace-nowrap text-[length:calc(var(--q)*64)] font-normal leading-[calc(var(--q)*60)] tracking-[-0.06em]">{HEADING_LINES[0]}<br />{HEADING_LINES[1]}</h2>
+        <p className="mt-[calc(var(--q)*20)] w-[calc(var(--q)*303)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/60">{INTRO}</p>
         {ENTRIES.map((e, i) => (
-          <div key={e.id} className={i === 0 ? "mt-[calc(var(--q)*41)]" : "mt-[calc(var(--q)*57)]"}>
-            <p className="text-[length:calc(var(--q)*14)] font-normal uppercase leading-[calc(var(--q)*20)] tracking-[-0.01em] text-black/60">{e.label}</p>
-            <p className="mt-[calc(var(--q)*12)] w-[calc(var(--q)*325)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em] text-black/70"><EntryText text={e.text} /></p>
+          <div key={e.id} className={i === 0 ? "mt-[calc(var(--q)*36)]" : "mt-[calc(var(--q)*70)]"}>
+            <p className="text-[length:calc(var(--q)*14)] font-normal uppercase leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/60">{e.phoneLabel || e.label}</p>
+            <p className={`mt-[calc(var(--q)*12)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/70 ${e.id === "word-hunt" ? "w-[calc(var(--q)*333)]" : "w-[calc(var(--q)*325)]"}`}><EntryText text={e.phoneText || e.text} /></p>
             <PhoneVisual entry={e} />
             <PhoneCtas entry={e} onPlay={onPlay} />
           </div>

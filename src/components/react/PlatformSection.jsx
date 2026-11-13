@@ -1,7 +1,8 @@
 import React from "react";
 
 // Platform Mind_set. Computer: her current Figma (kept copy, 12 Nov, frame 1920 x 1018), every place from the frame's
-// top-left: the moving shapes in a light box 671 x 653 at 170, 180; heading Inter Medium 172/141 -0.06em at 998, 180
+// top-left: the moving shapes in a light box 671 x 653 at 170, 180; heading Inter Medium 150/141 -0.06em at 998, 180
+// (150 in MM-HOME-001 of 13 Nov, was 172)
 // (pink "l" and the pink bar 71 x 12); body 22/31 -0.04em, 569 wide at 1011, 512; the pink line 188 wide at 785 and
 // "PLATFORM LAYER" 22/21 caps at 804, black 50%.
 // Phone, MM-HOME-002 (iPhone 16 & 17 Pro - 5, 390 x 844, 13 Nov): heading Inter Medium 64/65 -0.06em at 14, 40, its pink
@@ -13,7 +14,7 @@ export default function PlatformSection() {
       <div className="flex w-full flex-col sm:flex-row sm:items-stretch sm:gap-[8.18vw] sm:pl-[8.85vw]">
         <div className="order-1 flex flex-col pl-[calc(var(--q)*14)] sm:order-2 sm:h-[34.01vw] sm:px-0">
           <header className="mb-[calc(var(--q)*30)] sm:mb-[2.6vw]">
-            <h2 data-reveal-lines className="flex flex-col whitespace-nowrap text-[16.41vw] font-medium leading-[16.67vw] tracking-[-0.06em] text-black sm:text-[8.958vw] sm:font-medium sm:leading-[7.344vw] sm:tracking-[-0.06em]">
+            <h2 data-reveal-lines className="flex flex-col whitespace-nowrap text-[16.41vw] font-medium leading-[16.67vw] tracking-[-0.06em] text-black sm:text-[7.8125vw] sm:font-medium sm:leading-[7.344vw] sm:tracking-[-0.06em]">
               <span className="relative">P<span className="font-normal text-[#F600A9] sm:font-medium sm:text-[#e3009c]">l</span>atform</span>
               <span className="relative">Mind<span className="hidden translate-x-1 pr-[3px] sm:inline-block"><span className="block h-3 w-12 bg-[#e3009c] sm:h-[0.63vw] sm:w-[3.7vw]"></span></span><span className="font-normal text-[#F600A9] sm:hidden">_</span>set</span>
             </h2>

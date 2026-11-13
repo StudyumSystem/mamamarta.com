@@ -317,7 +317,14 @@ function Visual({ entry, active }) {
   const v = entry.visual;
   const s = SLIDE[entry.id];
   const size = { width: px(s.w), height: px(s.h) };
-  if (v.kind === "halftone-m") return <div style={size}><HalftoneM label={v.alt} className="block h-full w-full" /></div>;
+  // 14 Nov (Marta: "один в один"): in her frame MM-HOME-001 the solid M is about 492 x 454, its right edge at 1580 and
+  // its top at 2462, so the code M is drawn at 0.89 of the slide box and moved right; the box and the gaps stay
+  if (v.kind === "halftone-m")
+    return (
+      <div className="relative" style={size}>
+        <HalftoneM label={v.alt} className="absolute block" style={{ left: px(122), top: px(14), width: px(646), height: px(700) }} />
+      </div>
+    );
   if (v.kind === "video") {
     const src = phoneCopy(v.src, "-phone.mp4");
     const poster = phoneCopy(v.src, "-phone-poster.webp");

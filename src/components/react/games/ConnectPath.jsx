@@ -27,6 +27,43 @@ const INSTRUCTIONS = "Connect all the dots in one continuous path. Don't skip a 
 
 const STEPS = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 
+// 13 Nov (Marta): a dot that joins the path moves like a water drop on a flat surface, a little amorphous, then
+// settles back into a circle. Its outline is a circle whose radius ripples (2nd and 3rd harmonics) with a damped
+// wobble; `amp` is smaller when dots are joined quickly, so a fast drag stays calm.
+const WOBBLE_MS = 900;
+const blobPath = (cx, cy, r, amp, t, seed) => {
+  const N = 28;
+  let d = "";
+  for (let k = 0; k < N; k++) {
+    const th = (k / N) * Math.PI * 2;
+    const rr = r * (1 + amp * (0.6 * Math.sin(2 * th + seed + t * 9) + 0.4 * Math.sin(3 * th - seed * 1.7 - t * 7)));
+    d += `${k ? "L" : "M"}${(cx + rr * Math.cos(th)).toFixed(2)},${(cy + rr * Math.sin(th)).toFixed(2)}`;
+  }
+  return d + "Z";
+};
+
+function DropDot({ cx, cy, fill, wobble, className }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!wobble || prefersReducedMotion()) return;
+    const el = ref.current;
+    const seed = Math.random() * 6.28;
+    const t0 = performance.now();
+    let raf = 0;
+    const tick = (now) => {
+      const t = (now - t0) / WOBBLE_MS;
+      if (t >= 1) { el.setAttribute("d", blobPath(cx, cy, R, 0, 0, 0)); return; }
+      // a quick swell, then a soft damped jiggle back to round
+      const env = Math.sin(Math.PI * Math.min(1, t * 2.2)) * 0.35 + Math.exp(-4 * t) * Math.abs(Math.sin(t * 14)) * 0.65;
+      el.setAttribute("d", blobPath(cx, cy, R * (1 + 0.12 * Math.exp(-5 * t) * Math.sin(t * 18)), wobble * env, t, seed));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [wobble, cx, cy]);
+  return <path ref={ref} d={blobPath(cx, cy, R, 0, 0, 0)} fill={fill} className={className} />;
+}
+
 function walk() {
   const start = [Math.floor(Math.random() * BOARD), Math.floor(Math.random() * BOARD)];
   const path = [start];
@@ -84,6 +121,8 @@ export default function ConnectPath({ open, onClose }) {
   const pathRef = useRef([]);
   const dragging = useRef(false);
   const lastPoint = useRef(null);
+  const [drops, setDrops] = useState({}); // dot index -> { amp, n } for its water-drop wobble
+  const lastJoin = useRef(0);
   const svgRef = useRef(null);
   const timers = useRef([]);
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
@@ -102,7 +141,9 @@ export default function ConnectPath({ open, onClose }) {
     setPhase("play");
     setBest(false);
     setFinish(null);
+    setDrops({});
     startedAt.current = 0;
+    lastJoin.current = 0;
   }, []);
 
   // Back or close discards the path; reopening starts a fresh layout.
@@ -129,6 +170,11 @@ export default function ConnectPath({ open, onClose }) {
       const next = [...p, i];
       if (!startedAt.current) startedAt.current = performance.now();
       commit(next);
+      // slow joins wobble fully, quick ones (a fast drag) only a little
+      const now = performance.now(), gap = lastJoin.current ? now - lastJoin.current : 1000;
+      lastJoin.current = now;
+      const amp = 0.08 + 0.14 * Math.min(1, Math.max(0, (gap - 80) / 420));
+      setDrops((s) => ({ ...s, [i]: { amp, n: (s[i]?.n || 0) + 1 } }));
       if (next.length === DOTS) {
         dragging.current = false;
         const ms = performance.now() - startedAt.current;
@@ -261,6 +307,19 @@ export default function ConnectPath({ open, onClose }) {
                 </g>
                 {layout.dots.map((d, i) => {
                   const k = at.get(i);
+                  if (k != null) {
+                    const dr = drops[i];
+                    return (
+                      <DropDot
+                        key={`${d.r}-${d.c}-${dr?.n || 0}`}
+                        cx={(d.c + 0.5) * UNIT}
+                        cy={(d.r + 0.5) * UNIT}
+                        fill={k === 0 ? shade(0) : `url(#cp-g${i})`}
+                        wobble={k === 0 ? 0 : dr?.amp || 0}
+                        className={finish === "burst" ? "mm-dot-out" : undefined}
+                      />
+                    );
+                  }
                   return (
                     <circle
                       key={`${d.r}-${d.c}`}

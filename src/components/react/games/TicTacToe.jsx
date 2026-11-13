@@ -124,7 +124,7 @@ let xVideoPhone = false;
 let xVideoLoading = null;
 function preloadX() {
   if (xVideoUrl || xVideoLoading || typeof fetch === "undefined") return;
-  const phone = isPhone();
+  const phone = true; // 13 Nov: the white-baked copy everywhere (see Symbol)
   xVideoLoading = fetch(phone ? PHONE_X.video : X_VIDEO)
     .then((r) => (r.ok ? r.blob() : null))
     .then((b) => { if (b) { xVideoUrl = URL.createObjectURL(b); xVideoPhone = phone; } })
@@ -136,8 +136,10 @@ function preloadX() {
 // a white square with the figure on it, that's all, no greyish shades"): the videos' near-white background is
 // lifted to pure white first (the mm-ttt-dark filter below), so it vanishes on the white square, and only then
 // the figure's mid-tones are deepened. (The first try only deepened, which turned that near-white grey.)
+// 13 Nov (Marta, voice: pure white #FFFFFF everywhere, animations on pure white too): the computer now plays the
+// same white-baked copies as the phone (no blend or filter, which Safari on a Mac doesn't apply to a video either).
 const Symbol = ({ who, hop = null }) => {
-  const phone = isPhone();
+  const phone = true;
   const x = phone ? PHONE_X : { video: X_VIDEO, poster: X_SRC };
   const xSrc = xVideoUrl && xVideoPhone === phone ? xVideoUrl : x.video;
   return (
@@ -316,7 +318,7 @@ export default function TicTacToe({ open, onClose }) {
                   onClick={() => play(i)}
                   disabled={!!v || busy}
                   aria-label={v ? (v === "X" ? "X" : "Apple") : `Empty square ${i + 1}`}
-                  className={`flex min-h-0 min-w-0 items-center justify-center ${k >= 0 ? "overflow-visible" : "overflow-hidden"} ${v ? "bg-white" : "bg-white lg:bg-[#F0F0F0]"} ${
+                  className={`flex min-h-0 min-w-0 items-center justify-center ${k >= 0 ? "overflow-visible" : "overflow-hidden"} bg-white ${
                     !v && !busy ? "cursor-pointer" : "cursor-default"
                   }`}
                 >

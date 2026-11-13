@@ -11,7 +11,7 @@ import { sendStars } from "../forms/submitForm.js";
 // with the music button (sound on/off) and the MM✦ count on the right; Back during a round asks
 // "Leave the game?"; every round ends on a score screen with a timer line, then the quote screen with MM✦STARS.
 // On the phone the game panel is pure white #FFFFFF (Marta, 12 Nov, her iPhone: "the background is grey"); the
-// computer keeps her #F0F0F0.
+// computer keeps her #F0F0F0. 13 Nov (Marta, voice): pure white #FFFFFF on the computer too, animations included.
 
 export const PINK = "#F600A9";
 
@@ -415,7 +415,7 @@ export default function GameModal({
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={`absolute inset-x-[20px] top-[28px] bottom-[28px] flex flex-col overflow-y-auto outline-none lg:top-0 lg:bottom-0 ${game ? `bg-white lg:bg-[#F0F0F0] ${GAME_PANEL_X}` : "bg-white lg:inset-x-[13.542%]"}`}
+        className={`absolute inset-x-[20px] top-[28px] bottom-[28px] flex flex-col overflow-y-auto outline-none lg:top-0 lg:bottom-0 ${game ? `bg-white ${GAME_PANEL_X}` :"bg-white lg:inset-x-[13.542%]"}`}
         style={{ "--mm-u": STAGE_UNIT, "--mm-p": "min(100vw / 1920, 100vh / 1019)" }}
       >
         {/* A game's text on the computer (12 Nov 13:35, Marta: the top text "looks uneven" against the board, in

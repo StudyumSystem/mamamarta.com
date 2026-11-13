@@ -2,8 +2,7 @@ import { useEffect, useRef } from "react";
 
 // Word Hunt's letter M drawn in code, in place of m.mp4 (Marta, 13 Nov: "щоб оці точки вони бігали по всьому
 // периметру, по цих зіг загах ... плавно перетікали від одного краю до іншого, і навпаки ... на луп ... м'яка,
-// органічна ... мікроорганізм ... живе і дихає"). Her solid M (traced from her picture of 13 Nov 21:53; her SVG
-// replaces SHAPE when it comes) with a halftone halo of dots round its whole outline: the halo breathes, two swells
+// органічна ... мікроорганізм ... живе і дихає"). Her solid M (her M.svg) with a halftone halo of dots round its whole outline: the halo breathes, two swells
 // run along the outline from one foot to the other and back, and it hangs heavier below, as in her video.
 // Drawn in the video's 720 x 782 frame, where her M stood (85-635 across, from 122 down), and cut to its box the
 // way the video was (object-cover), so nothing around it moves.
@@ -12,11 +11,13 @@ const FRAME_H = 782;
 const M_X = 85;
 const M_Y = 122;
 const M_W = 550;
-// her M as a share of its width, from the left foot up and round
+// her M.svg (13 Nov, 246 x 227), from the left foot up and round, as a share of its width
+const SVG_W = 245.178;
 const SHAPE = [
-  [0, 0.922], [0, 0], [0.278, 0], [0.497, 0.622], [0.719, 0], [1, 0], [1, 0.922], [0.811, 0.922],
-  [0.811, 0.319], [0.603, 0.922], [0.394, 0.922], [0.189, 0.319], [0.189, 0.922],
-];
+  [0, 226.182], [0, 0], [68.9751, 0], [121.263, 151.966], [123.914, 151.966], [176.202, 0], [245.178, 0],
+  [245.178, 226.182], [198.793, 226.182], [198.793, 78.9648], [196.915, 78.9648], [148.382, 225.077],
+  [96.7958, 225.077], [48.2624, 78.4126], [46.3849, 78.4126], [46.3849, 226.182],
+].map(([x, y]) => [x / SVG_W, y / SVG_W]);
 const PITCH = 10.6; // the dot grid, turned 45° like a print screen
 const R_MAX = PITCH / 2;
 const REACH = 160; // the farthest a dot can ever be lit

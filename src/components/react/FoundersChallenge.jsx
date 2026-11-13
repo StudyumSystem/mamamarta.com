@@ -6,6 +6,7 @@ import ArtOfMoving from "./games/ArtOfMoving.jsx";
 import ConnectPath from "./games/ConnectPath.jsx";
 import ArrowIcon from "./ArrowIcon.jsx";
 import RollingCounter from "./RollingCounter.jsx";
+import HalftoneM from "./HalftoneM.jsx";
 
 // MM-HOME "The founder's challenge" (Marta's spec 01-home.md, frames MM-G01-00 … MM-G05-00, MM-C06 _Entry).
 // Desktop: text left, carousel right with 6 entries; autoplay for each entry's reading time in a loop (06 → 01), paused while the
@@ -51,7 +52,8 @@ const ENTRIES = [
     // her current Figma (12 Nov): the text box is 528 px wide on the computer (textW)
     text: "Some things are hiding in plain sight. You will find them fast, and then wonder how long they were there.",
     textW: "27.5vw",
-    visual: { kind: "video", src: "/assets/m.mp4", poster: "/assets/m-poster.webp", alt: "Letter M" },
+    // her M drawn in code instead of m.mp4 (Marta, 13 Nov: the dots run round the whole outline, alive): HalftoneM
+    visual: { kind: "halftone-m", alt: "Letter M" },
   },
   // 02-06: her updated texts (kept Figma copy, 12 Nov: the "Homepage / Slider Position" frames of MM-GAME-02 … 05
   // and MM-C06), Inter 22/34 -0.04em black 69%, text boxes 617 px wide (598 for The Art of Moving).
@@ -319,6 +321,7 @@ function Visual({ entry, active }) {
   const v = entry.visual;
   const s = SLIDE[entry.id];
   const size = { width: px(s.w), height: px(s.h) };
+  if (v.kind === "halftone-m") return <div style={size}><HalftoneM label={v.alt} className="block h-full w-full" /></div>;
   if (v.kind === "video") {
     const video = <LoopVideo src={v.src} poster={v.poster} alt={v.alt} active={active} className="block h-full w-full object-cover mix-blend-multiply brightness-[1.04] contrast-[1.08]" />;
     // The apple (Marta, 11 Nov 19:23 "too small", 19:42 "cut on the left"): its video has wide white around it,
@@ -393,7 +396,14 @@ function PhoneVisual({ entry }) {
   const style = { width: q(p.w), top: q(p.top + p.y), aspectRatio: p.ar };
   if (p.x) style.marginLeft = q(p.x);
   const box = { height: q(p.top + p.box + p.bottom) };
-  const src = v.kind === "video" ? v.src : v.video;
+  // the M in code sits exactly where its video copy did (same frame, same width)
+  if (v.kind === "halftone-m")
+    return (
+      <div className="relative -mx-[calc(var(--q)*20)] overflow-hidden bg-white" style={box}>
+        <HalftoneM label={v.alt} className="absolute left-1/2 block max-w-none -translate-x-1/2" style={{ ...style, height: q((p.w * 782) / 720) }} />
+      </div>
+    );
+  const src =v.kind === "video" ? v.src : v.video;
   // active={false}: the lazy loader (scripts/lazy-videos.js) fetches and plays it when it comes near
   return (
     <div className="relative -mx-[calc(var(--q)*20)] overflow-hidden bg-white" style={box}>

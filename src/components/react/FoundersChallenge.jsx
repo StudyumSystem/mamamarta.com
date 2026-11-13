@@ -158,27 +158,22 @@ function LoopVideo({ src, poster, alt, active, className, style }) {
 }
 
 // The Art of Moving card's figure (Marta, 10 Nov): her walk, her leap, the walk again, her stumble and rise,
-// one after another, all mirrored so the figure moves to the right. The two new clips have a light grey
-// background and a soft shadow: whitened and blended into the white card, edges pushed out of view.
-// Plays only while the card is on screen (and, on desktop, while it is the shown entry).
+// one after another, all mirrored so the figure moves to the right. Computer and phone play the same copies whose
+// white is in the pixels (scripts/make-phone-videos.mjs: the background pure #FFFFFF), with no blend or filter, so
+// they are white on every screen (Marta, 13 Nov: "Ніде не повинно бути ніяких сірих рамок... чистим і однорідним").
+// Her new card (13 Nov, MM-HOME-002 and MM-G04-00): the whole figure, head to shoes, with white space on both
+// sides. So each clip is drawn the card picture's full height, centred, and the white card fills the sides; its own
+// outer edge (where the leap and stumble clips have a thin line) is cut off by clip-path so only white meets white.
+// ar = the copy's width / height. Plays only while the card is on screen (and, on desktop, while it is shown).
 const MOVES = [
-  { src: "/assets/human-walking.mp4", fix: "" },
-  { src: "/assets/games/jump.mp4", fix: "mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)]" },
-  { src: "/assets/games/stumble.mp4", fix: "mix-blend-multiply [filter:brightness(1.18)_contrast(1.25)]" },
+  { src: "/assets/human-walking-phone.mp4", poster: "/assets/human-walking-phone-poster.webp", ar: "540 / 810" },
+  { src: "/assets/games/jump-phone.mp4", ar: "540 / 720" },
+  { src: "/assets/games/stumble-phone.mp4", ar: "540 / 720" },
 ];
 const MOVE_ORDER = [0, 1, 0, 2];
-// The phone (Marta, 12 Nov: "no animations"): the same walk, leap, walk, stumble, from copies whose white is in
-// the pixels (scripts/make-phone-videos.mjs: the computer's brightness / contrast baked in, the background pure
-// #FFFFFF), so no blend or filter is needed; iPhone Safari applies neither to a <video>.
-const PHONE_CLIPS = [
-  { src: "/assets/human-walking-phone.mp4", poster: "/assets/human-walking-phone-poster.webp", fix: "" },
-  { src: "/assets/games/jump-phone.mp4", fix: "" },
-  { src: "/assets/games/stumble-phone.mp4", fix: "" },
-];
 
-// phone: the phone copies above (the leap and stumble keep their 1.04 scale, which hides their thin side lines)
-function MovingFigure({ active = true, pos = "50% 0%", className = "", order = MOVE_ORDER, phone = false }) {
-  const clips = phone ? PHONE_CLIPS : MOVES;
+function MovingFigure({ active = true, className = "", order = MOVE_ORDER }) {
+  const clips = MOVES;
   const box = useRef(null);
   const vids = useRef([]);
   const [step, setStep] = useState(0);
@@ -220,15 +215,15 @@ function MovingFigure({ active = true, pos = "50% 0%", className = "", order = M
         <video
           key={m.src}
           ref={(v) => (vids.current[i] = v)}
-          poster={i === 0 ? m.poster || "/assets/human-walking-poster.webp" : undefined}
+          poster={m.poster}
           muted
           playsInline
           preload="none"
           aria-label={i === 0 ? "Walking figure" : undefined}
           aria-hidden={i === 0 ? undefined : "true"}
           onEnded={() => onEnded(i)}
-          className={`absolute inset-0 h-full w-full object-cover ${m.fix} ${i === order[step] ? "" : "opacity-0"}`}
-          style={{ transform: i > 0 ? "scale(-1.04, 1.04)" : "scaleX(-1)", objectPosition: pos }}
+          className={`absolute left-1/2 top-0 block h-full w-auto max-w-none bg-white object-cover [clip-path:inset(0.8%_2%)] ${i === order[step] ? "" : "opacity-0"}`}
+          style={{ aspectRatio: m.ar, transform: "translateX(-50%) scaleX(-1)" }}
         />
       ))}
     </div>
@@ -280,7 +275,7 @@ function WalkingCardPhone() {
   return (
     <div className="relative h-[calc(var(--q)*357)] w-[calc(var(--q)*278)] overflow-hidden rounded-[calc(var(--q)*19)] bg-black text-white">
       <div className="absolute left-[calc(var(--q)*11)] top-[calc(var(--q)*11)] w-[calc(var(--q)*256)] overflow-hidden rounded-[calc(var(--q)*13)] bg-white">
-        <MovingFigure pos="50% 20%" phone className="h-[calc(var(--q)*292)] w-full" />
+        <MovingFigure className="h-[calc(var(--q)*292)] w-full" />
       </div>
       <p className="absolute left-[calc(var(--q)*11)] top-[calc(var(--q)*308)] whitespace-nowrap text-[length:calc(var(--q)*14)] font-normal uppercase leading-[calc(var(--q)*20)] tracking-[-0.04em]">The Art of Moving</p>
       <p className="absolute left-[calc(var(--q)*11)] top-[calc(var(--q)*328)] whitespace-nowrap text-[length:calc(var(--q)*12)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-white/70">Keep moving. Collect the pink stars.</p>
@@ -297,7 +292,7 @@ function WalkingCard({ active }) {
   return (
     <div className="relative overflow-hidden bg-black text-left text-white" style={{ width: px(420), height: px(540), borderRadius: px(24) }}>
       <div className="absolute overflow-hidden bg-white" style={{ left: px(10), top: px(10), width: px(400), height: px(454), borderRadius: px(16) }}>
-        <MovingFigure active={active} pos="50% 0%" className="h-full w-full" />
+        <MovingFigure active={active} className="h-full w-full" />
       </div>
       <p className="absolute whitespace-nowrap font-normal uppercase" style={{ left: px(22), top: px(481), fontSize: px(22), lineHeight: px(21) }}>The Art of Moving</p>
       <p className="absolute whitespace-nowrap text-white/[.69]" style={{ left: px(22), top: px(509), fontSize: px(14), lineHeight: px(17) }}>Keep moving. Collect the pink stars.</p>
@@ -309,28 +304,31 @@ function WalkingCard({ active }) {
 function PlusKey({ video, active, className = "", style }) {
   const [ok, setOk] = useState(true);
   if (video)
-    return <LoopVideo src={video} poster="/assets/games/plus-key.png" alt="Black key with a plus sign" active={active} className={`object-contain mix-blend-multiply brightness-[1.04] contrast-[1.08] ${className}`} style={style} />;
+    return <LoopVideo src={phoneCopy(video, "-phone.mp4")} poster={phoneCopy(video, "-phone-poster.webp")} alt="Black key with a plus sign" active={active} className={`bg-white object-contain ${className}`} style={style} />;
   if (!ok) return <div className={className} style={style} aria-hidden="true" />;
   return <img src="/assets/games/plus-key.png" alt="Black key with a plus sign" onError={() => setOk(false)} className={`object-contain ${className}`} style={style} />;
 }
 
-// Desktop: each picture at its size in her frame (SLIDE); the videos' light background melts into the white
-// page. The glove's video is drawn 2% wider than its box and cut to it, so the thin grey line along its edge
-// never shows.
+// Desktop: each picture at its size in her frame (SLIDE). The videos are the copies with pure #FFFFFF in the pixels
+// (the same brightness 1.04 / contrast 1.08 the computer used to apply, now baked in), with no blend or filter, so
+// they are white in every browser, Safari too (Marta, 13 Nov: "анімації також мають бути на чистобілим офоні").
+// The glove's video is drawn 2% wider than its box and cut to it, so the thin line along its edge never shows.
 function Visual({ entry, active }) {
   const v = entry.visual;
   const s = SLIDE[entry.id];
   const size = { width: px(s.w), height: px(s.h) };
   if (v.kind === "halftone-m") return <div style={size}><HalftoneM label={v.alt} className="block h-full w-full" /></div>;
   if (v.kind === "video") {
-    const video = <LoopVideo src={v.src} poster={v.poster} alt={v.alt} active={active} className="block h-full w-full object-cover mix-blend-multiply brightness-[1.04] contrast-[1.08]" />;
+    const src = phoneCopy(v.src, "-phone.mp4");
+    const poster = phoneCopy(v.src, "-phone-poster.webp");
+    const video = <LoopVideo src={src} poster={poster} alt={v.alt} active={active} className="block h-full w-full bg-white object-cover" />;
     // The apple (Marta, 11 Nov 19:23 "too small", 19:42 "cut on the left"): its video has wide white around it,
     // so its box is larger (SLIDE) and the whole video is shown, never cut; the box's white melts into the page.
     if (entry.id === "tic-tac-toe")
       return (
         <div style={size}>
           {/* its white right margin is cut off (the apple ends at 83% of the box), so the box never lies over the next card */}
-          <LoopVideo src={v.src} poster={v.poster} alt={v.alt} active={active} className="block h-full w-full object-contain mix-blend-multiply brightness-[1.04] contrast-[1.08] [clip-path:inset(0_12%_0_0)]" />
+          <LoopVideo src={src} poster={poster} alt={v.alt} active={active} className="block h-full w-full bg-white object-contain [clip-path:inset(0_12%_0_0)]" />
         </div>
       );
     if (entry.id !== "connect-the-path") return <div style={size}>{video}</div>;

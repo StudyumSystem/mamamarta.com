@@ -85,8 +85,9 @@ const NoteIcon = ({ off }) => (
     {off && <path d="M3 3l18 18" stroke={PINK} strokeWidth="2" strokeLinecap="round" />}
   </svg>
 );
+// It starts as on (sound is on unless the visitor turned it off), so it never shows "off" for a moment first.
 export function SoundButton({ className = "" }) {
-  const [on, setOn] = useState(false);
+  const [on, setOn] = useState(true);
   useEffect(() => {
     setOn(soundOn());
     const sync = (e) => setOn(!!e.detail?.on);
@@ -411,11 +412,11 @@ export default function GameModal({
 
   return (
     <div className="mm-fade-in fixed inset-0 z-50 font-[Inter]" role="dialog" aria-modal="true" aria-label={label}>
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-md" onClick={requestClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-md [touch-action:none]" onClick={requestClose} aria-hidden="true" />
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={`absolute inset-x-[20px] top-[28px] bottom-[28px] flex flex-col overflow-y-auto outline-none lg:top-0 lg:bottom-0 ${game ? `bg-white ${GAME_PANEL_X}` :"bg-white lg:inset-x-[13.542%]"}`}
+        className={`absolute inset-x-[20px] top-[28px] bottom-[28px] flex flex-col overflow-y-auto overscroll-none outline-none lg:top-0 lg:bottom-0 ${game ? `bg-white ${GAME_PANEL_X}` :"bg-white lg:inset-x-[13.542%]"}`}
         style={{ "--mm-u": STAGE_UNIT, "--mm-p": "min(100vw / 1920, 100vh / 1019)" }}
       >
         {/* A game's text on the computer (12 Nov 13:35, Marta: the top text "looks uneven" against the board, in
@@ -491,8 +492,12 @@ export default function GameModal({
             <span className={`${phoneCounter} self-end px-[15px] text-[16px] leading-[20px] font-normal text-black/70 lg:hidden`} aria-live="polite">{counter}</span>
           )
         )}
-        {/* a stage game sizes its play area by --mm-u itself, so only the other screens are zoomed down */}
-        <div className="flex flex-1 flex-col" style={fit < 1 && !stage ? { zoom: fit } : undefined}>{children}</div>
+        {/* a stage game sizes its play area by --mm-u itself, so only the other screens are zoomed down.
+            Phone (14 Nov, Marta: "many games don't fit the full screen ... there must be no scrolling while you play
+            a game"): this part takes exactly the height the screen leaves between the top rows and Back, and is the
+            box the games measure (100cqh = its height): each board is sized to fit it whole, so the panel never
+            scrolls. Type keeps its sizes; only the board grows or shrinks with the screen. */}
+        <div className="flex flex-1 flex-col max-lg:min-h-0 max-lg:[container-type:size]" style={fit < 1 && !stage ? { zoom: fit } : undefined}>{children}</div>
         <div className="flex justify-center pb-[20px] pt-6 lg:hidden">
           <BackLink onClick={requestClose} game={game} />
         </div>

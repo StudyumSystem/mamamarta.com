@@ -119,16 +119,26 @@ const APPLE_VIDEO = "/assets/apple.mp4";
 const isPhone = () => typeof window !== "undefined" && !window.matchMedia?.("(min-width: 1024px)").matches;
 const PHONE_X = { video: "/assets/games/ttt-x-phone.mp4", poster: "/assets/games/ttt-x-phone-poster.webp" };
 const PHONE_APPLE = { video: "/assets/games/ttt-apple-phone.mp4", poster: "/assets/games/ttt-apple-phone-poster.webp" };
-let xVideoUrl = null;
-let xVideoPhone = false;
-let xVideoLoading = null;
-function preloadX() {
-  if (xVideoUrl || xVideoLoading || typeof fetch === "undefined") return;
-  const phone = true; // 13 Nov: the white-baked copy everywhere (see Symbol)
-  xVideoLoading = fetch(phone ? PHONE_X.video : X_VIDEO)
-    .then((r) => (r.ok ? r.blob() : null))
-    .then((b) => { if (b) { xVideoUrl = URL.createObjectURL(b); xVideoPhone = phone; } })
-    .catch(() => {});
+// 14 Nov (Marta, her iPhone: "when you place the X, it blinks. This must not happen"). Three things blinked:
+// - every square was a disabled button while Apple "thinks", and iPhone Safari draws a disabled button at 40%
+//   opacity: the whole board went pale for that moment and came back. The squares are no longer disabled (a tap
+//   then is simply not taken, as before).
+// - a new symbol was a bare <video>: empty until its poster had loaded, then the poster, then a flash as the
+//   video took over. Now her poster (the video's own first frame) is a picture already loaded when the game opens,
+//   always under the video, and the video shows only once it is really playing, so the poster and the moving
+//   symbol meet without a gap.
+// - an X placed before her video had come into memory kept the address it was given, and the next turn changed
+//   it to the copy in memory, which reloaded that X. Each symbol now keeps the address it started with.
+const loaded = {}; // video file -> its copy in memory
+function preload() {
+  if (typeof fetch === "undefined") return;
+  for (const s of [PHONE_X, PHONE_APPLE]) {
+    if (!(s.video in loaded)) {
+      loaded[s.video] = null;
+      fetch(s.video).then((r) => (r.ok ? r.blob() : null)).then((b) => { if (b) loaded[s.video] = URL.createObjectURL(b); }).catch(() => {});
+    }
+    if (!loaded[s.poster]) { const i = new Image(); i.src = s.poster; loaded[s.poster] = i; }
+  }
 }
 
 // hop: a winning symbol jumps (12 Nov). The jump is on the video itself, so it still melts into the square.
@@ -139,22 +149,41 @@ function preloadX() {
 // 13 Nov (Marta, voice: pure white #FFFFFF everywhere, animations on pure white too): the computer now plays the
 // same white-baked copies as the phone (no blend or filter, which Safari on a Mac doesn't apply to a video either).
 const Symbol = ({ who, hop = null }) => {
-  const phone = true;
-  const x = phone ? PHONE_X : { video: X_VIDEO, poster: X_SRC };
-  const xSrc = xVideoUrl && xVideoPhone === phone ? xVideoUrl : x.video;
+  const s = who === "X" ? PHONE_X : PHONE_APPLE;
+  const [src] = useState(() => loaded[s.video] || s.video); // never changes while the symbol is on the board
+  const [live, setLive] = useState(false);
+  const vRef = useRef(null);
+  useEffect(() => {
+    const v = vRef.current;
+    if (!v) return;
+    // shown once a frame of it is on the screen: playing, and its time has moved on from the start
+    const on = () => { if (!v.paused && v.currentTime > 0) setLive(true); };
+    v.addEventListener("timeupdate", on);
+    v.play?.().catch(() => {}); // a phone in low-power mode may refuse; the poster then stays, still and whole
+    return () => v.removeEventListener("timeupdate", on);
+  }, []);
+  const fit = "absolute inset-0 h-full w-full object-contain";
   return (
-    <video
-      src={who === "X" ? xSrc : phone ? PHONE_APPLE.video : APPLE_VIDEO}
-      poster={who === "X" ? x.poster : phone ? PHONE_APPLE.poster : APPLE_SRC}
+    <span
+      className={`${hop ? "mm-hop" : "mm-symbol"} relative block ${who === "X" ? "h-[80%] w-[80%]" : "h-full w-full"}`}
+      style={{ clipPath: "inset(3%)", ...(hop ? { "--delay": hop } : null) }}
+      role="img"
       aria-label={who === "X" ? "X" : "Apple"}
-      muted
-      autoPlay
-      loop
-      playsInline
-      preload="auto"
-      className={`${hop ? "mm-hop" : "mm-symbol"} object-contain ${phone ? "" : "mix-blend-multiply"} ${who === "X" ? "h-[80%] w-[80%]" : "h-full w-full"}`}
-      style={{ clipPath: "inset(3%)", ...(phone ? null : { filter: "url(#mm-ttt-dark)" }), ...(hop ? { "--delay": hop } : null) }}
-    />
+    >
+      <img src={s.poster} alt="" className={fit} draggable={false} />
+      <video
+        ref={vRef}
+        src={src}
+        muted
+        autoPlay
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        className={fit}
+        style={{ opacity: live ? 1 : 0 }}
+      />
+    </span>
   );
 };
 
@@ -216,7 +245,7 @@ export default function TicTacToe({ open, onClose }) {
   }, []);
 
   // Back or close resets an unfinished round; reopening starts with an empty 3x3 board.
-  useEffect(() => { if (open) { preloadX(); rounds.current = 0; reset(3); } return clearTimers; }, [open, reset]);
+  useEffect(() => { if (open) { preload(); rounds.current = 0; reset(3); } return clearTimers; }, [open, reset]);
 
   // 12 Nov 04:02 (Marta: "mix the grid at random, so it's more fun: first 3x3, the next round 4x4, then random"):
   // the second round is always 4x4, every round after that 3x3 or 4x4 by chance.
@@ -303,7 +332,7 @@ export default function TicTacToe({ open, onClose }) {
               the top (MM-G03-02 _Desktop_4*4 _Grid). On the phone both stay 310 wide, as her two phone frames. */}
           <div
             ref={boardRef}
-            className={`${fx === "fade" ? "mm-fade-out" : ""} relative grid aspect-square w-[92.8%] max-w-[420px] ${size === 4 ? "grid-cols-4 grid-rows-4 lg:w-[calc(700*var(--mm-u))]" : "grid-cols-3 grid-rows-3 lg:w-[calc(525*var(--mm-u))]"} gap-px border border-[#969696] bg-[#969696] lg:pointer-events-auto lg:max-w-none`}
+            className={`${fx === "fade" ? "mm-fade-out" : ""} relative grid aspect-square w-[min(92.8%,calc(100cqh-64px))] max-w-[420px] ${size === 4 ? "grid-cols-4 grid-rows-4 lg:w-[calc(700*var(--mm-u))]" : "grid-cols-3 grid-rows-3 lg:w-[calc(525*var(--mm-u))]"} gap-px border border-[#969696] bg-[#969696] lg:pointer-events-auto lg:max-w-none`}
             style={fx === "fade" ? { animationDuration: "850ms" } : undefined}
             role="grid"
             aria-label={`Tic-Tac-Toe board, ${size} by ${size}`}
@@ -316,7 +345,7 @@ export default function TicTacToe({ open, onClose }) {
                   key={`${size}-${i}`}
                   type="button"
                   onClick={() => play(i)}
-                  disabled={!!v || busy}
+                  aria-disabled={!!v || busy}
                   aria-label={v ? (v === "X" ? "X" : "Apple") : `Empty square ${i + 1}`}
                   className={`flex min-h-0 min-w-0 items-center justify-center ${k >= 0 ? "overflow-visible" : "overflow-hidden"} bg-white ${
                     !v && !busy ? "cursor-pointer" : "cursor-default"

@@ -268,7 +268,7 @@ export default function WordHunt({ open, onClose }) {
             onPointerCancel={onUp}
             role="grid"
             aria-label={`Word Hunt letter grid, ${found.length} of ${COUNT} words found${found.length ? `: ${found.join(", ")}` : ""}`}
-            className={`${finish === "fade" ? "mm-fade-out" : ""} relative grid w-full max-w-[640px] select-none grid-cols-10 gap-px border [container-type:inline-size] [touch-action:none] lg:pointer-events-auto lg:w-[calc(739*var(--mm-u))] lg:max-w-none ${
+            className={`${finish === "fade" ? "mm-fade-out" : ""} relative grid w-[min(100%,calc(100cqh-51px))] max-w-[640px] select-none grid-cols-10 gap-px border [container-type:inline-size] [touch-action:none] lg:pointer-events-auto lg:w-[calc(739*var(--mm-u))] lg:max-w-none ${
               Array.isArray(finish) ? "border-transparent bg-transparent" : "border-[#d4d4d4] bg-[#d4d4d4]"
             }`}
           >

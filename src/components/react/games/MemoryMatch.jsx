@@ -149,7 +149,7 @@ export default function MemoryMatch({ open, onClose }) {
           {/* her MM-G02-01 / -02 at 1920 x 1019: five cards of 125 x 159.5 a row, 16 apart, rows 22 apart (689 wide),
               198 from the panel's top; on the computer in her frame's px measured against the screen's height
               (--mm-u, GameModal), so the cards take the share of the height hers do on every screen (12 Nov) */}
-          <div ref={gridRef} className={`${phase === "fade" ? "mm-fade-out" : ""} relative grid w-full max-w-[640px] grid-cols-4 gap-[6px] lg:pointer-events-auto lg:w-[calc(689*var(--mm-u))] lg:max-w-none lg:grid-cols-5 lg:gap-x-[calc(16*var(--mm-u))] lg:gap-y-[calc(22*var(--mm-u))]`}>
+          <div ref={gridRef} className={`${phase === "fade" ? "mm-fade-out" : ""} relative grid w-[min(100%,calc((100cqh-74px)/1.6+18px))] max-w-[640px] grid-cols-4 gap-[6px] lg:pointer-events-auto lg:w-[calc(689*var(--mm-u))] lg:max-w-none lg:grid-cols-5 lg:gap-x-[calc(16*var(--mm-u))] lg:gap-y-[calc(22*var(--mm-u))]`}>
             {deck.map((card, i) => {
               const faceUp = phase !== "play" || matched.has(i) || up.includes(i);
               const f = phase === "burst" && fly?.[i];

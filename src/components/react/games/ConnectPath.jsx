@@ -284,8 +284,8 @@ export default function ConnectPath({ open, onClose }) {
                 onPointerCancel={onUp}
                 role="img"
                 aria-label={`Connect the Path, ${path.length} of ${DOTS} dots connected`}
-                className="block select-none [touch-action:none] [--s:min(14vw,70px)] lg:[--s:calc(115*var(--mm-u))]"
-                style={{ width: `calc(${layout.cols} * var(--s))`, height: `calc(${layout.rows} * var(--s))` }}
+                className="block select-none [touch-action:none] [--s:min(14vw,70px,calc((100cqh-64px)/var(--rows)))] lg:[--s:calc(115*var(--mm-u))]"
+                style={{ "--rows": layout.rows, width: `calc(${layout.cols} * var(--s))`, height: `calc(${layout.rows} * var(--s))` }}
               >
                 <defs>
                   <filter id="cp-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7" /></filter>

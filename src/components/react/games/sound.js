@@ -5,9 +5,22 @@
 // iPhone: Web Audio is silent until it is started inside a tap, and the ring/silent switch mutes it as "ambient"
 // sound. So the page asks for "playback" audio (navigator.audioSession, Safari 16.4+) before the context is made,
 // and the visitor's first tap anywhere starts the context and plays one silent sample, which unlocks it.
+// 14 Nov (Marta, her iPhone, again: "no sound in any of the games"). What was missing:
+// - navigator.audioSession exists only in Safari 16.4 and later, and not in every app's built-in browser (a link
+//   opened inside Telegram), so there the ring/silent switch still muted the tones. The one way that works
+//   everywhere on iPhone: inside a tap, also start a looping, truly silent <audio> clip (at normal volume; a
+//   muted or volume-0 one doesn't count). While a media element plays, iPhone treats the page's sound as playback,
+//   and Web Audio is heard with the switch on silent too. It runs only while a game is open and the page is in
+//   view, and stops when the sound is turned off.
+// - the taps listened to stopped once the first one had unlocked sound, so when iPhone later paused the sound
+//   (the page in the background, a call, the screen locked: the "interrupted" state), nothing could start it
+//   again: resume() outside a tap is refused. Every tap now checks and restarts it, and coming back to the page
+//   tries too.
+// - pointerdown from a finger is not a tap iPhone accepts for sound; touchend, click and keys are.
 const KEY = "mm-sound";
 let ctx = null;
-let unlocked = false;
+let tag = null; // the silent <audio>
+let inGame = false; // a game's window is open (GameModal's "mm-modal")
 
 export function soundOn() {
   try { return localStorage.getItem(KEY) !== "off"; } catch { return true; }
@@ -17,6 +30,7 @@ export function setSound(on) {
   try { localStorage.setItem(KEY, on ? "on" : "off"); } catch { /* private mode: lasts this visit */ }
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("mm-sound", { detail: { on } }));
   if (on) unlock(); // the click that turns it on also unlocks audio on iPhone
+  else tag?.pause();
 }
 
 function audio() {
@@ -31,27 +45,64 @@ function audio() {
   return ctx;
 }
 
-// Inside a tap: start the context and play one silent sample (what iPhone needs to let sound out).
+// Half a second of silence as a WAV (8 kHz, 16-bit, every sample 0), made here: no file to load.
+function silentWav() {
+  const n = 4000, b = new DataView(new ArrayBuffer(44 + n * 2));
+  const s = (o, t) => { for (let i = 0; i < t.length; i++) b.setUint8(o + i, t.charCodeAt(i)); };
+  s(0, "RIFF"); b.setUint32(4, 36 + n * 2, true); s(8, "WAVEfmt "); b.setUint32(16, 16, true);
+  b.setUint16(20, 1, true); b.setUint16(22, 1, true); b.setUint32(24, 8000, true); b.setUint32(28, 16000, true);
+  b.setUint16(32, 2, true); b.setUint16(34, 16, true); s(36, "data"); b.setUint32(40, n * 2, true);
+  let bin = "";
+  const u = new Uint8Array(b.buffer);
+  for (let i = 0; i < u.length; i++) bin += String.fromCharCode(u[i]);
+  return `data:audio/wav;base64,${btoa(bin)}`;
+}
+
+// The silent clip playing (inside a tap only; outside one iPhone refuses, which is harmless).
+function holdPlayback() {
+  if (!inGame || document.hidden || !soundOn()) return;
+  try {
+    if (!tag) {
+      tag = document.createElement("audio");
+      tag.setAttribute("playsinline", "");
+      tag.setAttribute("x-webkit-airplay", "deny");
+      tag.loop = true;
+      tag.preload = "auto";
+      tag.src = silentWav();
+    }
+    if (tag.paused) tag.play().catch(() => {});
+  } catch { /* never let a sound break the page */ }
+}
+
+// Inside a tap: the silent clip, the context started (or restarted after iPhone paused it) and one silent sample
+// played through it, which is what iPhone needs to let Web Audio out.
 function unlock() {
+  if (!soundOn()) return;
+  holdPlayback();
   const ac = audio();
-  if (!ac || unlocked) return;
+  if (!ac) return;
   try {
     const src = ac.createBufferSource();
     src.buffer = ac.createBuffer(1, 1, ac.sampleRate);
     src.connect(ac.destination);
     src.start(0);
-    if (ac.state === "running") unlocked = true;
-    else ac.resume().then(() => { unlocked = ac.state === "running"; }).catch(() => {});
   } catch { /* never let a sound break the page */ }
 }
 
 if (typeof window !== "undefined") {
-  const first = () => {
-    if (!soundOn()) return;
-    unlock();
-    if (unlocked) for (const t of ["touchend", "pointerdown", "click", "keydown"]) window.removeEventListener(t, first, true);
+  // window, capture: the first to hear every tap, before any game's own handler
+  for (const t of ["touchend", "click", "keydown"]) window.addEventListener(t, unlock, { capture: true, passive: true });
+  window.addEventListener("mm-modal", (e) => {
+    inGame = !!e.detail?.open;
+    if (inGame) holdPlayback(); else tag?.pause();
+  });
+  const back = () => {
+    if (document.hidden) { tag?.pause(); return; }
+    holdPlayback();
+    if (ctx && ctx.state !== "running" && soundOn()) ctx.resume().catch(() => {});
   };
-  for (const t of ["touchend", "pointerdown", "click", "keydown"]) window.addEventListener(t, first, { capture: true, passive: true });
+  document.addEventListener("visibilitychange", back);
+  window.addEventListener("pageshow", back);
 }
 
 // One soft tone: quick attack, exponential fade, optional glide.

@@ -296,6 +296,15 @@ body {
 	from { transform: skewY(-0.3999deg) scaleY(1.022); }
 	to { transform: skewY(0.3999deg) scaleY(0.978); }
 }
+/* The same sway for her two phone cable pieces (14 Nov): each piece sets its own transform-origin (its end behind
+   the button) and --sk, the skew that keeps its far end on the line between its ends, so both ends stay put. */
+.mm-wire-sway-v {
+	animation: mm-wire-sway-v 6.5s ease-in-out infinite alternate;
+}
+@keyframes mm-wire-sway-v {
+	from { transform: skewY(var(--sk)) scaleY(1.022); }
+	to { transform: skewY(calc(var(--sk) * -1)) scaleY(0.978); }
+}
 
 /* Marta's "experience" (What is heading): her Figma's Inter Italic 400 is Inter 3.19's italic (flat e and c
    endings, the upright letters slanted); the site's Inter (4.x, fontsource) draws its italic differently.

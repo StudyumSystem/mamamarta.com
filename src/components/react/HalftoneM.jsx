@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 
 // Word Hunt's letter M drawn in code, in place of m.mp4 (Marta, 13 Nov: "щоб оці точки вони бігали по всьому
 // периметру, по цих зіг загах ... плавно перетікали від одного краю до іншого, і навпаки ... на луп ... м'яка,
-// органічна ... мікроорганізм ... живе і дихає"). Her solid M (her M.svg) with its halftone shadow as in her video
-// (see LAP below, 14 Nov).
+// органічна ... мікроорганізм ... живе і дихає"). Her M (her M.svg) dissolving into halftone as in her video
+// (see SOFT_MAX below, 14 Nov).
 // Drawn in the video's 720 x 782 frame, where her M stood (85-635 across, from 122 down), and cut to its box the
 // way the video was (object-cover), so nothing around it moves.
 const FRAME_W = 720;
@@ -19,22 +19,25 @@ const SHAPE = [
   [96.7958, 225.077], [48.2624, 78.4126], [46.3849, 78.4126], [46.3849, 226.182],
 ].map(([x, y]) => [x / SVG_W, y / SVG_W]);
 const PITCH = 9; // the dot grid, turned 45° like a print screen
-const R_MAX = PITCH / 2;
-const REACH = 150; // the farthest a dot can ever be lit
+const RB = 4.9; // a dot's radius at full cover (from 4.5 the dots close into solid black)
+const DOT_T = PITCH / Math.SQRT2 / 2; // neighbouring dots touch
+const DOT_A = Math.sqrt((PITCH * PITCH) / 2 / Math.PI); // a dot covering its whole cell's area
+const REACH = 115; // the farthest a dot can ever be lit
 const TAU = Math.PI * 2;
 // 14 Nov (Marta: "Анімація для букви М має бути така, як була, але вона перетікає по всьому периметру букви, від
-// одного краю до іншого. І так по колу... у мене повільні ритми анімації"): as in her m.mp4, the dots are the M's
-// soft shadow cast down and a little right (nothing above the letter), dense against it and thinning out. A slow
-// swell runs round the whole outline in one direction, one lap every LAP seconds, with a fainter one half a lap behind.
-const OFF_X = 12;
-const OFF_Y = 44;
-const SHADE = 0.66; // the shadow at its darkest: dots, never solid black
+// одного краю до іншого. І так по колу... у мене повільні ритми анімації"; her phone frame MM-HOME-002 and the
+// first frame of her m.mp4): the letter is crisp at the top and DISSOLVES into halftone towards its feet: inside it
+// white holes open, outside it dots spread, as if the M were blurred more and more downwards and printed. A slow
+// swell of that dissolve runs round the whole outline in one direction, one lap every LAP seconds, with a fainter
+// one half a lap behind; it also passes the top edge, lighter, then the edge is crisp again.
+const SOFT_MAX = 65; // how far the feet dissolve (her video: the cloud about 40 px past the letter)
+const SWELL = 40;
 const LAP = 16;
-// in her video the shadow is light at the top of the letter and deepest at its feet; the swell still shows on the
-// way round the top, fainter
 const M_H = (226.182 / SVG_W) * M_W;
+// crisp down to 30% of the letter, fully dissolved at its feet
+const Y_CRISP = M_Y + 0.3 * M_H;
 const ramp = (y) => {
-  const u = Math.min(1, Math.max(0, (y - (M_Y + 0.2 * M_H)) / (0.65 * M_H)));
+  const u = Math.min(1, Math.max(0, (y - Y_CRISP) / (0.7 * M_H)));
   return u * u * (3 - 2 * u);
 };
 
@@ -60,37 +63,38 @@ function geometry() {
     }
     return c;
   };
-  // each dot is measured against the shadow (the M moved down-right): its distance to each nearby side of it and the
-  // place on the outline it faces; a dot inside the shadow is full
-  const xs = [], ys = [], first = [], d = [], s = [], full = [];
-  for (let j = 0; j * (PITCH / 2) <= FRAME_H + PITCH; j++) {
-    const y = j * (PITCH / 2);
-    for (let x = (j % 2) * (PITCH / 2); x <= FRAME_W + PITCH; x += PITCH) {
-      if (inside(x, y)) continue;
-      const qx = x - OFF_X;
-      const qy = y - OFF_Y;
-      const at = d.length;
-      for (const e of edges) {
-        const t = Math.min(1, Math.max(0, ((qx - e.ax) * e.dx + (qy - e.ay) * e.dy) / (e.len * e.len)));
-        const dist = Math.hypot(qx - (e.ax + t * e.dx), qy - (e.ay + t * e.dy));
-        if (dist >= REACH) continue;
-        d.push(dist);
-        s.push(e.s0 + t * e.len);
-      }
-      if (d.length > at) {
-        xs.push(x);
-        ys.push(y);
-        first.push(at);
-        full.push(inside(qx, qy) ? 1 : 0);
+  // one grid of dots inside and outside the letter, so the dissolving part is one even print with no outline left
+  // in it. Each dot is measured against every nearby side of the letter: its distance and the place on the outline
+  // it faces. Inside, only below the crisp part (above it the letter is drawn solid).
+  const points = (inner) => {
+    const xs = [], ys = [], first = [], d = [], s = [];
+    for (let j = 0; j * (PITCH / 2) <= FRAME_H + PITCH; j++) {
+      const y = j * (PITCH / 2);
+      if (inner && y < Y_CRISP) continue;
+      for (let x = (j % 2) * (PITCH / 2); x <= FRAME_W + PITCH; x += PITCH) {
+        if (inside(x, y) !== inner) continue;
+        const at = d.length;
+        for (const e of edges) {
+          const t = Math.min(1, Math.max(0, ((x - e.ax) * e.dx + (y - e.ay) * e.dy) / (e.len * e.len)));
+          const dist = Math.hypot(x - (e.ax + t * e.dx), y - (e.ay + t * e.dy));
+          if (dist >= REACH) continue;
+          d.push(dist);
+          s.push(e.s0 + t * e.len);
+        }
+        if (d.length > at) {
+          xs.push(x);
+          ys.push(y);
+          first.push(at);
+        }
       }
     }
-  }
-  first.push(d.length);
-  GEO = {
-    P, L,
-    x: Float32Array.from(xs), y: Float32Array.from(ys), first: Uint32Array.from(first), full: Uint8Array.from(full),
-    d: Float32Array.from(d), s: Float32Array.from(s),
+    first.push(d.length);
+    return {
+      x: Float32Array.from(xs), y: Float32Array.from(ys), first: Uint32Array.from(first),
+      d: Float32Array.from(d), s: Float32Array.from(s),
+    };
   };
+  GEO = { P, L, out: points(false), inn: points(true) };
   return GEO;
 }
 
@@ -98,48 +102,60 @@ function draw(ctx, g, t, W, H) {
   const scale = Math.max(W / FRAME_W, H / FRAME_H);
   const ox = (W - FRAME_W * scale) / 2;
   const oy = (H - FRAME_H * scale) / 2;
-  const { P, L, x, y, first, full, d, s } = g;
-  const breath = 1 + 0.08 * Math.sin((TAU * t) / 7); // a slow breath
+  const { P, L, out, inn } = g;
+  const breath = 1 + 0.1 * Math.sin((TAU * t) / 7); // a slow breath
   const p1 = ((t / LAP) % 1) * L; // once round the outline every LAP s, always the same way
   const sig = L * 0.11;
   const near = (sv, p) => {
     const a = ((((sv - p) % L) + 1.5 * L) % L - L / 2) / sig; // the outline is closed: measured round it
     return Math.exp(-a * a);
   };
+  // how much of the dissolving letter covers a point: half on its outline, more inside, fading outside; crisp
+  // (all or nothing) where it doesn't dissolve
+  const cover = (set, i, inner) => {
+    const r = ramp(set.y[i]);
+    let best = inner ? 1 : 0;
+    for (let m = set.first[i]; m < set.first[i + 1]; m++) {
+      const sv = set.s[m];
+      const swell = near(sv, p1) + 0.45 * near(sv, p1 + L / 2);
+      const soft = (SOFT_MAX * r * breath + SWELL * swell * (0.35 + 0.65 * r)) * (1 + 0.06 * Math.sin(sv * 0.009 - t * 0.5));
+      if (soft < 1) continue;
+      const c = inner ? 0.5 + set.d[m] / (2 * soft) : 0.5 - set.d[m] / (2 * soft);
+      if (inner ? c < best : c > best) best = c;
+    }
+    return best;
+  };
+  // a printed halftone: a dot's area follows the cover; full dots overlap into solid black, and as the cover drops
+  // white opens between them
+  const dots = (set, inner) => {
+    for (let i = 0; i < set.x.length; i++) {
+      const c = cover(set, i, inner);
+      if (c <= 0.03) continue;
+      // the share of the cell the dot covers is the cover: apart up to 0.785 (dots touching), then they close up
+      const r = (c <= 0.785 ? DOT_A * Math.sqrt(c) : DOT_T + ((Math.min(1, c) - 0.785) / 0.215) * (RB - DOT_T)) * scale;
+      if (r < 0.35) continue;
+      const cx = ox + set.x[i] * scale;
+      const cy = oy + set.y[i] * scale;
+      ctx.moveTo(cx + r, cy);
+      ctx.arc(cx, cy, r, 0, TAU);
+    }
+  };
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, W, H);
-  ctx.beginPath();
-  for (let i = 0; i < x.length; i++) {
-    // how much of the soft shadow covers this dot: half at the shadow's outline, more inside it, fading outside
-    const inShadow = full[i] === 1;
-    let best = inShadow ? 1 : 0;
-    let at = 0;
-    for (let m = first[i]; m < first[i + 1]; m++) {
-      const sv = s[m];
-      const swell = near(sv, p1) + 0.45 * near(sv, p1 + L / 2);
-      const soft = (44 * breath + 34 * swell) * (1 + 0.06 * Math.sin(sv * 0.009 - t * 0.5));
-      const c = inShadow ? 0.5 + d[m] / (2 * soft) : 0.5 - d[m] / (2 * soft);
-      if (inShadow ? c < best : c > best) {
-        best = c;
-        at = swell;
-      }
-    }
-    best = SHADE * Math.min(1, best) * Math.max(ramp(y[i]), 0.7 * Math.min(1, at));
-    if (best <= 0.02) continue;
-    // a printed halftone: the dot's area follows the cover, so the dots are thick against the letter and thin out
-    // into single small dots, as in her video
-    const r = R_MAX * 1.2 * Math.sqrt(best) * scale;
-    if (r < 0.35) continue;
-    const cx = ox + x[i] * scale;
-    const cy = oy + y[i] * scale;
-    ctx.moveTo(cx + r, cy);
-    ctx.arc(cx, cy, r, 0, TAU);
-  }
   ctx.fillStyle = "#000";
-  ctx.fill();
+  // the crisp top of the letter, solid
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, W, oy + Y_CRISP * scale);
+  ctx.clip();
   ctx.beginPath();
   P.forEach(([px, py], i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, ox + px * scale, oy + py * scale));
   ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+  ctx.beginPath();
+  dots(inn, true);
+  dots(out, false);
   ctx.fill();
 }
 

@@ -9,7 +9,7 @@ import ArrowIcon from "./ArrowIcon";
 // (the picture over a pink square with "lighten": black becomes the pink, white stays white); the cable twice,
 // laid over the page with "multiply" so its white disappears; the two cables meet behind the button.
 // Phone (390 frame, --q): the same copy and order on white, her phone type (heading in three lines, 65 px
-// apart), body 252 wide, button 46 tall, the pink M and the cable's loops below.
+// apart), body 252 wide, button 46 tall; behind them her own phone layers (her pink M and two cable pieces).
 
 const PINK = "#fcd2f0";
 
@@ -78,6 +78,25 @@ const Cable = () => (
   </div>
 );
 
+// Phone (Marta, 14 Nov: her MM-HOME-002 What is screen, frame 1224:184): her own two cable pieces, exported at 3x
+// with their shadows (1224:185 the loop at the top right, 1224:190 the S with two loops down to the bottom left),
+// placed at her frame's numbers (390 frame, --q). They meet behind the button, as on the computer. Each sways
+// like the computer's cable: every point moves up or down by 2.2% of its distance from the line joining the
+// piece's two ends, so both ends stay where they are (origin = the end behind the button, --sk = the skew that
+// keeps the far end on that line). The pink light runs along each piece.
+const PhoneCable = ({ src, box, origin, sk }) => (
+  <div className="pointer-events-none absolute" aria-hidden="true" style={box}>
+    <div className="mm-wire-part mm-wire-sway-v absolute inset-0" style={{ transformOrigin: origin, "--sk": sk }}>
+      <img src={src} alt="" className="block h-full w-full max-w-none" />
+      <div
+        className="mm-wire-sheen absolute inset-0"
+        style={{ WebkitMaskImage: `url(${src})`, maskImage: `url(${src})` }}
+      />
+    </div>
+  </div>
+);
+const q = (n) => `calc(var(--q) * ${n})`;
+
 export default function WhatIsSection() {
   return (
     <section id="what-is" className="mm-phone-w relative overflow-hidden bg-white text-black">
@@ -104,13 +123,28 @@ export default function WhatIsSection() {
       </div>
 
       {/* Phone */}
-      <div className="relative h-[calc(var(--q)*844)] sm:hidden">
-        <PinkM
-          className="left-[calc(var(--q)*-24)] top-[calc(var(--q)*441)] h-[calc(var(--q)*455)] w-[calc(var(--q)*380)]"
+      <div className="relative h-[calc(var(--q)*844)] overflow-hidden sm:hidden">
+        {/* Her layer order: the top cable, her soft pink M over it, the lower cable, then the text. */}
+        <PhoneCable
+          src="/assets/what-is-cable-top-phone.png"
+          box={{ left: q(145.88), top: q(92), width: q(476.33), height: q(439) }}
+          origin="26.68% 69.02%"
+          sk="1.3256deg"
         />
-        <div className="pointer-events-none absolute left-[calc(var(--q)*-40)] top-[calc(var(--q)*430)] aspect-[16/9] w-[calc(var(--q)*820)]" aria-hidden="true">
-          <Cable />
-        </div>
+        {/* her pink M (Mask group 1224:186, its blur and fade already in the picture), 28 px of blur round her box */}
+        <img
+          src="/assets/what-is-m-phone.png"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute max-w-none"
+          style={{ left: q(-131), top: q(252), width: q(561), height: q(645.67) }}
+        />
+        <PhoneCable
+          src="/assets/what-is-cable-bottom-phone.png"
+          box={{ left: q(-106.55), top: q(336.32), width: q(588.33), height: q(645) }}
+          origin="65.15% 11.63%"
+          sk="2.1636deg"
+        />
         {/* MM-HOME-002, 13 Nov 21:46 UTC (iPhone 16 & 17 Pro - 8, one 844 screen, right after the first screen):
             heading Inter Medium 64/65 -0.06em at 14, 65 ("experience" stays her italic 400); body 14/20 -0.04em
             black 70% at 20, 280 in her three lines; button the full 350 x 46 at 20, 375, 16 semibold -0.023em */}

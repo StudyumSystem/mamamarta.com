@@ -323,7 +323,7 @@ export default function TicTacToe({ open, onClose }) {
         <ScoreScreen badge="Well played" label="Round completed" value={RESULT[outcome].value} stars={RESULT[outcome].stars} onDone={toQuote} />
       ) : (
         <div className={`flex flex-1 items-center justify-center overflow-clip px-[15px] py-8 lg:pointer-events-none lg:absolute lg:inset-0 lg:items-start lg:p-0 ${size === 4 ? "lg:pt-[calc(212*var(--mm-u))]" : "lg:pt-[calc(247*var(--mm-u))]"}`}>
-          {/* MM-G03-02 (11 Nov): 175 px squares at 1920, 1 px #969696 lines; played squares stay grey (Marta, 11 Nov 19:50).
+          {/* MM-G03-02 (11 Nov): 175 px squares at 1920, 1 px #969696 lines; empty squares grey, played squares white (her Active frame).
               4x4 (12 Nov): four squares a side; the board itself is square and splits into equal rows, so the lines
               stay straight when a square comes out at a fraction of a pixel.
               12 Nov (Marta: the board is smaller than in her design, "h?"): on the computer the board is placed as in
@@ -332,7 +332,7 @@ export default function TicTacToe({ open, onClose }) {
               the top (MM-G03-02 _Desktop_4*4 _Grid). On the phone both stay 310 wide, as her two phone frames. */}
           <div
             ref={boardRef}
-            className={`${fx === "fade" ? "mm-fade-out" : ""} relative grid aspect-square w-[min(92.8%,calc(100cqh-64px))] max-w-[420px] ${size === 4 ? "grid-cols-4 grid-rows-4 lg:w-[calc(700*var(--mm-u))]" : "grid-cols-3 grid-rows-3 lg:w-[calc(525*var(--mm-u))]"} gap-px border border-[#969696] bg-[#969696] lg:pointer-events-auto lg:max-w-none`}
+            className={`${fx === "fade" ? "mm-fade-out" : ""} relative grid aspect-square w-[min(310px,100%,calc(100cqh-64px))] max-w-[420px] ${size === 4 ? "grid-cols-4 grid-rows-4 lg:w-[calc(700*var(--mm-u))]" : "grid-cols-3 grid-rows-3 lg:w-[calc(525*var(--mm-u))]"} gap-px border border-[#969696] bg-[#969696] lg:pointer-events-auto lg:max-w-none`}
             style={fx === "fade" ? { animationDuration: "850ms" } : undefined}
             role="grid"
             aria-label={`Tic-Tac-Toe board, ${size} by ${size}`}
@@ -347,7 +347,9 @@ export default function TicTacToe({ open, onClose }) {
                   onClick={() => play(i)}
                   aria-disabled={!!v || busy}
                   aria-label={v ? (v === "X" ? "X" : "Apple") : `Empty square ${i + 1}`}
-                  className={`flex min-h-0 min-w-0 items-center justify-center ${k >= 0 ? "overflow-visible" : "overflow-hidden"} bg-white ${
+                  // her MM-G03-02 Desktop / Active (1161:862) and phone frame: empty squares the panel's #F0F0F0,
+                  // a played square white #FFFFFF, so the X and the apple sit on white with no edge (13 Nov 22:30)
+                  className={`flex min-h-0 min-w-0 items-center justify-center ${k >= 0 ? "overflow-visible" : "overflow-hidden"} ${v ? "bg-white" : "bg-[#F0F0F0]"} ${
                     !v && !busy ? "cursor-pointer" : "cursor-default"
                   }`}
                 >

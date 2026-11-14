@@ -10,8 +10,15 @@ import { sendStars } from "../forms/submitForm.js";
 // 11 Nov (her updated game frames MM-G01…G05, MM-confirmation_dialog): the game panel is light grey #F0F0F0,
 // with the music button (sound on/off) and the MM✦ count on the right; Back during a round asks
 // "Leave the game?"; every round ends on a score screen with a timer line, then the quote screen with MM✦STARS.
-// On the phone the game panel is pure white #FFFFFF (Marta, 12 Nov, her iPhone: "the background is grey"); the
-// computer keeps her #F0F0F0. 13 Nov (Marta, voice): pure white #FFFFFF on the computer too, animations included.
+// 13 Nov 22:30 (Marta, voice: "every game was in a pop-up window of a greyish colour... recreate everything as it
+// is in my Figma"): the game panel is her light grey #F0F0F0 popup again, on the computer and on the phone. Her
+// frames: computer MM-G0x Desktop 1400 x 1019 over the home dimmed 50% black and blurred; phone MM-G0x Mobile and
+// MM_Mobile _Confirmation 350 x 791, 20 px in from the sides and 28 px from the top and bottom, over the same dimmed
+// home. Inside it the white is hers only: the Word Hunt board, The Art of Moving card, played Tic-Tac-Toe squares
+// and Memory Match faces; the empty Tic-Tac-Toe squares are the panel's grey. The music button has her 1 px pink
+// edge. "Leave the game?" covers the panel only, with her white 78% veil. The phone panel never scrolls: the play
+// area takes the height left between the top rows and Back. (Before: 12-13 Nov the panel was made pure white, then
+// the whole phone screen; that is what she saw as not her design.)
 
 export const PINK = "#F600A9";
 
@@ -101,7 +108,7 @@ export function SoundButton({ className = "" }) {
       aria-pressed={on}
       aria-label={on ? "Sound on. Turn sound off" : "Sound off. Turn sound on"}
       title={on ? "Sound on" : "Sound off"}
-      className={`inline-flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[1px] bg-[#FEF6FB] transition-colors hover:bg-[#fde3f3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F600A9] lg:h-[clamp(40px,2.6vw,50px)] lg:w-[clamp(40px,2.6vw,50px)] ${className}`}
+      className={`inline-flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[1px] border border-[#F600A9] bg-[#FEF6FB] transition-colors hover:bg-[#fde3f3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F600A9] lg:h-[clamp(40px,2.6vw,50px)] lg:w-[clamp(40px,2.6vw,50px)] ${className}`}
     >
       <NoteIcon off={!on} />
     </button>
@@ -123,7 +130,7 @@ function LeaveDialog({ kind, onLeave, onStay }) {
   useEffect(() => { stayRef.current?.focus(); }, []);
   return (
     <div
-      className={`mm-fade-in fixed inset-0 z-20 flex items-center justify-center bg-white/[0.78] px-[25px] max-lg:pt-[57px] lg:top-0 lg:bottom-0 ${GAME_PANEL_X}`}
+      className={`mm-fade-in fixed inset-x-[20px] top-[max(28px,env(safe-area-inset-top))] bottom-[max(28px,env(safe-area-inset-bottom))] z-20 flex items-center justify-center bg-white/[0.78] px-[25px] max-lg:pt-[57px] lg:top-0 lg:bottom-0 ${GAME_PANEL_X}`}
       style={{ backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
       role="alertdialog" aria-modal="true" aria-labelledby="mm-leave-title"
     >
@@ -416,9 +423,9 @@ export default function GameModal({
       <div
         ref={panelRef}
         tabIndex={-1}
-        // a game on the phone is the whole screen, as in her phone frames (Marta, 13 Nov 22:06, her Safari screenshot:
-        // grey around the window and a scroll bar); no scrolling while playing; the computer is unchanged
-        className={`absolute flex flex-col overscroll-none outline-none lg:top-0 lg:bottom-0 ${game ? `inset-0 bg-white max-lg:overflow-hidden max-lg:pt-[env(safe-area-inset-top)] max-lg:pb-[env(safe-area-inset-bottom)] lg:overflow-y-auto ${GAME_PANEL_X}` : "inset-x-[20px] top-[28px] bottom-[28px] overflow-y-auto bg-white lg:inset-x-[13.542%]"}`}
+        // a game: her #F0F0F0 popup (see the top of this file), on the phone 20 px in from the sides and 28 px from
+        // the top and bottom (more where the iPhone's notch or bar needs it), never scrolling while playing
+        className={`absolute flex flex-col overscroll-none outline-none lg:top-0 lg:bottom-0 ${game ? `inset-x-[20px] top-[max(28px,env(safe-area-inset-top))] bottom-[max(28px,env(safe-area-inset-bottom))] bg-[#F0F0F0] max-lg:overflow-hidden lg:overflow-y-auto ${GAME_PANEL_X}` : "inset-x-[20px] top-[28px] bottom-[28px] overflow-y-auto bg-white lg:inset-x-[13.542%]"}`}
         style={{ "--mm-u": STAGE_UNIT, "--mm-p": "min(100vw / 1920, 100vh / 1019)" }}
       >
         {/* A game's text on the computer (12 Nov 13:35, Marta: the top text "looks uneven" against the board, in

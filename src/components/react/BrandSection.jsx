@@ -29,7 +29,9 @@ export default function BrandSection() {
 
       {/* Phone: one full screen, as MM-HOME-002 (390x844; Marta, 2 Nov: "the footer is half the screen, it is a
           full screen on the phone"). Logo, copy and button from the top; icons and © on the bottom edge. */}
-      <div className="mm-phone-w relative z-10 h-[100svh] min-h-[calc(var(--q)*700)] md:hidden">
+      {/* 14 Nov (Marta: "футер... повноекранний, а зараз він чомусь обрізаний"): 100svh is the screen with Safari's
+          bars showing, so with them hidden the block above peeked in; dvh follows the screen as it is right now */}
+      <div className="mm-phone-w relative z-10 h-[100svh] min-h-[calc(var(--q)*700)] supports-[height:100dvh]:h-[100dvh] md:hidden">
         <h2 className="select-none">
           <img src="/assets/brand/footer-logo-mobile.png" alt="MAMA MARTA" className="absolute left-[calc(var(--q)*19)] top-[calc(var(--q)*39)] h-auto w-[calc(var(--q)*357)] max-w-none" />
         </h2>

@@ -173,7 +173,9 @@ const MOVES = [
 const MOVE_ORDER = [0, 1, 0, 2];
 // 14 Nov (her phone screenshots): the coat swings past the clip's side, which showed as a straight cut in the white;
 // the clip's two sides now fade into the white instead (its thin edge line inside the fade), so nothing ends in a line
-const SIDE_FADE = "linear-gradient(to right, transparent 2.5%, #000 12%, #000 88%, transparent 97.5%)";
+// 14 Nov (Marta: "Анімація людини там обрізана ногами... щоб не було цих обрізаних з боків частин"): the wide fade
+// ate the shoes (they reach 10% and 95% of the clip's width), so it is now only the outer 3%, where the edge line is
+const SIDE_FADE = "linear-gradient(to right, transparent 0.5%, #000 3%, #000 97%, transparent 99.5%)";
 
 function MovingFigure({ active = true, className = "", order = MOVE_ORDER }) {
   const clips = MOVES;

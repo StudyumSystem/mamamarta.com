@@ -27,14 +27,14 @@ export default function PlatformSection() {
             <p className="text-[1.146vw] uppercase leading-[1.094vw] tracking-[-0.017em] text-black/50">Platform layer</p>
           </div>
         </div>
-        {/* phone: her picture 388 x 349 at the screen's left edge, 120 px under the body */}
-        <div className="order-2 mt-[calc(var(--q)*120)] w-[calc(var(--q)*388)] sm:order-1 sm:mt-0 sm:w-auto sm:px-0">
-          {/* Below the computer's width (Marta, 12 Nov, her iPhone: "the background is grey"): iPhone Safari doesn't
-              blend a <video>, so the phone gets a copy whose background is pure #FFFFFF in the pixels
-              (scripts/make-phone-videos.mjs) on a white box, no blend; the computer keeps its #fafafa and blend. */}
-          <div data-reveal className="relative aspect-[388/349] w-full overflow-hidden bg-white sm:aspect-auto sm:h-[34.01vw] sm:w-[34.95vw] lg:bg-[#fafafa]">
-            <video data-lazy-video data-src={'/assets/moving-objects-loop-phone.mp4'} poster={'/assets/moving-objects-loop-phone-poster.webp'} preload="none" muted loop playsInline aria-label="Moving objects" className="absolute inset-0 h-full w-full scale-[1.18] object-cover lg:hidden" />
-            <video data-lazy-video data-src={'/assets/moving-objects-loop.mp4'} poster={'/assets/moving-objects-loop-poster.webp'} preload="none" muted loop playsInline aria-label="Moving objects" className="absolute inset-0 hidden h-full w-full scale-[1.18] object-cover mix-blend-multiply lg:block" />
+        {/* phone: her picture 388 x 349 at the screen's left edge, at 380 of her frame (14 Nov: it sat 20 higher) */}
+        <div className="order-2 mt-[calc(var(--q)*140)] w-[calc(var(--q)*388)] sm:order-1 sm:mt-0 sm:w-auto sm:px-0">
+          {/* Marta, 12 Nov (her iPhone: "the background is grey") and 14 Nov ("фон все одно далі сірий... там де пише
+              Mindset"): every screen plays the copy whose background is pure #FFFFFF in the pixels
+              (scripts/make-phone-videos.mjs) on a white box, no blend or filter. On the phone the shapes are at her
+              picture's own size (her frame shows them smaller, no zoom); the computer keeps its zoom. */}
+          <div data-reveal className="relative aspect-[388/349] w-full overflow-hidden bg-white sm:aspect-auto sm:h-[34.01vw] sm:w-[34.95vw]">
+            <video data-lazy-video data-src={'/assets/moving-objects-loop-phone.mp4'} poster={'/assets/moving-objects-loop-phone-poster.webp'} preload="none" muted loop playsInline aria-label="Moving objects" className="absolute inset-0 h-full w-full object-cover sm:scale-[1.18]" />
           </div>
         </div>
         <div className="order-3 mt-[calc(var(--q)*50)] block pl-[calc(var(--q)*20)] sm:hidden">

@@ -10,11 +10,13 @@ import React from "react";
 // 388 x 349 at 0, 380; the pink line at 20, 779 and "Platform layer" 12/15 black 63% under it.
 export default function PlatformSection() {
   return (
-    <section id="mindset" className="mm-phone-w block h-[calc(var(--q)*844)] overflow-hidden bg-white pt-[calc(var(--q)*40)] sm:block sm:h-[53.02vw] sm:min-h-0 sm:overflow-visible sm:py-0 sm:pt-[9.375vw]">
+    <section id="mindset" className="mm-phone-w block h-[calc(var(--q)*844)] overflow-hidden bg-white pt-[calc(var(--q)*65)] sm:block sm:h-[53.02vw] sm:min-h-0 sm:overflow-visible sm:py-0 sm:pt-[9.375vw]">
       <div className="flex w-full flex-col sm:flex-row sm:items-stretch sm:gap-[8.18vw] sm:pl-[8.85vw]">
         <div className="order-1 flex flex-col pl-[calc(var(--q)*14)] sm:order-2 sm:h-[34.01vw] sm:px-0">
-          <header className="mb-[calc(var(--q)*30)] sm:mb-[2.6vw]">
-            <h2 data-reveal-lines className="flex flex-col whitespace-nowrap text-[16.41vw] font-medium leading-[16.67vw] tracking-[-0.06em] text-black sm:text-[7.8125vw] sm:font-medium sm:leading-[7.344vw] sm:tracking-[-0.06em]">
+          {/* 14 Nov, phone to her MM-HOME-002 layer numbers: heading Inter 400 64/60 at 14, 65 (was medium 64/65 at 40),
+              the text 35 under it, the shapes still at 380 */}
+          <header className="mb-[calc(var(--q)*35)] sm:mb-[2.6vw]">
+            <h2 data-reveal-lines className="flex flex-col whitespace-nowrap text-[16.41vw] font-normal leading-[15.385vw] tracking-[-0.06em] text-black sm:text-[7.8125vw] sm:font-medium sm:leading-[7.344vw] sm:tracking-[-0.06em]">
               <span className="relative">P<span className="font-normal text-[#F600A9] sm:font-medium sm:text-[#e3009c]">l</span>atform</span>
               <span className="relative">Mind<span className="hidden translate-x-1 pr-[3px] sm:inline-block"><span className="block h-3 w-12 bg-[#e3009c] sm:h-[0.63vw] sm:w-[3.7vw]"></span></span><span className="font-normal text-[#F600A9] sm:hidden">_</span>set</span>
             </h2>
@@ -28,7 +30,7 @@ export default function PlatformSection() {
           </div>
         </div>
         {/* phone: her picture 388 x 349 at the screen's left edge, at 380 of her frame (14 Nov: it sat 20 higher) */}
-        <div className="order-2 mt-[calc(var(--q)*140)] w-[calc(var(--q)*388)] sm:order-1 sm:mt-0 sm:w-auto sm:px-0">
+        <div className="order-2 mt-[calc(var(--q)*120)] w-[calc(var(--q)*388)] sm:order-1 sm:mt-0 sm:w-auto sm:px-0">
           {/* Marta, 12 Nov (her iPhone: "the background is grey") and 14 Nov ("фон все одно далі сірий... там де пише
               Mindset"): every screen plays the copy whose background is pure #FFFFFF in the pixels
               (scripts/make-phone-videos.mjs) on a white box, no blend or filter. On the phone the shapes are at her

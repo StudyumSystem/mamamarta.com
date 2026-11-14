@@ -134,19 +134,19 @@ export default function Hero({ initialMenuOpen = false }) {
               breaking after "product," (still plain px, so 14 on her iPhone too), the button the full 350 at 509,
               menu label 14/20 regular. */}
           <div className="absolute inset-x-0 flex flex-col items-center px-5 text-center text-white top-[calc(var(--p)*340)]">
-            <p className="text-[20px] font-normal leading-[27px] tracking-[-0.01em]">
+            <p className="text-[20px] font-normal leading-[27px] tracking-[-0.04em]">
               Your product works.
               <br />
               Nobody remembers it.
             </p>
-            <p className="mt-[calc(var(--p)*49)] max-w-[280px] text-[14px] font-normal leading-[20px] tracking-[-0.01em]">
+            <p className="mt-[calc(var(--p)*49)] max-w-[280px] text-[14px] font-normal leading-[20px] tracking-[-0.04em]">
               {FOR_WHOM} {WHAT}
             </p>
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noreferrer"
-              className="mt-[calc(var(--p)*26)] flex h-[46px] w-full items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[16px] font-semibold whitespace-nowrap text-white backdrop-blur-md"
+              className="mt-[calc(var(--p)*26)] flex h-[46px] w-[350px] max-w-full items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[16px] font-semibold tracking-[-0.023em] whitespace-nowrap text-white backdrop-blur-md"
               style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
             >
               Straight to Marta <ArrowIcon />

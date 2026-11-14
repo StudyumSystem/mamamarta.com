@@ -108,7 +108,7 @@ export default function ContactSection() {
                 type="submit"
                 disabled={sending}
                 aria-busy={sending}
-                className="mm-gradient group mt-[24px] inline-flex h-[46px] w-full items-center justify-center gap-[0.3em] text-[16px] font-semibold text-white disabled:opacity-70 md:mt-[1.04vw] md:h-[3.54vw] md:min-h-[44px] md:text-[1.146vw] md:tracking-[-0.017em]"
+                className="mm-gradient group mt-[24px] inline-flex h-[46px] w-full items-center justify-center gap-[0.3em] text-[16px] font-semibold tracking-[-0.023em] text-white disabled:opacity-70 md:mt-[1.04vw] md:h-[3.54vw] md:min-h-[44px] md:text-[1.146vw] md:tracking-[-0.017em]"
               >
                 {sending ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-label="Sending" />

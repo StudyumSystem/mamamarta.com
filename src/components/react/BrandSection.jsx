@@ -50,7 +50,7 @@ export default function BrandSection() {
             href={WHATSAPP_URL}
             target="_blank"
             rel="noreferrer"
-            className="mt-[calc(var(--q)*22)] flex h-[calc(var(--q)*46)] w-[calc(var(--q)*350)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*16)] font-semibold whitespace-nowrap backdrop-blur-md"
+            className="mt-[calc(var(--q)*25)] flex h-[calc(var(--q)*46)] w-[calc(var(--q)*350)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*16)] font-semibold tracking-[-0.023em] whitespace-nowrap backdrop-blur-md"
             style={{ background: buttonOff }}
           >
             Straight to Marta <ArrowIcon />

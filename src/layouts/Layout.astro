@@ -16,12 +16,15 @@ interface Props {
 	description?: string;
 	// Heavy pictures to start loading at once (e.g. the footer fur), each for its screen size.
 	preload?: { href: string; media?: string }[];
+	// The browser bar colour (Safari, Chrome on phones): white on the white game pages, black elsewhere (the dark hero).
+	themeColor?: string;
 }
 const site = 'https://mamamarta.com';
 const {
 	title = 'Mamamarta · Design house for digital products',
 	description = 'Mamamarta is a design house for digital products, crafted to shape systems, interactions, and digital identity. Book a discovery call.',
 	preload = [],
+	themeColor = '#000000',
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, site).href;
 ---
@@ -47,7 +50,7 @@ const canonical = new URL(Astro.url.pathname, site).href;
 		<meta property="og:image" content={site + "/og.jpg"} />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
-		<meta name="theme-color" content="#000000" />
+		<meta name="theme-color" content={themeColor} />
 		<script type="application/ld+json" set:html={JSON.stringify({
 			'@context': 'https://schema.org',
 			'@type': 'Organization',

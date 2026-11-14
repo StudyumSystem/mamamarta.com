@@ -241,14 +241,14 @@ function MovingFigure({ active = true, className = "", order = MOVE_ORDER }) {
 function MemoryCard() {
   return (
     <div className="relative overflow-hidden bg-[#171717] text-left text-white [font-family:Arial,Helvetica,sans-serif]" style={{ width: px(420), height: px(540), borderRadius: px(18) }}>
-      <span className="absolute grid place-items-center rounded-full bg-white uppercase text-black" style={{ left: px(24), top: px(22), width: px(106), height: px(32), fontSize: px(10), lineHeight: px(11) }}>Memory game</span>
+      <span className="absolute grid place-items-center rounded-full bg-white uppercase text-black" style={{ left: px(24), top: px(22), width: px(106), height: px(32), fontSize: px(10), lineHeight: px(11), letterSpacing: "0.02em" }}>Memory game</span>
       {/* the number ends where the pink line does, so no digit is cut by the card's edge (Marta, 11 Nov 19:23) */}
-      <span className="absolute font-normal leading-none" style={{ right: px(29), top: px(8), fontSize: px(194) }}><RollingCounter /></span>
-      <p className="absolute whitespace-nowrap text-right text-[#F600A9]" style={{ right: px(29), top: px(186), fontSize: px(10), lineHeight: px(14) }}>© Mamamarta 2026</p>
-      <p className="absolute whitespace-nowrap text-right text-[#E1E6E2]/[.86]" style={{ right: px(29), top: px(270), fontSize: px(12), lineHeight: px(15) }}>
+      <span className="absolute font-normal leading-none" style={{ right: px(29), top: px(8), fontSize: px(194), letterSpacing: "-0.09em" }}><RollingCounter /></span>
+      <p className="absolute whitespace-nowrap text-right text-[#F600A9]" style={{ right: px(29), top: px(186), fontSize: px(10), lineHeight: px(14), letterSpacing: "-0.04em" }}>© Mamamarta 2026</p>
+      <p className="absolute whitespace-nowrap text-right text-[#E1E6E2]/[.86]" style={{ right: px(29), top: px(270), fontSize: px(12), lineHeight: px(15), letterSpacing: "-0.04em" }}>
         A LITTLE TEST FOR YOUR MIND.<br />Flip the cards.<br />Find the pairs.<br />Trust your memory.
       </p>
-      <p className="absolute whitespace-nowrap font-normal" style={{ left: px(24), top: px(403), fontSize: px(64), lineHeight: px(55) }}>Memory<br />Match</p>
+      <p className="absolute whitespace-nowrap font-normal" style={{ left: px(24), top: px(403), fontSize: px(64), lineHeight: px(55), letterSpacing: "-0.02em" }}>Memory<br />Match</p>
       <span className="absolute grid place-items-center rounded-full border border-[#F600A9] text-white" style={{ left: px(348), top: px(470), width: px(43), height: px(43), fontSize: px(14) }} aria-hidden="true"><ArrowIcon dir="down-left" /></span>
     </div>
   );

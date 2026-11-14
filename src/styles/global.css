@@ -10,6 +10,19 @@ body {
 	overflow-x: hidden;
 }
 
+/* Pure #FFFFFF under everything (Marta, 13 Nov 21:29): the root, so overscroll and Safari's bar tint are white too. */
+html {
+	background-color: #ffffff;
+}
+
+/* Safari 17 and older only blur with the prefixed property (Tailwind 4 writes only backdrop-filter). */
+.backdrop-blur-md {
+	-webkit-backdrop-filter: blur(12px);
+}
+.backdrop-blur-xl {
+	-webkit-backdrop-filter: blur(24px);
+}
+
 .scrollbar-hide {
 	scrollbar-width: none;
 	-ms-overflow-style: none;

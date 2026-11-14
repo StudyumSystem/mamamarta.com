@@ -42,8 +42,8 @@ export default function PlatformSection() {
         </div>
         <div className="order-3 mt-[calc(var(--q)*50)] block pl-[calc(var(--q)*20)] sm:hidden">
           <div className="mb-[calc(var(--q)*9)] h-[1px] w-[calc(var(--q)*119)] bg-[#f48fcf]"></div>
-          {/* Phone: sentence case in her phone frame (desktop keeps caps), Inter 12/15 -0.04em black 63%. */}
-          <p className="text-[length:calc(var(--q)*12)] leading-[calc(var(--q)*15)] tracking-[-0.04em] text-black/[.63]">Platform layer</p>
+          {/* Phone: MM-HOME-002 1050:3 "Platform layer" has textCase UPPER, Inter 400 14/20, -0.56 px (-0.04em), black 60%. */}
+          <p className="text-[length:calc(var(--q)*14)] uppercase leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/60">Platform layer</p>
         </div>
       </div>
     </section>

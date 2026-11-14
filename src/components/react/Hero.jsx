@@ -217,7 +217,7 @@ export default function Hero({ initialMenuOpen = false }) {
         href={WHATSAPP_URL}
         target="_blank"
         rel="noreferrer"
-        className="whatsapp-button fixed bottom-[5vh] right-[2.5vw] max-md:bottom-[27px] max-md:right-[32px] max-md:h-[50px] max-md:w-[50px] lg:bottom-[9.35vh] lg:right-[6.98vw] z-20 grid h-12 w-12 lg:h-[clamp(48px,3.54vw,68px)] lg:w-[clamp(48px,3.54vw,68px)] place-items-center rounded-full border border-white/20 text-white shadow-lg shadow-black/30 backdrop-blur-md transition"
+        className="whatsapp-button fixed bottom-[5vh] right-[2.5vw] max-md:bottom-[27px] max-md:right-[32px] max-md:h-[50px] max-md:w-[50px] lg:bottom-[9.35vh] lg:right-[6.98vw] z-20 grid h-12 w-12 lg:h-[clamp(48px,3.54vw,68px)] lg:w-[clamp(48px,3.54vw,68px)] place-items-center rounded-full border border-white/20 text-white backdrop-blur-md transition"
         aria-label="WhatsApp"
         onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)'}
         onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}

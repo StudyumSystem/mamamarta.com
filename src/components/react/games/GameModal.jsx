@@ -515,8 +515,10 @@ export default function GameModal({
             Phone (14 Nov, Marta: "many games don't fit the full screen ... there must be no scrolling while you play
             a game"): this part takes exactly the height the screen leaves between the top rows and Back, and is the
             box the games measure (100cqh = its height): each board is sized to fit it whole, so the panel never
-            scrolls. Type keeps its sizes; only the board grows or shrinks with the screen. */}
-        <div className="flex flex-1 flex-col max-lg:min-h-0 max-lg:[container-type:size]" style={fit < 1 && !stage ? { zoom: fit } : undefined}>{children}</div>
+            scrolls. Type keeps its sizes; only the board grows or shrinks with the screen.
+            Games only (14 Nov 23:46, Marta's iPhone screenshot of Suggest a game: Back over the form): a form scrolls,
+            and a size container doesn't grow with what's in it, so the form ran past it and Back sat mid-form. */}
+        <div className={`flex flex-1 flex-col ${game ? "max-lg:min-h-0 max-lg:[container-type:size]" : ""}`} style={fit < 1 && !stage ? { zoom: fit } : undefined}>{children}</div>
         <div className="flex justify-center pb-[20px] pt-6 lg:hidden">
           <BackLink onClick={requestClose} game={game} />
         </div>

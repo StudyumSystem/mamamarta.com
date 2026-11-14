@@ -54,10 +54,11 @@ export default function ContactSection() {
   return (
     <section id="contact" className="mm-phone-w bg-white font-[Inter] text-black">
       {/* Computer: heading 150/141 -0.06em at 163, 78; the form column 687 wide at 1011, its line at 97; 97 px under the button */}
-      {/* Phone, MM-HOME-002 (iPhone 16 & 17 Pro - 7, 13 Nov): heading 64/65 at 14, 40; text 292 wide at 20, 254; the
-          form at 331 with 11 px between its parts; 60 px under the button */}
-      <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*40)] pb-[calc(var(--q)*60)] md:grid md:grid-cols-[44.17vw_35.78vw] md:items-start md:px-0 md:pl-[8.49vw] md:pt-[4.06vw] md:pb-[5.05vw]">
-        <h2 className="-ml-[calc(var(--q)*6)] text-[length:calc(var(--q)*64)] font-normal leading-[calc(var(--q)*65)] tracking-[-0.06em] md:ml-0 md:text-[7.8125vw] md:leading-[7.344vw] md:tracking-[-0.06em]">
+      {/* Phone, MM-HOME-002 (iPhone 16 & 17 Pro - 7, 13 Nov; measured against her frame 14 Nov): heading 64/60 at 14, 40;
+          text 292 wide at 20, 254; the form at 331 with 11 px between the fields and 24 above the button; 48 px under
+          the last line (the privacy line, which her frame doesn't have) */}
+      <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*40)] pb-[calc(var(--q)*48)] md:grid md:grid-cols-[44.17vw_35.78vw] md:items-start md:px-0 md:pl-[8.49vw] md:pt-[4.06vw] md:pb-[5.05vw]">
+        <h2 className="-ml-[calc(var(--q)*6)] text-[length:calc(var(--q)*64)] font-normal leading-[calc(var(--q)*60)] tracking-[-0.06em] md:ml-0 md:text-[7.8125vw] md:leading-[7.344vw] md:tracking-[-0.06em]">
           {/* Marta's advisor, 10 Nov 23:36 (replaces his 23:13 word): keep it, and follow it at once with who it is for */}
           We are
           <br />
@@ -66,7 +67,7 @@ export default function ContactSection() {
           everyone.
         </h2>
 
-        <div className="mt-[calc(var(--q)*19)] md:mt-[0.99vw]">
+        <div className="mt-[calc(var(--q)*34)] md:mt-[0.99vw]">
           {/* who it is for, 18/34 -0.04em black 69% on the computer, 14/20 -0.04em black 60% on the phone */}
           <p className="w-[calc(var(--q)*292)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] text-black/70 max-md:tracking-[-0.04em] max-md:text-black/60 md:w-auto md:text-[0.9375vw] md:leading-[1.77vw] md:tracking-[-0.04em]">
             We work with funded founders who would rather be understood than liked.
@@ -107,7 +108,7 @@ export default function ContactSection() {
                 type="submit"
                 disabled={sending}
                 aria-busy={sending}
-                className="mm-gradient group mt-[12px] inline-flex h-[46px] w-full items-center justify-center gap-[0.3em] text-[16px] font-semibold text-white disabled:opacity-70 md:mt-[1.04vw] md:h-[3.54vw] md:min-h-[44px] md:text-[1.146vw] md:tracking-[-0.017em]"
+                className="mm-gradient group mt-[24px] inline-flex h-[46px] w-full items-center justify-center gap-[0.3em] text-[16px] font-semibold text-white disabled:opacity-70 md:mt-[1.04vw] md:h-[3.54vw] md:min-h-[44px] md:text-[1.146vw] md:tracking-[-0.017em]"
               >
                 {sending ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-label="Sending" />

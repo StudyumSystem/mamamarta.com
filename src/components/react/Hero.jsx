@@ -85,7 +85,7 @@ export default function Hero({ initialMenuOpen = false }) {
     // is wrong": gaps were in screen height, type in screen width, so on a wide, short window the gaps shrank).
     // The type, logo and button keep their own sizes (Marta, 20:44: "why did you make the text smaller? put it
     // back, only the spacing between the blocks had to change").
-    <section id="hero" className="relative max-h-screen overflow-hidden bg-slate-950 text-white" style={{ "--h": "calc(100vw / 1920)" }}>
+    <section id="hero" className="relative max-h-screen supports-[height:100dvh]:max-h-[100dvh] overflow-hidden bg-slate-950 text-white" style={{ "--h": "calc(100vw / 1920)" }}>
       {isMenuOpen && <MobileMenu onClose={closeMenu} />}
 
       {/* Marta, 28 Oct 16:45: the fur looked washed out next to MM-HOME-001; richer, brighter raspberry as in her frame. */}
@@ -100,7 +100,7 @@ export default function Hero({ initialMenuOpen = false }) {
         src={'/assets/hero-bg.mp4'}
       ></video>
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col">
+      <div className="relative z-10 mx-auto flex min-h-screen supports-[height:100dvh]:min-h-[100dvh] max-w-6xl flex-col">
 
         {/* Phone: one full screen laid out as MM-HOME-002 (390x844, her 2x export halved). Every position and
             size is in --p, one pixel of that frame, so the lines break and sit exactly where hers do on any phone

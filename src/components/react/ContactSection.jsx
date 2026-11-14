@@ -57,7 +57,7 @@ export default function ContactSection() {
       {/* Phone, MM-HOME-002 (iPhone 16 & 17 Pro - 7, 13 Nov; measured against her frame 14 Nov): heading 64/60 at 14, 40;
           text 292 wide at 20, 254; the form at 331 with 11 px between the fields and 24 above the button; 48 px under
           the last line (the privacy line, which her frame doesn't have) */}
-      <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*40)] pb-[calc(var(--q)*48)] md:grid md:grid-cols-[44.17vw_35.78vw] md:items-start md:px-0 md:pl-[8.49vw] md:pt-[4.06vw] md:pb-[5.05vw]">
+      <div className="px-[calc(var(--q)*20)] pt-[calc(var(--q)*40)] pb-[calc(var(--q)*48)] md:grid md:grid-cols-[44.17vw_35.78vw] md:items-start md:px-0 md:pl-[8.49vw] md:pt-[4.06vw] md:pb-[max(5.05vw,64px)]">
         <h2 className="-ml-[calc(var(--q)*6)] text-[length:calc(var(--q)*64)] font-normal leading-[calc(var(--q)*60)] tracking-[-0.06em] md:ml-0 md:text-[7.8125vw] md:leading-[7.344vw] md:tracking-[-0.06em]">
           {/* Marta's advisor, 10 Nov 23:36 (replaces his 23:13 word): keep it, and follow it at once with who it is for */}
           We are

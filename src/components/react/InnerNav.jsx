@@ -21,7 +21,8 @@ export const navLinks = [
 // page's own --u: Bio's --u follows the width only, which made its Back bigger than The Method's on any
 // window shorter than 16:9. Her frames: 22 px on the computer (line 21, at 170 / 123 px from the top left),
 // 14 px on the phone (21 / 24 px; its line height is left to the place it stands in, so nothing around it moves).
-const backUnit = { "--bu": "min(calc(100vw / 1920), calc(100dvh / 1080))" };
+// Never below 0.6 px (14 Nov): on a tablet it was 0.4 px, a 9 px Back.
+const backUnit = { "--bu": "max(0.6px, min(calc(100vw / 1920), calc(100dvh / 1080)))" };
 const backText =
   "underline underline-offset-4 tracking-normal text-[14px] font-normal md:font-light md:text-[length:calc(var(--bu)*22)] transition-colors duration-300 hover:text-[#F600A9]";
 const backColour = (light) => (light ? "text-[#b0b0b0]" : "text-[#555] md:text-[#7e7e7e]");

@@ -14,7 +14,9 @@ import { BottomBack, TopBack } from "./InnerNav";
 // (the charcoal, its label and the title), and Back scales with the page.
 
 const du = (n) => `calc(var(--u) * ${n})`;
-const unit = { "--u": "min(calc(100vw / 1920), calc(100dvh / 1080))" };
+// 14 Nov (Marta: "check how it all looks at different sizes"): on a tablet (768 wide) that unit was 0.4 px, so the
+// text came out 7-9 px. It never goes below 0.6 px now, as on Bio; her column stays centred and inside the screen.
+const unit = { "--u": "max(0.6px, min(calc(100vw / 1920), calc(100dvh / 1080)))" };
 
 const stages = [
   {

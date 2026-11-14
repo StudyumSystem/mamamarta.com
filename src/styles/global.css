@@ -47,9 +47,12 @@ html {
 .mm-fit {
 	--u: min(calc(100vw / 390), calc(100dvh / 844));
 }
-/* --p = one pixel of her 390x844 phone frames (MM-HOME-002, her 2x export halved), fitted to the screen. */
+/* --p = one pixel of her 390x844 phone frames (MM-HOME-002, her 2x export halved), fitted to the screen.
+   14 Nov (Marta, her iPhone screen recording: "блок із хутром скаче при скролі"): svh, the screen with the
+   browser's bars showing, which never changes while scrolling; dvh changed as the bars hid and the hero resized. */
 .mm-phone-u {
-	--p: min(calc(100vw / 390), calc(100dvh / 844));
+	--p: min(calc(100vw / 390), calc(100vh / 844));
+	--p: min(calc(100vw / 390), calc(100svh / 844));
 }
 /* --q = one pixel of her 390-wide phone frames, following the width only (long scrolling sections). */
 .mm-phone-w {

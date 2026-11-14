@@ -118,6 +118,34 @@ function straight(a, b) {
   return Array.from({ length: len + 1 }, (_, k) => a + k * step);
 }
 
+// 14 Nov (Marta's iPhone video: swiping PATTERN lit PATTERNU and it never counted): on a touch screen the swipe's
+// end moves on to a letter only once the finger is 30% inside it, and back only once 30% inside the one before, so a
+// fingertip on a border or rolling as it lifts doesn't flick the end onto the next letter. The start stays where the
+// finger first touched; the mouse keeps the plain letter under it (dead 0, as before).
+const DEAD = 0.3;
+// f: the finger along one axis in cells (2.5 = the middle of the third); cur: the end's cell on that axis now
+function steady(f, cur, dead) {
+  const k = f >= cur + 1 + dead ? Math.floor(f - dead) : f < cur - dead ? Math.floor(f + dead) : cur;
+  return Math.min(SIZE - 1, Math.max(0, k));
+}
+
+// 14 Nov (the same video): a word not found yet counts when all its letters lie in the swipe with at most one extra
+// letter at either end (the finger ran one letter on, or started one early); a whole row doesn't, nor a swipe shorter
+// than the word. An exact swipe is the case with nothing extra; if two words fit, the longer one. Only the word's own
+// letters stay pink (its placed cells), never the extra one.
+function pickWord(sel, placed, found) {
+  let best = null;
+  for (const p of placed) {
+    if (found.includes(p.word)) continue;
+    const at = p.cells.map((i) => sel.indexOf(i));
+    if (at.includes(-1)) continue;
+    // the swipe is one straight line, so the word's letters are one run inside it: what is left over at each end
+    if (Math.min(...at) > 1 || sel.length - 1 - Math.max(...at) > 1) continue;
+    if (!best || p.word.length > best.word.length) best = p;
+  }
+  return best;
+}
+
 export default function WordHunt({ open, onClose }) {
   const [round, setRound] = useState(null);
   const [found, setFound] = useState([]); // words found, in order
@@ -127,6 +155,7 @@ export default function WordHunt({ open, onClose }) {
   const [phase, setPhase] = useState("play"); // play | score | done
   const [finish, setFinish] = useState(null); // null | "fade" | per-letter rain
   const drag = useRef(null);
+  const end = useRef(null); // the swipe's end cell { r, c } and its dead zone (steady)
   const selRef = useRef([]);
   const gridRef = useRef(null);
   const timers = useRef([]);
@@ -152,9 +181,10 @@ export default function WordHunt({ open, onClose }) {
 
   const cellAt = (e) => {
     const rect = gridRef.current.getBoundingClientRect();
-    const c = Math.floor(((e.clientX - rect.left) / rect.width) * SIZE);
-    const r = Math.floor(((e.clientY - rect.top) / rect.height) * SIZE);
-    return { r: Math.min(SIZE - 1, Math.max(0, r)), c: Math.min(SIZE - 1, Math.max(0, c)), inside: r >= 0 && r < SIZE && c >= 0 && c < SIZE };
+    const x = ((e.clientX - rect.left) / rect.width) * SIZE;
+    const y = ((e.clientY - rect.top) / rect.height) * SIZE;
+    const c = Math.floor(x), r = Math.floor(y);
+    return { x, y, r: Math.min(SIZE - 1, Math.max(0, r)), c: Math.min(SIZE - 1, Math.max(0, c)), inside: r >= 0 && r < SIZE && c >= 0 && c < SIZE };
   };
 
   const onDown = (e) => {
@@ -164,6 +194,7 @@ export default function WordHunt({ open, onClose }) {
     e.preventDefault();
     gridRef.current.setPointerCapture?.(e.pointerId);
     drag.current = r * SIZE + c;
+    end.current = { r, c, dead: e.pointerType === "mouse" ? 0 : DEAD };
     selRef.current = [drag.current];
     setSel(selRef.current);
   };
@@ -171,8 +202,11 @@ export default function WordHunt({ open, onClose }) {
   const onMove = (e) => {
     if (drag.current == null) return;
     e.preventDefault();
-    const { r, c } = cellAt(e);
-    selRef.current = straight(drag.current, r * SIZE + c);
+    const { x, y } = cellAt(e);
+    const at = end.current;
+    at.r = steady(y, at.r, at.dead);
+    at.c = steady(x, at.c, at.dead);
+    selRef.current = straight(drag.current, at.r * SIZE + at.c);
     setSel(selRef.current);
   };
 
@@ -181,9 +215,7 @@ export default function WordHunt({ open, onClose }) {
     drag.current = null;
     const sel = selRef.current;
     selRef.current = [];
-    const word = sel.map((i) => round.grid[i]).join("");
-    const back = [...word].reverse().join("");
-    const hit = round.placed.find((p) => !found.includes(p.word) && sel.length === p.word.length && (p.word === word || p.word === back));
+    const hit = pickWord(sel, round.placed, found);
     setSel([]); // a wrong selection simply fades back (colour transition on the cells)
     if (!hit) { if (sel.length > 1) play("back"); return; }
     const next = [...found, hit.word];

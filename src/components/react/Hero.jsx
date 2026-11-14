@@ -156,8 +156,9 @@ export default function Hero({ initialMenuOpen = false }) {
 
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex justify-center rounded-lg h-[10vh] lg:h-[calc(var(--h)*148)] items-end">
-          <ul className="flex flex-wrap justify-center font-light lg:font-normal text-white gap-x-6 lg:gap-x-[calc(var(--h)*27)]">
+        {/* 14 Nov: her menu words are 22/21, box 126-147 of her 1920 x 1080 (they sat 5 px higher with the default line). */}
+        <nav className="hidden md:flex justify-center rounded-lg h-[10vh] lg:h-[calc(var(--h)*147)] items-end">
+          <ul className="flex flex-wrap justify-center font-light lg:font-normal lg:leading-[0.955] text-white gap-x-6 lg:gap-x-[calc(var(--h)*27)]">
             {navLinks.map((link, index) => (
               <li key={index}>
                 <a className="sm:text-lg lg:text-[clamp(16px,1.146vw,22px)] transition-all duration-300 hover:font-bold hover:text-white" href={link.href}>
@@ -184,7 +185,7 @@ export default function Hero({ initialMenuOpen = false }) {
               />
             </h1>
 
-            <p className="lg:mt-[calc(var(--h)*35.4)] mt-4 text-[18px] font-normal tracking-[-0.01em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] lg:tracking-[-0.03em] text-white">
+            <p className="lg:mt-[calc(var(--h)*35.4)] mt-4 text-[18px] font-normal tracking-[-0.01em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] lg:tracking-[-0.04em] text-white">
               {TAGLINE}
             </p>
             <p className="mt-2 lg:mt-[calc(var(--h)*58)] text-[13px] font-normal text-white lg:font-medium lg:text-[clamp(18px,1.458vw,28px)] lg:leading-[1.357] lg:tracking-[-0.0134em]">
@@ -227,7 +228,7 @@ export default function Hero({ initialMenuOpen = false }) {
           alt="Call icon"
           width="20"
           height="20"
-          className="h-5 w-5 max-md:h-[27px] max-md:w-[27px]"
+          className="h-5 w-5 max-md:h-[27px] max-md:w-[27px] lg:h-[clamp(20px,1.77vw,34px)] lg:w-[clamp(20px,1.77vw,34px)]"
         />
       </a>}
 

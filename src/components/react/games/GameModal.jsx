@@ -123,7 +123,7 @@ function LeaveDialog({ kind, onLeave, onStay }) {
   useEffect(() => { stayRef.current?.focus(); }, []);
   return (
     <div
-      className={`mm-fade-in fixed inset-x-[20px] top-[28px] bottom-[28px] z-20 flex items-center justify-center bg-white/[0.78] px-[25px] max-lg:pt-[57px] lg:top-0 lg:bottom-0 ${GAME_PANEL_X}`}
+      className={`mm-fade-in fixed inset-0 z-20 flex items-center justify-center bg-white/[0.78] px-[25px] max-lg:pt-[57px] lg:top-0 lg:bottom-0 ${GAME_PANEL_X}`}
       style={{ backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
       role="alertdialog" aria-modal="true" aria-labelledby="mm-leave-title"
     >
@@ -416,7 +416,9 @@ export default function GameModal({
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={`absolute inset-x-[20px] top-[28px] bottom-[28px] flex flex-col overflow-y-auto overscroll-none outline-none lg:top-0 lg:bottom-0 ${game ? `bg-white ${GAME_PANEL_X}` :"bg-white lg:inset-x-[13.542%]"}`}
+        // a game on the phone is the whole screen, as in her phone frames (Marta, 13 Nov 22:06, her Safari screenshot:
+        // grey around the window and a scroll bar); no scrolling while playing; the computer is unchanged
+        className={`absolute flex flex-col overscroll-none outline-none lg:top-0 lg:bottom-0 ${game ? `inset-0 bg-white max-lg:overflow-hidden max-lg:pt-[env(safe-area-inset-top)] max-lg:pb-[env(safe-area-inset-bottom)] lg:overflow-y-auto ${GAME_PANEL_X}` : "inset-x-[20px] top-[28px] bottom-[28px] overflow-y-auto bg-white lg:inset-x-[13.542%]"}`}
         style={{ "--mm-u": STAGE_UNIT, "--mm-p": "min(100vw / 1920, 100vh / 1019)" }}
       >
         {/* A game's text on the computer (12 Nov 13:35, Marta: the top text "looks uneven" against the board, in

@@ -36,7 +36,7 @@ export default function PlatformSection() {
               (scripts/make-phone-videos.mjs) on a white box, no blend or filter. On the phone the shapes are at her
               picture's own size (her frame shows them smaller, no zoom); the computer keeps its zoom. */}
           <div data-reveal className="relative aspect-[388/349] w-full overflow-hidden bg-white sm:aspect-auto sm:h-[34.01vw] sm:w-[34.95vw]">
-            <video data-lazy-video data-src={'/assets/moving-objects-loop-phone.mp4'} poster={'/assets/moving-objects-loop-phone-poster.webp'} preload="none" muted loop playsInline aria-label="Moving objects" className="absolute inset-0 h-full w-full object-cover sm:scale-[1.18]" />
+            <video data-lazy-video data-src={'/assets/moving-objects-loop-phone.mp4'} poster={'/assets/moving-objects-loop-phone-poster.webp'} preload="none" muted loop playsInline aria-label="Moving objects" className="absolute inset-0 h-full w-full bg-white object-cover sm:scale-[1.18]" />
           </div>
         </div>
         <div className="order-3 mt-[calc(var(--q)*50)] block pl-[calc(var(--q)*20)] sm:hidden">

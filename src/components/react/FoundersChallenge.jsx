@@ -311,7 +311,7 @@ function PlusKey({ video, active, className = "", style }) {
   if (video)
     return <LoopVideo src={phoneCopy(video, "-phone.mp4")} poster={phoneCopy(video, "-phone-poster.webp")} alt="Black key with a plus sign" active={active} className={`bg-white object-contain ${className}`} style={style} />;
   if (!ok) return <div className={className} style={style} aria-hidden="true" />;
-  return <img src="/assets/games/plus-key.png" alt="Black key with a plus sign" onError={() => setOk(false)} className={`object-contain ${className}`} style={style} />;
+  return <img src="/assets/games/plus-key.png" alt="Black key with a plus sign" onError={() => setOk(false)} className={`bg-white object-contain ${className}`} style={style} />;
 }
 
 // Desktop: each picture at its size in her frame (SLIDE). The videos are the copies with pure #FFFFFF in the pixels
@@ -341,6 +341,15 @@ function Visual({ entry, active }) {
         <div style={size}>
           {/* its white right margin is cut off (the apple ends at 83% of the box), so the box never lies over the next card */}
           <LoopVideo src={src} poster={poster} alt={v.alt} active={active} className="block h-full w-full bg-white object-contain [clip-path:inset(0_12%_0_0)]" />
+        </div>
+      );
+    // Her M video (Marta, 13 Nov 21:29) at her MM-HOME-001 place: the solid M about 492 x 454, right edge at 1580,
+    // top at 2462. Drawn at the full box its M came out 555 wide ending at 1527, so it is drawn at 0.89 of the box
+    // and moved right, as the code M was; the box and the gaps stay
+    if (entry.id === "word-hunt")
+      return (
+        <div className="relative bg-white" style={size}>
+          <div className="absolute" style={{ left: px(122), top: px(14), width: px(646), height: px(700) }}>{video}</div>
         </div>
       );
     if (entry.id !== "connect-the-path") return <div style={size}>{video}</div>;

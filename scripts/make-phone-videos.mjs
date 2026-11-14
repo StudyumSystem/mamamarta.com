@@ -22,11 +22,13 @@ const WHITE = "clip(val*255/249,0,255)";
 const CLIPS = [
   { src: "m.mp4", w: 720, fx: LIFT(1.04, 1.08) },
   { src: "apple.mp4", w: 720, fx: LIFT(1.04, 1.08) },
-  { src: "google.mp4", w: 720, fx: LIFT(1.04, 1.08) },
+  // edge: [top/bottom rows, left/right columns] painted pure white after whitening: her clip's own thin grey line
+  // along the frame (Marta, 13 Nov 21:29: no visible edge anywhere), where the clip has only white anyway
+  { src: "google.mp4", w: 720, fx: LIFT(1.04, 1.08), edge: [3, 0] },
   { src: "games/plus-key.mp4", w: 640, fx: LIFT(1.04, 1.08) },
   { src: "human-walking.mp4", w: 540, fx: WHITE },
   { src: "games/jump.mp4", w: 540, fx: LIFT(1.18, 1.25) },
-  { src: "games/stumble.mp4", w: 540, fx: LIFT(1.18, 1.25) },
+  { src: "games/stumble.mp4", w: 540, fx: LIFT(1.18, 1.25), edge: [0, 3] },
   { src: "games/ttt-x.mp4", w: 540, fx: TTT },
   { src: "apple.mp4", as: "games/ttt-apple.mp4", w: 540, fx: TTT },
   { src: "moving-objects-loop.mp4", w: 720, fx: WHITE },
@@ -77,6 +79,8 @@ function filters(c) {
     `scale=${c.w}:-2:flags=lanczos`,
     "format=rgb24",
     `lutrgb=r='${e}':g='${e}':b='${e}'`,
+    ...(c.edge?.[0] ? [`drawbox=x=0:y=0:w=iw:h=${c.edge[0]}:color=white:t=fill`, `drawbox=x=0:y=ih-${c.edge[0]}:w=iw:h=${c.edge[0]}:color=white:t=fill`] : []),
+    ...(c.edge?.[1] ? [`drawbox=x=0:y=0:w=${c.edge[1]}:h=ih:color=white:t=fill`, `drawbox=x=iw-${c.edge[1]}:y=0:w=${c.edge[1]}:h=ih:color=white:t=fill`] : []),
     "scale=out_color_matrix=bt709:out_range=tv",
     "format=yuv420p",
     "lutyuv=y='if(gt(val\\,225)\\,min(255\\,val+(val-225)*0.5)\\,val)'",

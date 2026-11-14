@@ -171,6 +171,9 @@ const MOVES = [
   { src: "/assets/games/stumble-phone.mp4", ar: "540 / 720" },
 ];
 const MOVE_ORDER = [0, 1, 0, 2];
+// 14 Nov (her phone screenshots): the coat swings past the clip's side, which showed as a straight cut in the white;
+// the clip's two sides now fade into the white instead (its thin edge line inside the fade), so nothing ends in a line
+const SIDE_FADE = "linear-gradient(to right, transparent 2.5%, #000 12%, #000 88%, transparent 97.5%)";
 
 function MovingFigure({ active = true, className = "", order = MOVE_ORDER }) {
   const clips = MOVES;
@@ -222,8 +225,8 @@ function MovingFigure({ active = true, className = "", order = MOVE_ORDER }) {
           aria-label={i === 0 ? "Walking figure" : undefined}
           aria-hidden={i === 0 ? undefined : "true"}
           onEnded={() => onEnded(i)}
-          className={`absolute left-1/2 top-0 block h-full w-auto max-w-none bg-white object-cover [clip-path:inset(0.8%_2%)] ${i === order[step] ? "" : "opacity-0"}`}
-          style={{ aspectRatio: m.ar, transform: "translateX(-50%) scaleX(-1)" }}
+          className={`absolute left-1/2 top-0 block h-full w-auto max-w-none bg-white object-cover [clip-path:inset(0.8%_0)] ${i === order[step] ? "" : "opacity-0"}`}
+          style={{ aspectRatio: m.ar, transform: "translateX(-50%) scaleX(-1)", WebkitMaskImage: SIDE_FADE, maskImage: SIDE_FADE }}
         />
       ))}
     </div>

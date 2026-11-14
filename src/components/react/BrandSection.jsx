@@ -35,18 +35,20 @@ export default function BrandSection() {
         </h2>
         {/* her phone frame: text Inter 14/20 white, button 199 x 46 with 16 semibold; the call line (not in her
             frame) in the same 14/20 so it reads as well; the three follow each other so they never overlap */}
-        <div className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*243)] flex w-[calc(var(--q)*266)] flex-col items-start">
-          <p className="text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em]">
-            {WHAT_WE_DO}
+        {/* 14 Nov, her MM-HOME-002 against her screenshots: the text 14/20 -0.04em in two lines (after "products."),
+            the call line 12/20 two lines 30 below it, the button the full 350 wide 22 below */}
+        <div className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*243)] flex w-[calc(var(--q)*350)] flex-col items-start">
+          <p className="text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em]">
+            {WHAT_WE_DO.replace("products. ", "products.\n").split("\n").map((l) => <span key={l} className="block whitespace-nowrap">{l}</span>)}
           </p>
-          <p className="mt-[calc(var(--q)*12)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.01em] text-white/85">
+          <p className="mt-[calc(var(--q)*30)] w-[calc(var(--q)*250)] text-[length:calc(var(--q)*12)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-white/85">
             {CALL_LINE}
           </p>
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noreferrer"
-            className="mt-[calc(var(--q)*20)] flex h-[calc(var(--q)*46)] w-[calc(var(--q)*199)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*16)] font-semibold whitespace-nowrap backdrop-blur-md"
+            className="mt-[calc(var(--q)*22)] flex h-[calc(var(--q)*46)] w-[calc(var(--q)*350)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*16)] font-semibold whitespace-nowrap backdrop-blur-md"
             style={{ background: buttonOff }}
           >
             Straight to Marta <ArrowIcon />
@@ -54,14 +56,15 @@ export default function BrandSection() {
         </div>
         {/* MM-HOME-002 (13 Nov): text 266 wide; icons in 40 px boxes at 20 / 83 / 147, 26 px above the ©, which
             ends 41 px from the bottom (the same 40 px icons as the computer) */}
-        <div className="absolute bottom-[calc(var(--q)*92)] left-[calc(var(--q)*20)] flex gap-[calc(var(--q)*23.5)]">
+        {/* 14 Nov: icons 32 at 23 / 87 / 150, 105 above the bottom; © 13/16 regular, 49 above the bottom */}
+        <div className="absolute bottom-[calc(var(--q)*105)] left-[calc(var(--q)*23)] flex gap-[calc(var(--q)*31.5)]">
           {icons.map((icon) => (
             <a key={icon.alt} href={icon.href} target={icon.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="inline-flex">
-              <img src={icon.src} alt={icon.alt} className="h-[calc(var(--q)*40)] w-[calc(var(--q)*40)]" />
+              <img src={icon.src} alt={icon.alt} className="h-[calc(var(--q)*32)] w-[calc(var(--q)*32)]" />
             </a>
           ))}
         </div>
-        <p className="absolute bottom-[calc(var(--q)*41)] left-[calc(var(--q)*20)] text-[length:calc(var(--q)*18)] font-medium leading-[calc(var(--q)*25)] text-[#F5F5F5]">© Mamamarta 2026</p>
+        <p className="absolute bottom-[calc(var(--q)*49)] left-[calc(var(--q)*20)] text-[length:calc(var(--q)*13)] font-normal leading-[calc(var(--q)*16)] text-[#F5F5F5]">© Mamamarta 2026</p>
       </div>
 
       {/* Desktop, her new home frame of 9 Nov: copy, button and the icons / © row on the left (165-852 px),

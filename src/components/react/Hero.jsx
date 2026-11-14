@@ -114,7 +114,7 @@ export default function Hero({ initialMenuOpen = false }) {
             className="absolute left-1/2 z-50 flex -translate-x-1/2 flex-col items-center text-white top-[calc(var(--p)*77)]"
           >
             <MenuEyeIcon isMenuOpen={false} color={"white"} />
-            <span className="mt-1 text-[18px] font-medium">menu</span>
+            <span className="mt-1 text-[14px] font-normal leading-[20px]">menu</span>
           </button>
           <h1 className="contents">
             <img
@@ -129,23 +129,24 @@ export default function Hero({ initialMenuOpen = false }) {
               which follows the screen's HEIGHT too, so in Safari (toolbars take ~100 px) the 14 px lines drew ~12 px.
               Now her phone type in plain px: the line under the logo Inter 20/29 (her frame), the two lines Inter
               Medium 16/23 (medium as on the computer), the button text 16 semibold; the blocks follow each other, so
-              on a short screen they never overlap; at 390 x 844 the button sits at her 552. */}
-          <div className="absolute inset-x-0 flex flex-col items-center px-5 text-center text-white top-[calc(var(--p)*343)]">
-            <p className="text-[20px] font-normal leading-[29px] tracking-[-0.01em]">
+              on a short screen they never overlap.
+              14 Nov, her updated MM-HOME-002 (13 Nov): the line under the logo 20/27, the two lines Inter 400 14/20
+              breaking after "product," (still plain px, so 14 on her iPhone too), the button the full 350 at 509,
+              menu label 14/20 regular. */}
+          <div className="absolute inset-x-0 flex flex-col items-center px-5 text-center text-white top-[calc(var(--p)*340)]">
+            <p className="text-[20px] font-normal leading-[27px] tracking-[-0.01em]">
               Your product works.
               <br />
               Nobody remembers it.
             </p>
-            <p className="mt-[calc(var(--p)*16)] max-w-[262px] text-[16px] font-medium leading-[23px] tracking-[-0.01em]">
-              {FOR_WHOM}
-              <br />
-              {WHAT}
+            <p className="mt-[calc(var(--p)*49)] max-w-[280px] text-[14px] font-normal leading-[20px] tracking-[-0.01em]">
+              {FOR_WHOM} {WHAT}
             </p>
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noreferrer"
-              className="mt-[calc(var(--p)*66)] flex h-[46px] w-[199px] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[16px] font-semibold whitespace-nowrap text-white backdrop-blur-md"
+              className="mt-[calc(var(--p)*26)] flex h-[46px] w-full items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[16px] font-semibold whitespace-nowrap text-white backdrop-blur-md"
               style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
             >
               Straight to Marta <ArrowIcon />
@@ -215,7 +216,7 @@ export default function Hero({ initialMenuOpen = false }) {
         href={WHATSAPP_URL}
         target="_blank"
         rel="noreferrer"
-        className="whatsapp-button fixed bottom-[5vh] right-[2.5vw] lg:bottom-[9.35vh] lg:right-[6.98vw] z-20 grid h-12 w-12 lg:h-[clamp(48px,3.54vw,68px)] lg:w-[clamp(48px,3.54vw,68px)] place-items-center rounded-full border border-white/20 text-white shadow-lg shadow-black/30 backdrop-blur-md transition"
+        className="whatsapp-button fixed bottom-[5vh] right-[2.5vw] max-md:bottom-[27px] max-md:right-[32px] max-md:h-[50px] max-md:w-[50px] lg:bottom-[9.35vh] lg:right-[6.98vw] z-20 grid h-12 w-12 lg:h-[clamp(48px,3.54vw,68px)] lg:w-[clamp(48px,3.54vw,68px)] place-items-center rounded-full border border-white/20 text-white shadow-lg shadow-black/30 backdrop-blur-md transition"
         aria-label="WhatsApp"
         onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)'}
         onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}
@@ -226,7 +227,7 @@ export default function Hero({ initialMenuOpen = false }) {
           alt="Call icon"
           width="20"
           height="20"
-          className="h-5 w-5"
+          className="h-5 w-5 max-md:h-[27px] max-md:w-[27px]"
         />
       </a>}
 

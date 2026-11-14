@@ -500,9 +500,9 @@ export default function ArtOfMoving({ open, onClose }) {
 
             {phase === "default" && (
               <div className="mm-fade-in absolute inset-0 flex flex-col items-center justify-center px-6 pt-[18%] text-center">
-                <p className="text-[17px] leading-[1.45] lg:leading-[1.5] lg:text-[clamp(15px,1.07vw,21px)] font-normal text-black/70">
-                  {/* her MM-G04-01 (11 Nov): "Press Space to jump. Ready?" */}
-                  {touch ? "Tap anywhere to jump. Ready?" : "Press Space to jump. Ready?"}
+                <p className="text-[17px] leading-[1.45] lg:leading-[1.41] lg:text-[clamp(15px,1.146vw,22px)] font-normal text-black/70">
+                  {/* her MM-G04-01 (11 Nov): "Press Space to jump. Ready?"; on the computer two lines at 22 px as her frame (14 Nov) */}
+                  {touch ? "Tap anywhere to jump. Ready?" : <>Press Space to jump.<br className="max-lg:hidden" /> Ready?</>}
                 </p>
                 <button
                   type="button"

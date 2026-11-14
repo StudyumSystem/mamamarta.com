@@ -112,8 +112,9 @@ export default function WhatIsSection() {
         <div className="absolute left-[52.7vw] top-[7.71vw] z-10">
           <Heading className="text-[7.8125vw] font-normal leading-[7.34vw] tracking-[-0.06em]" />
         </div>
-        {/* her Figma: body 22/31, -0.04em, 658 wide at 1011, 621; button text 22 semibold -0.017em */}
-        <p className="absolute left-[52.66vw] top-[32.34vw] z-10 w-[34.27vw] text-[1.146vw] leading-[1.615vw] tracking-[-0.04em] text-black/70">{BODY}</p>
+        {/* her Figma: body 22/31, -0.04em, 658 wide at 1011, 621; button text 22 semibold -0.017em;
+            her line breaks after "never notice," (14 Nov) */}
+        <p className="absolute left-[52.66vw] top-[32.34vw] z-10 w-[34.27vw] text-[1.146vw] leading-[1.615vw] tracking-[-0.04em] text-black/70">It is never accidental. It is the decisions people never notice,<br />but always feel.</p>
         <a
           href="/what-is"
           className="mm-gradient group absolute left-[52.66vw] top-[39.95vw] z-10 inline-flex h-[3.54vw] w-[16.25vw] items-center justify-center gap-[0.3em] text-[1.146vw] font-semibold tracking-[-0.017em] text-white"

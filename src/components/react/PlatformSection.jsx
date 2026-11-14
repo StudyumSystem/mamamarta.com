@@ -22,7 +22,7 @@ export default function PlatformSection() {
             </h2>
           </header>
           <div data-reveal className="ml-[calc(var(--q)*6)] w-[calc(var(--q)*292)] sm:ml-[0.677vw] sm:w-[29.64vw]">
-            <p className="text-[14px] leading-[20px] text-black/70 max-sm:tracking-[-0.04em] max-sm:text-black/60 sm:text-[max(1.146vw,13px)] sm:leading-[max(1.615vw,18px)] sm:tracking-[-0.04em]">A product is never finished. It grows through real use, and a system built to hold it.</p>
+            <p className="text-[14px] leading-[20px] text-black/70 max-sm:tracking-[-0.04em] max-sm:text-black/60 sm:text-[max(1.146vw,13px)] sm:leading-[max(1.615vw,18px)] sm:tracking-[-0.04em]">A product is never finished. It grows through real use, and <br className="max-sm:hidden" />a system built to hold it.</p>
           </div>
           <div className="mt-auto hidden sm:ml-[0.677vw] sm:mb-[0.417vw] sm:block">
             <div className="mb-[0.9vw] h-[2px] w-[9.8vw] bg-[#f48fcf]"></div>

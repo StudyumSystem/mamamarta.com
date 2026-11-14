@@ -181,23 +181,25 @@ export function ScoreScreen({ badge, label, value, stars, onDone, ms = SCORE_MS 
   // 38 tall at 299 in a 271 column, its text 16/20 at 354, the 485 line at 440. Her letter spacing: -4% on the
 // small lines, -9% on the 88 px result (-3% on the phone); without it "YOU WON" ran 16% wider than hers.
 // The game passes stage here too.
+// Phone (14 Nov, her MM-G02-06 Mobile_Score 1071:1988): trophy 12 from the word, label 9 under the trophy row,
+// result 20 under the label, the MM✦STARS line 88 under the result, its star 12 from the text.
   const u = (n) => `calc(${n}*var(--mm-u))`;
   return (
-    <div className="mm-fade-in flex flex-1 flex-col items-center justify-center px-[25px] text-center lg:pointer-events-none lg:absolute lg:inset-0 lg:justify-start lg:px-0 lg:pt-[var(--mm-score-top)]" style={{ "--mm-score-top": u(280) }} role="status">
+    <div className="mm-fade-in flex flex-1 flex-col items-center justify-center px-[25px] pb-[16px] text-center lg:pb-0 lg:pointer-events-none lg:absolute lg:inset-0 lg:justify-start lg:px-0 lg:pt-[var(--mm-score-top)]" style={{ "--mm-score-top": u(280) }} role="status">
       <div className="flex w-full max-w-[300px] flex-col items-center lg:w-[var(--w)] lg:max-w-none" style={{ "--w": u(504) }}>
         {badge && (
-          <p className="inline-flex items-center gap-[6px] text-[14px] leading-[31px] text-black/[0.69] tracking-[-0.04em] lg:gap-[var(--g)] lg:text-[length:var(--t)] lg:leading-[var(--l)]" style={{ "--g": u(8), "--t": u(16), "--l": u(31), "--i": u(24) }}>
+          <p className="inline-flex items-center gap-[12px] text-[14px] leading-[31px] text-black/[0.69] tracking-[-0.04em] lg:gap-[var(--g)] lg:text-[length:var(--t)] lg:leading-[var(--l)]" style={{ "--g": u(8), "--t": u(16), "--l": u(31), "--i": u(24) }}>
             <TrophyIcon className="h-[18px] w-[18px] lg:h-[var(--i)] lg:w-[var(--i)]" /> {badge}
           </p>
         )}
-        <p className="mt-[6px] text-[12px] leading-[20px] text-black/60 tracking-[-0.04em] lg:mt-[var(--m)] lg:text-[length:var(--t)] lg:leading-[var(--l)] lg:text-black/[0.69]" style={{ "--m": u(10), "--t": u(16), "--l": u(19) }}>{label}</p>
-        <p className="mt-[4px] whitespace-nowrap text-[60px] font-medium leading-[73px] tracking-[-0.03em] text-black lg:mt-[var(--m)] lg:text-[length:var(--t)] lg:leading-[var(--l)] lg:tracking-[-0.09em]" style={{ "--m": u(29), "--t": u(88), "--l": u(107) }}>{value}</p>
+        <p className="mt-[9px] text-[12px] leading-[20px] text-black/60 tracking-[-0.04em] lg:mt-[var(--m)] lg:text-[length:var(--t)] lg:leading-[var(--l)] lg:text-black/[0.69]" style={{ "--m": u(10), "--t": u(16), "--l": u(19) }}>{label}</p>
+        <p className="mt-[20px] whitespace-nowrap text-[60px] font-medium leading-[73px] tracking-[-0.03em] text-black lg:mt-[var(--m)] lg:text-[length:var(--t)] lg:leading-[var(--l)] lg:tracking-[-0.09em]" style={{ "--m": u(29), "--t": u(88), "--l": u(107) }}>{value}</p>
       </div>
-      <div className="mt-[52px] w-full max-w-[229px] lg:mt-[var(--m)] lg:w-[var(--w)] lg:max-w-none" style={{ "--m": u(103), "--w": u(485) }}>
+      <div className="mt-[88px] w-full max-w-[229px] lg:mt-[var(--m)] lg:w-[var(--w)] lg:max-w-none" style={{ "--m": u(103), "--w": u(485) }}>
         {/* 12 Nov 13:34 (Marta: "Great work" must sit on the centre line, ours was left-aligned and the composition
             looked uneven): the MM✦STARS line and its text are centred, in every game */}
         <div className="mx-auto w-fit text-center lg:w-[var(--w)]" style={{ "--w": u(271) }}>
-          <p className="inline-flex items-center gap-[10px] whitespace-nowrap text-[18px] leading-[31px] tracking-[-0.04em] text-black lg:gap-[var(--g)] lg:text-[length:var(--t)] lg:leading-[var(--l)]" style={{ "--g": u(12), "--t": u(30), "--l": u(38), "--i": u(38) }}>
+          <p className="inline-flex items-center gap-[12px] whitespace-nowrap text-[18px] leading-[31px] tracking-[-0.04em] text-black lg:gap-[var(--g)] lg:text-[length:var(--t)] lg:leading-[var(--l)]" style={{ "--g": u(12), "--t": u(30), "--l": u(38), "--i": u(38) }}>
             {stars} MM✦STARS <StarBadge className="h-[24px] w-[24px] lg:h-[var(--i)] lg:w-[var(--i)]" />
           </p>
           {/* her text box is 271 x 40 at 16/20, two lines; its width in em so it wraps as hers on every screen */}
@@ -267,7 +269,7 @@ function StarsBlock() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="flex w-full max-w-[300px] flex-col items-stretch gap-[16px] lg:max-w-[clamp(420px,27.4vw,526px)] lg:gap-[clamp(20px,1.67vw,32px)]">
+    <form onSubmit={submit} noValidate className="flex w-full max-w-[300px] flex-col items-stretch gap-[16px] lg:max-w-[clamp(420px,27.4vw,526px)] lg:gap-[clamp(20px,2.71vw,52px)]">
       {step === "idle" ? (
         <div className="flex items-center justify-between gap-4 text-left">
           {/* her text box is 342 x 50 at 16/25 (two lines); width in em so it wraps as hers on every screen */}
@@ -335,10 +337,21 @@ export function Completion({ quote, onPlayAgain }) {
 // frame's place: absolute in the panel, its top and size in --mm-u (Tic-Tac-Toe 525 at 247, Word Hunt 739 at 178,
 // ...). So on every screen it takes the share of the height her frame gives it; the text row above stays in vw.
 export const STAGE_UNIT = "min(100vh / 1019, 100vw / 1280)";
+
+// The phone's music row (music button, MM✦, counter), phone only.
+export function PhoneHud({ stars = null, counter = null, className = "" }) {
+  return (
+    <div className={`${className} flex w-full items-center justify-between lg:hidden`}>
+      <SoundButton className="max-lg:h-[36px] max-lg:w-[36px]" />
+      <span className="text-[18px] leading-[22px]" style={{ color: PINK }}>{stars == null ? null : `${stars} MM✦`}</span>
+      <span className="min-w-[36px] text-right text-[14px] leading-[20px] text-black/60" aria-live="polite">{counter}</span>
+    </div>
+  );
+}
 export default function GameModal({
   open, onClose, instructions, counter, label, children, phoneCounter = "mt-3",
   game = false, stars = null, hud = true, confirm = null, onBack = null, stage = false,
-  textBox = [356, 608], phoneTextW = 305,
+  textBox = [356, 608], phoneTextW = 305, phoneHud = true,
 }) {
   const panelRef = useRef(null);
   const returnFocus = useRef(null);
@@ -490,12 +503,9 @@ export default function GameModal({
         </div>
         {showHud ? (
           /* phone (her MM-G0x Mobile): music button left, MM✦ in the middle, counter right; 13 Nov from her
-             MM-G01 Mobile frame: the button 36 x 36, MM✦ Inter 18/22 pink, the counter 14/20 black 60% */
-          <div className="mt-[18px] flex items-center justify-between px-[15px] lg:hidden">
-            <SoundButton className="max-lg:h-[36px] max-lg:w-[36px]" />
-            <span className="text-[18px] leading-[22px]" style={{ color: PINK }}>{starsText}</span>
-            <span className="min-w-[36px] text-right text-[14px] leading-[20px] text-black/60" aria-live="polite">{counter}</span>
-          </div>
+             MM-G01 Mobile frame: the button 36 x 36, MM✦ Inter 18/22 pink, the counter 14/20 black 60%.
+             phoneHud={false}: the game draws this row itself next to its board (PhoneHud, Tic-Tac-Toe). */
+          phoneHud && <PhoneHud className="mt-[18px] px-[15px]" stars={stars} counter={counter} />
         ) : (
           counter != null && phoneCounter && (
             <span className={`${phoneCounter} self-end px-[15px] text-[16px] leading-[20px] font-normal text-black/70 lg:hidden`} aria-live="polite">{counter}</span>

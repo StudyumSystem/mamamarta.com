@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import GameModal, { Completion, ScoreScreen, PINK } from "./GameModal.jsx";
+import GameModal, { Completion, ScoreScreen, PhoneHud, PINK } from "./GameModal.jsx";
 import { takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
 import { play as playSound } from "./sound.js";
 import Burst from "./Burst.jsx";
@@ -315,6 +315,7 @@ export default function TicTacToe({ open, onClose }) {
       textBox={[356, 689]}
       stars={ended ? null : outcome ? RESULT[outcome].stars : 0}
       hud={!ended}
+      phoneHud={false}
       confirm={ended ? "completed" : board.some(Boolean) && !outcome ? "game" : null}
     >
       {phase === "done" && quote ? (
@@ -322,7 +323,10 @@ export default function TicTacToe({ open, onClose }) {
       ) : phase === "score" ? (
         <ScoreScreen badge="Well played" label="Round completed" value={RESULT[outcome].value} stars={RESULT[outcome].stars} onDone={toQuote} />
       ) : (
-        <div className={`flex flex-1 items-center justify-center overflow-clip px-[15px] py-8 lg:pointer-events-none lg:absolute lg:inset-0 lg:items-start lg:p-0 ${size === 4 ? "lg:pt-[calc(212*var(--mm-u))]" : "lg:pt-[calc(247*var(--mm-u))]"}`}>
+        // phone (14 Nov, her MM-G03-04 Mobile / Default 1054:3004): the music row sits 16 px above the board, not
+        // under the text; the two together a little above the middle (her row at 215, board at 267 of 847)
+        <div className={`flex flex-1 flex-col items-center justify-center overflow-clip px-[15px] pb-[66px] pt-4 lg:flex-row lg:pointer-events-none lg:absolute lg:inset-0 lg:items-start lg:justify-center lg:p-0 ${size === 4 ? "lg:pt-[calc(212*var(--mm-u))]" : "lg:pt-[calc(247*var(--mm-u))]"}`}>
+          <PhoneHud className="mb-[16px]" stars={outcome ? RESULT[outcome].stars : 0} />
           {/* MM-G03-02 (11 Nov): 175 px squares at 1920, 1 px #969696 lines; empty squares grey, played squares white (her Active frame).
               4x4 (12 Nov): four squares a side; the board itself is square and splits into equal rows, so the lines
               stay straight when a square comes out at a fraction of a pixel.
@@ -332,7 +336,7 @@ export default function TicTacToe({ open, onClose }) {
               the top (MM-G03-02 _Desktop_4*4 _Grid). On the phone both stay 310 wide, as her two phone frames. */}
           <div
             ref={boardRef}
-            className={`${fx === "fade" ? "mm-fade-out" : ""} relative grid aspect-square w-[min(310px,100%,calc(100cqh-64px))] max-w-[420px] ${size === 4 ? "grid-cols-4 grid-rows-4 lg:w-[calc(700*var(--mm-u))]" : "grid-cols-3 grid-rows-3 lg:w-[calc(525*var(--mm-u))]"} gap-px border border-[#969696] bg-[#969696] lg:pointer-events-auto lg:max-w-none`}
+            className={`${fx === "fade" ? "mm-fade-out" : ""} relative grid aspect-square w-[min(310px,100%,calc(100cqh-134px))] max-w-[420px] ${size === 4 ? "grid-cols-4 grid-rows-4 lg:w-[calc(700*var(--mm-u))]" : "grid-cols-3 grid-rows-3 lg:w-[calc(525*var(--mm-u))]"} gap-px border border-[#969696] bg-[#969696] lg:pointer-events-auto lg:max-w-none`}
             style={fx === "fade" ? { animationDuration: "850ms" } : undefined}
             role="grid"
             aria-label={`Tic-Tac-Toe board, ${size} by ${size}`}

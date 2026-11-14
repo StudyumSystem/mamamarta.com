@@ -507,7 +507,8 @@ export default function ArtOfMoving({ open, onClose }) {
                 <button
                   type="button"
                   onClick={start}
-                  className="mm-gradient mt-10 inline-flex h-[60px] w-full max-w-[312px] items-center justify-center gap-2 text-[18px] font-semibold text-white lg:mt-[clamp(28px,4.4vw,84px)] lg:h-[clamp(54px,3.7vw,71px)] lg:w-[clamp(240px,16.9vw,325px)] lg:text-[clamp(16px,1.146vw,22px)]"
+                  // phone: her phone buttons are 199 x 46, Inter 600 16 (MM-G04 Mobile, Marta 13 Nov 22:07 "the button is the wrong size")
+                  className="mm-gradient mt-8 inline-flex h-[46px] w-[199px] items-center justify-center gap-2 text-[16px] font-semibold tracking-[-0.023em] text-white lg:tracking-normal lg:mt-[clamp(28px,4.4vw,84px)] lg:h-[clamp(54px,3.7vw,71px)] lg:w-[clamp(240px,16.9vw,325px)] lg:text-[clamp(16px,1.146vw,22px)]"
                 >
                   Start <span aria-hidden="true">→</span>
                 </button>

@@ -52,8 +52,8 @@ const ENTRIES = [
     // her current Figma (12 Nov): the text box is 528 px wide on the computer (textW)
     text: "Some things are hiding in plain sight. You will find them fast, and then wonder how long they were there.",
     textW: "27.5vw",
-    // her M drawn in code instead of m.mp4 (Marta, 13 Nov: the dots run round the whole outline, alive): HalftoneM
-    visual: { kind: "halftone-m", alt: "Letter M" },
+    // her own M video again (Marta, 13 Nov 21:29: the M drawn in code "looks even worse", put back the animation she gave)
+    visual: { kind: "video", src: "/assets/m.mp4", poster: "/assets/m-poster.webp", alt: "Letter M" },
   },
   // 02-06: her updated texts (kept Figma copy, 12 Nov: the "Homepage / Slider Position" frames of MM-GAME-02 … 05
   // and MM-C06), Inter 22/34 -0.04em black 69%, text boxes 617 px wide (598 for The Art of Moving).

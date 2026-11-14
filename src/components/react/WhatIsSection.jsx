@@ -148,7 +148,7 @@ export default function WhatIsSection() {
         {/* MM-HOME-002, 13 Nov 21:46 UTC (iPhone 16 & 17 Pro - 8, one 844 screen, right after the first screen):
             heading Inter Medium 64/65 -0.06em at 14, 65 ("experience" stays her italic 400); body 14/20 -0.04em
             black 70% at 20, 280 in her three lines; button the full 350 x 46 at 20, 375, 16 semibold -0.023em */}
-        <Heading className="absolute left-[calc(var(--q)*14)] top-[calc(var(--q)*65)] z-10 text-[length:calc(var(--q)*64)] font-medium leading-[calc(var(--q)*65)] tracking-[-0.06em]" />
+        <Heading className="absolute left-[calc(var(--q)*14)] top-[calc(var(--q)*65)] z-10 text-[length:calc(var(--q)*64)] font-normal leading-[calc(var(--q)*60)] tracking-[-0.06em]" />
         <p className="absolute left-[calc(var(--q)*20)] top-[calc(var(--q)*280)] z-10 whitespace-nowrap text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/70">
           It is never accidental.<br />It is the decisions people<br />never notice, but always feel.
         </p>

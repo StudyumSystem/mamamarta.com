@@ -22,11 +22,12 @@ export default function PlatformSection() {
             </h2>
           </header>
           <div data-reveal className="ml-[calc(var(--q)*6)] w-[calc(var(--q)*292)] sm:ml-[0.677vw] sm:w-[29.64vw]">
-            <p className="text-[14px] leading-[20px] text-black/70 max-sm:tracking-[-0.04em] max-sm:text-black/60 sm:text-[1.146vw] sm:leading-[1.615vw] sm:tracking-[-0.04em]">A product is never finished. It grows through real use, and a system built to hold it.</p>
+            <p className="text-[14px] leading-[20px] text-black/70 max-sm:tracking-[-0.04em] max-sm:text-black/60 sm:text-[max(1.146vw,13px)] sm:leading-[max(1.615vw,18px)] sm:tracking-[-0.04em]">A product is never finished. It grows through real use, and a system built to hold it.</p>
           </div>
           <div className="mt-auto hidden sm:ml-[0.677vw] sm:mb-[0.417vw] sm:block">
             <div className="mb-[0.9vw] h-[2px] w-[9.8vw] bg-[#f48fcf]"></div>
-            <p className="text-[1.146vw] uppercase leading-[1.094vw] tracking-[-0.017em] text-black/50">Platform layer</p>
+            {/* 14 Nov: on a tablet (768) these were 8-9 px; the px floors only reach below 1150 wide, so laptop and desktop keep her vw */}
+            <p className="text-[max(1.146vw,12px)] uppercase leading-[max(1.094vw,13px)] tracking-[-0.017em] text-black/50">Platform layer</p>
           </div>
         </div>
         {/* phone: her picture 388 x 349 at the screen's left edge, at 380 of her frame (14 Nov: it sat 20 higher) */}

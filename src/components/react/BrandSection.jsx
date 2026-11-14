@@ -74,16 +74,18 @@ export default function BrandSection() {
       {/* Her current Figma (kept copy, 12 Nov, frame 1920 x 540), places from the frame's top-left: text 22/31
           -0.04em, 560 wide at 163, 99; the call line 15/34 at 172; button 312 x 68 at 236; icons in 40 px boxes at
           399, 23 apart; © 18/38 at 378, 408; the MAMA / MARTA letters from 1014, 108. */}
-      <div className="relative z-10 hidden md:grid md:h-[28.125vw] md:grid-cols-[35.8vw_35vw] md:gap-x-[8.36vw] md:pl-[8.49vw] md:pt-[5.156vw] md:pb-[4.896vw]">
+      {/* 14 Nov, tablet (768): the texts were 6-9 px and the icons 16; px floors below about 1150 wide (taller
+          block, readable text), laptop and desktop keep her vw */}
+      <div className="relative z-10 hidden md:grid md:h-[max(28.125vw,260px)] md:grid-cols-[35.8vw_35vw] md:gap-x-[8.36vw] md:pl-[8.49vw] md:pt-[5.156vw] md:pb-[4.896vw]">
         <h2 className="order-2 select-none md:self-start md:pt-[0.47vw]">
           <img src="/assets/brand/footer-logo.png" alt="MAMA MARTA" className="h-auto w-full" />
         </h2>
 
         <div className="order-1 flex flex-col">
-          <p className="text-[15px] leading-[1.41] md:max-w-[29.17vw] md:text-[1.146vw] md:leading-[1.615vw] md:tracking-[-0.04em]">
+          <p className="text-[15px] leading-[1.41] md:max-w-[max(29.17vw,260px)] md:text-[max(1.146vw,13px)] md:leading-[max(1.615vw,18px)] md:tracking-[-0.04em]">
             {WHAT_WE_DO}
           </p>
-          <p className="mt-5 text-[14px] font-normal leading-[1.45] text-white md:mt-[0.573vw] md:text-[0.781vw] md:leading-[1.77vw] md:tracking-[-0.04em]">
+          <p className="mt-5 text-[14px] font-normal leading-[1.45] text-white md:mt-[0.573vw] md:text-[max(0.781vw,11px)] md:leading-[max(1.77vw,16px)] md:tracking-[-0.04em]">
             {CALL_LINE}
           </p>
 
@@ -103,11 +105,11 @@ export default function BrandSection() {
             <div className="flex gap-4 md:gap-[1.198vw]">
               {icons.map((icon) => (
                 <a key={icon.alt} href={icon.href} target={icon.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="-m-2 inline-flex p-2 transition-opacity hover:opacity-70 md:m-0 md:p-0">
-                  <img src={icon.src} alt={icon.alt} className="h-6 w-6 md:h-[2.083vw] md:w-[2.083vw]" />
+                  <img src={icon.src} alt={icon.alt} className="h-6 w-6 md:h-[max(2.083vw,22px)] md:w-[max(2.083vw,22px)]" />
                 </a>
               ))}
             </div>
-            <p className="text-[13px] opacity-[0.84] md:mt-[0.47vw] md:text-[0.9375vw] md:leading-[1.98vw] md:tracking-[-0.04em]">© Mamamarta 2026</p>
+            <p className="text-[13px] opacity-[0.84] md:mt-[0.47vw] md:text-[max(0.9375vw,11px)] md:leading-[max(1.98vw,16px)] md:tracking-[-0.04em]">© Mamamarta 2026</p>
           </div>
         </div>
       </div>

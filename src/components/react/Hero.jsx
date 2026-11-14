@@ -114,7 +114,7 @@ export default function Hero({ initialMenuOpen = false }) {
             className="absolute left-1/2 z-50 flex -translate-x-1/2 flex-col items-center text-white top-[calc(var(--p)*77)]"
           >
             <MenuEyeIcon isMenuOpen={false} color={"white"} />
-            <span className="mt-1 text-[14px] font-normal leading-[20px]">menu</span>
+            <span className="mt-1 text-[14px] font-normal leading-[20px] tracking-[-0.04em]">menu</span>
           </button>
           <h1 className="contents">
             <img

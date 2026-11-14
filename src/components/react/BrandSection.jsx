@@ -58,15 +58,16 @@ export default function BrandSection() {
         </div>
         {/* MM-HOME-002 (13 Nov): text 266 wide; icons in 40 px boxes at 20 / 83 / 147, 26 px above the ©, which
             ends 41 px from the bottom (the same 40 px icons as the computer) */}
-        {/* 14 Nov: icons 32 at 23 / 87 / 150, 105 above the bottom; © 13/16 regular, 49 above the bottom */}
-        <div className="absolute bottom-[calc(var(--q)*105)] left-[calc(var(--q)*23)] flex gap-[calc(var(--q)*31.5)]">
+        {/* 14 Nov, her newest MM-HOME-002 (changed 13 Nov 22:17 UTC): icons in 40 px boxes at 20 / 83.5 / 147, 102 above
+            the bottom; © Inter 14/20 -0.04em #F5F5F5, 46 above the bottom */}
+        <div className="absolute bottom-[calc(var(--q)*102)] left-[calc(var(--q)*20)] flex gap-[calc(var(--q)*23.5)]">
           {icons.map((icon) => (
             <a key={icon.alt} href={icon.href} target={icon.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="inline-flex">
-              <img src={icon.src} alt={icon.alt} className="h-[calc(var(--q)*32)] w-[calc(var(--q)*32)]" />
+              <img src={icon.src} alt={icon.alt} className="h-[calc(var(--q)*40)] w-[calc(var(--q)*40)]" />
             </a>
           ))}
         </div>
-        <p className="absolute bottom-[calc(var(--q)*49)] left-[calc(var(--q)*20)] text-[length:calc(var(--q)*13)] font-normal leading-[calc(var(--q)*16)] text-[#F5F5F5]">© Mamamarta 2026</p>
+        <p className="absolute bottom-[calc(var(--q)*46)] left-[calc(var(--q)*20)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-[#F5F5F5]">© Mamamarta 2026</p>
       </div>
 
       {/* Desktop, her new home frame of 9 Nov: copy, button and the icons / © row on the left (165-852 px),

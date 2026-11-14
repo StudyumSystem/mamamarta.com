@@ -7,6 +7,7 @@ import ConnectPath from "./games/ConnectPath.jsx";
 import ArrowIcon from "./ArrowIcon.jsx";
 import RollingCounter from "./RollingCounter.jsx";
 import HalftoneM from "./HalftoneM.jsx";
+import WhiteVideo from "./WhiteVideo.jsx";
 
 // MM-HOME "The founder's challenge" (Marta's spec 01-home.md, frames MM-G01-00 … MM-G05-00, MM-C06 _Entry).
 // Desktop: text left, carousel right with 6 entries; autoplay for each entry's reading time in a loop (06 → 01), paused while the
@@ -154,7 +155,8 @@ function LoopVideo({ src, poster, alt, active, className, style }) {
     el.addEventListener("canplay", play);
     return () => el.removeEventListener("canplay", play);
   }, [active, src]);
-  return <video ref={ref} data-lazy-video data-src={src} poster={poster} muted autoPlay loop playsInline preload="none" aria-label={alt} className={className} style={style} />;
+  // drawn through a canvas too, so its white is the page's white on an iPhone (WhiteVideo.jsx, Marta 14 Nov)
+  return <WhiteVideo videoRef={ref} data-lazy-video data-src={src} poster={poster} muted autoPlay loop playsInline preload="none" aria-label={alt} className={className} style={style} />;
 }
 
 // The Art of Moving card's figure (Marta, 10 Nov): her walk, her leap, the walk again, her stumble and rise,
@@ -456,7 +458,7 @@ function Ctas({ entry, onPlay }) {
 // -0.023em. Play →; under the last entry one button, "Make a game for my brand" with her arrow
 // (Icon_Arrow_Right_Outline_18), which opens the brand form.
 function PhoneCtas({ entry, onPlay }) {
-  const base = "mm-gradient flex w-full items-center justify-center gap-[0.4em] font-semibold tracking-[-0.023em] text-white h-[calc(var(--q)*46)] text-[length:calc(var(--q)*16)]";
+  const base = "mm-gradient flex w-full items-center justify-center gap-[0.4em] font-semibold tracking-[-0.023em] text-white h-[calc(var(--q)*46)] text-[length:calc(var(--q)*16)] leading-[calc(var(--q)*21)]";
   if (entry.id === "collaborate")
     return (
       <button type="button" onClick={() => openForm("brand")} className={base}>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ArrowIcon from "./ArrowIcon";
 import { submitForm } from "./forms/submitForm";
 
@@ -19,7 +19,7 @@ const newId = () =>
 // 14 Nov, tablet (768): labels were 5-6 px and the text 7-9 px; px floors below about 1150 wide, laptop and desktop unchanged.
 const labelCls = "block text-[12px] md:text-[max(0.729vw,10px)] font-normal leading-[15px] md:leading-[max(0.882vw,12px)] tracking-[-0.04em] md:tracking-[-0.04em] text-black/[.69] md:text-black/70";
 const inputCls =
-  "mt-[5px] md:mt-[0.26vw] block w-full border border-black/20 bg-white px-[12px] md:px-[1.094vw] " +
+  "mt-[5px] md:mt-[0.26vw] block w-full border border-[#D4D4D4] md:border-black/20 bg-white px-[12px] md:px-[1.094vw] " +
   "text-[16px] md:text-[max(1.146vw,13px)] tracking-[-0.04em] md:tracking-[-0.04em] font-normal md:font-normal text-black placeholder:text-black/40 md:placeholder:text-black/40 outline-none transition-colors focus:border-black";
 const errorCls = "mt-1 text-[12px] md:text-[clamp(12px,0.73vw,14px)] text-[#c2006f]";
 
@@ -28,6 +28,15 @@ export default function ContactSection() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
+  // 14 Nov: her phone frame's email placeholder is "Your Email Address", her desktop frame's "Your email"
+  const [phone, setPhone] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767.98px)");
+    const on = () => setPhone(mq.matches);
+    on();
+    mq.addEventListener?.("change", on);
+    return () => mq.removeEventListener?.("change", on);
+  }, []);
   const [failed, setFailed] = useState(false);
   const [sent, setSent] = useState(false);
   const submissionId = useRef(newId());
@@ -70,7 +79,11 @@ export default function ContactSection() {
 
         <div className="mt-[calc(var(--q)*34)] md:mt-[0.99vw]">
           {/* who it is for, 18/34 -0.04em black 69% on the computer, 14/20 -0.04em black 60% on the phone */}
-          <p className="w-[calc(var(--q)*292)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] text-black/70 max-md:tracking-[-0.04em] max-md:text-black/60 md:w-auto md:text-[max(0.9375vw,12px)] md:leading-[max(1.77vw,18px)] md:tracking-[-0.04em]">
+          {/* 14 Nov (her rule: her newest frame is the spec): the phone says her MM-HOME-002 line, 238 wide; the computer keeps hers */}
+          <p className="w-[calc(var(--q)*238)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/60 md:hidden">
+            We work with people who value thoughtful design and bold decisions.
+          </p>
+          <p className="hidden font-normal text-black/70 md:block md:text-[max(0.9375vw,12px)] md:leading-[max(1.77vw,18px)] md:tracking-[-0.04em]">
             We work with funded founders who would rather be understood than liked.
           </p>
 
@@ -86,7 +99,7 @@ export default function ContactSection() {
                 type="email"
                 inputMode="email"
                 autoComplete="email"
-                placeholder="Your email"
+                placeholder={phone ? "Your Email Address" : "Your email"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 aria-invalid={!!error}
@@ -119,8 +132,9 @@ export default function ContactSection() {
               </button>
 
               {failed && <p className={`${errorCls} mt-3`} role="alert">Something went wrong. Please try submitting again.</p>}
-              {/* Not in her frame: the privacy line approved on 28 Oct, kept in the space under the button so her layout is unchanged */}
-              <p className="mt-[14px] text-[11px] font-light leading-[1.45] text-black/50 md:absolute md:left-0 md:right-0 md:top-full md:mt-[0.9vw] md:text-[clamp(10px,0.63vw,12px)]">
+              {/* Not in her frame: the privacy line approved on 28 Oct, kept in the space under the button so her layout is
+                  unchanged on the computer; 14 Nov, not on the phone (her MM-HOME-002 has none, and it pushed the footer 63 px down) */}
+              <p className="mt-[14px] text-[11px] max-md:hidden font-light leading-[1.45] text-black/50 md:absolute md:left-0 md:right-0 md:top-full md:mt-[0.9vw] md:text-[clamp(10px,0.63vw,12px)]">
                 We use your details only to reply to you and keep them private. We never sell them. To have them deleted, write to{" "}
                 <a href="mailto:mymamamarta@icloud.com" className="underline underline-offset-2">mymamamarta@icloud.com</a>.
               </p>

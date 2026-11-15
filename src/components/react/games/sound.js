@@ -123,8 +123,9 @@ function tone(ac, { freq, to, type = "sine", start = 0, dur = 0.1, gain = 0.1 })
 }
 
 // A short burst of filtered noise: paper, wood, a soft swish (no file, made in the browser).
+// 15 Nov: `to` glides the filter, so the swish can rise (The Art of Moving's jump).
 let noiseBuf = null;
-function noise(ac, { freq = 2000, q = 1, type = "bandpass", start = 0, dur = 0.08, gain = 0.1 }) {
+function noise(ac, { freq = 2000, to, q = 1, type = "bandpass", start = 0, dur = 0.08, gain = 0.1 }) {
   if (!noiseBuf) {
     noiseBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.5), ac.sampleRate);
     const d = noiseBuf.getChannelData(0);
@@ -136,6 +137,7 @@ function noise(ac, { freq = 2000, q = 1, type = "bandpass", start = 0, dur = 0.0
   const f = ac.createBiquadFilter();
   f.type = type;
   f.frequency.setValueAtTime(freq, t0);
+  if (to) f.frequency.exponentialRampToValueAtTime(to, t0 + dur);
   f.Q.value = q;
   const g = ac.createGain();
   g.gain.setValueAtTime(0.0001, t0);
@@ -218,6 +220,34 @@ SETS["memory-match"].match = (ac, run = 1) => {
 };
 SETS["word-hunt"].match = (ac) => [523.25, 659.25, 783.99].forEach((freq, i) => { tone(ac, { freq, start: i * 0.07, dur: 0.22, gain: 0.08 }); tone(ac, { freq: freq * 4, start: i * 0.07, dur: 0.04, gain: 0.02 }); });
 SETS["art-of-moving"].coin = SETS["art-of-moving"].flip;
+// 15 Nov (Marta: "the game lacks sounds for the jump, for voicing the moves … when the figure collects many coins
+// in a row, make a rising sound"; her 11 Nov rule: very minimal, never irritating). All soft and short:
+// jump = a light rising swish of air with a soft rising blip under it; land = a muted thud of a soft shoe;
+// step = a barely-there tap for each footfall of her walk; coin = the retro coin, a step higher (C D E F G A of a
+// major scale) for every coin in a row, a little quieter as it climbs; bonus = a bright little sparkle for every
+// third coin in a row.
+const AOM_STEPS = [0, 2, 4, 5, 7, 9];
+Object.assign(SETS["art-of-moving"], {
+  jump: (ac) => {
+    noise(ac, { freq: 900, to: 2400, q: 0.8, dur: 0.16, gain: 0.025 });
+    tone(ac, { freq: 330, to: 620, dur: 0.13, gain: 0.03 });
+  },
+  land: (ac) => {
+    tone(ac, { freq: 150, to: 85, dur: 0.1, gain: 0.06 });
+    noise(ac, { freq: 600, q: 0.7, type: "lowpass", dur: 0.06, gain: 0.03 });
+  },
+  step: (ac) => noise(ac, { freq: 650 * (0.92 + Math.random() * 0.16), q: 1.1, dur: 0.04, gain: 0.012 }),
+  coin: (ac, run = 1) => {
+    const st = AOM_STEPS[Math.min(Math.max(1, run), AOM_STEPS.length) - 1];
+    const k = Math.pow(2, st / 12), gain = 0.03 * Math.pow(2, -st / 24);
+    tone(ac, { freq: 987.77 * k, type: "square", dur: 0.06, gain });
+    tone(ac, { freq: 1318.5 * k, type: "square", start: 0.06, dur: 0.18, gain });
+  },
+  bonus: (ac) => {
+    kalimba(ac, 1046.5, 0.16, 0.035, 0.7);
+    [1567.98, 2093, 2637, 3135.96].forEach((freq, i) => tone(ac, { freq, type: "triangle", start: 0.18 + i * 0.05, dur: 0.1, gain: 0.025 }));
+  },
+});
 const SHARED = {
   coins: (ac) => [1567.98, 2093, 2637].forEach((freq, i) => tone(ac, { freq, type: "triangle", start: i * 0.045, dur: 0.08, gain: 0.03 })),
   count: (ac) => Array.from({ length: 8 }, (_, i) => tone(ac, { freq: 1200 + i * 110, type: "triangle", start: i * 0.075, dur: 0.05, gain: 0.03 })),

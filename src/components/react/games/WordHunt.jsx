@@ -119,31 +119,25 @@ function straight(a, b) {
 }
 
 // 14 Nov (Marta's iPhone video: swiping PATTERN lit PATTERNU and it never counted): on a touch screen the swipe's
-// end moves on to a letter only once the finger is 30% inside it, and back only once 30% inside the one before, so a
+// end moves on to a letter only once the finger is 40% inside it, and back only once 40% inside the one before, so a
 // fingertip on a border or rolling as it lifts doesn't flick the end onto the next letter. The start stays where the
 // finger first touched; the mouse keeps the plain letter under it (dead 0, as before).
-const DEAD = 0.3;
+const DEAD = 0.4;
 // f: the finger along one axis in cells (2.5 = the middle of the third); cur: the end's cell on that axis now
 function steady(f, cur, dead) {
   const k = f >= cur + 1 + dead ? Math.floor(f - dead) : f < cur - dead ? Math.floor(f + dead) : cur;
   return Math.min(SIZE - 1, Math.max(0, k));
 }
 
-// 14 Nov (the same video): a word not found yet counts when all its letters lie in the swipe with at most one extra
-// letter at either end (the finger ran one letter on, or started one early); a whole row doesn't, nor a swipe shorter
-// than the word. An exact swipe is the case with nothing extra; if two words fit, the longer one. Only the word's own
-// letters stay pink (its placed cells), never the extra one.
+// 14 Nov (a player's feedback through Marta: "frame" with a "k" counted): a word not found yet counts only when the
+// swipe holds exactly its letters, from either end, and not one more or one less; FRAMEK, PATTERNU or ATTERN never
+// count. The finger's overshoot is caught by the dead zone above instead, so what lights up is what is checked.
 function pickWord(sel, placed, found) {
-  let best = null;
   for (const p of placed) {
-    if (found.includes(p.word)) continue;
-    const at = p.cells.map((i) => sel.indexOf(i));
-    if (at.includes(-1)) continue;
-    // the swipe is one straight line, so the word's letters are one run inside it: what is left over at each end
-    if (Math.min(...at) > 1 || sel.length - 1 - Math.max(...at) > 1) continue;
-    if (!best || p.word.length > best.word.length) best = p;
+    if (found.includes(p.word) || sel.length !== p.cells.length) continue;
+    if (p.cells.every((i, k) => sel[k] === i) || p.cells.every((i, k) => sel[sel.length - 1 - k] === i)) return p;
   }
-  return best;
+  return null;
 }
 
 export default function WordHunt({ open, onClose }) {

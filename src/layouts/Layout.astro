@@ -10,6 +10,10 @@ import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
+// Her "experience" font (global.css, .mm-exp), served with the site and asked for with the page (14 Nov, Marta:
+// "Слово experience скаче і міняє шрифт": fetched from jsDelivr after the page had loaded, it replaced the site's
+// italic on screen and moved the word). TODO on commit: move the file into public/fonts and point both here.
+import expItalic from '../../../../from-phone/Inter-Italic.woff2?url';
 
 interface Props {
 	title?: string;
@@ -18,6 +22,8 @@ interface Props {
 	preload?: { href: string; media?: string }[];
 	// The browser bar colour (Safari, Chrome on phones): white on the white game pages, black elsewhere (the dark hero).
 	themeColor?: string;
+	// The page has her italic "experience" (the home page): its font is fetched with the page, before the first paint.
+	italicWord?: boolean;
 }
 const site = 'https://mamamarta.com';
 const {
@@ -25,6 +31,7 @@ const {
 	description = 'Mamamarta is a design house for digital products, crafted to shape systems, interactions, and digital identity. Book a discovery call.',
 	preload = [],
 	themeColor = '#000000',
+	italicWord = false,
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, site).href;
 ---
@@ -61,6 +68,7 @@ const canonical = new URL(Astro.url.pathname, site).href;
 			sameAs: ['https://www.linkedin.com/company/mamamarta/', 'https://www.instagram.com/mymamamarta/'],
 		})} />
 		{preload.map((p) => <link rel="preload" as="image" href={p.href} media={p.media} fetchpriority="high" />)}
+		{italicWord && <link rel="preload" as="font" type="font/woff2" href={expItalic} crossorigin />}
 		<ClientRouter />
 	</head>
 	<body>
@@ -69,7 +77,6 @@ const canonical = new URL(Astro.url.pathname, site).href;
 			import '../scripts/scroll-reveals.js';
 			import '../scripts/lazy-videos.js';
 			import '../scripts/back-link.js';
-			import '../scripts/late-fonts.js';
 		</script>
 	</body>
 </html>

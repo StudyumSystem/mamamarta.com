@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import GameModal, { Completion, ScoreScreen, StarIcon } from "./GameModal.jsx";
 import { takeQuote, prefersReducedMotion, recordStars, ROUND_STARS } from "./shared.js";
 import { play as playSound } from "./sound.js";
-import { H0, FH, BODY_U, PLAT_H, COIN_R, FOOT_FRONT, GRACE, V0, Y_START, SPEED0, clamp, newWorld, pressJump, runStep } from "./aomWorld.js";
+import { H0, FH, BODY_U, PLAT_H, COIN_R, FOOT_FRONT, FOOT_BACK, GRACE, V0, G, Y_START, SPEED0, STREAK_BONUS, POP_T, clamp, newWorld, pressJump, runStep } from "./aomWorld.js";
 import SHEETS from "./aomPoses.json";
-const sound = (name) => playSound(name, "art-of-moving");
+const sound = (name, level) => playSound(name, "art-of-moving", level);
 
 // MM-GAME-04 The Art of Moving (Marta's spec + frames MM-G04-01…05): endless runner.
 // Default → Start → countdown 3, 2, 1, GO → automatic run, one input = one fixed jump → one fall ends the run
@@ -30,13 +30,34 @@ const sound = (name) => playSound(name, "art-of-moving");
 //   next one, and she fell (30 to 80 runs of 100, measured on the check page). Her first five bricks are now level
 //   or a small step down with gaps of 64 to 70, a landing a hair late still counts, and a jump that comes down
 //   short lands on her back foot: no press there can end the run (aomWorld.js).
+// 15 Nov (Marta: "the moves look a little delayed, blurred, there's no plasticity … it looks like it's being
+// chopped"; "the game lacks sounds for the jump"; "three coins in a row … extra MM-stars"). What was found and done:
+// - her walk was 54 pictures shown 30 a second, but 18 of them repeat the picture before them (her walk clip holds
+//   about a third of its frames twice), so she held a pose for 2 or 3 steps of the screen and then jumped two
+//   poses: a stutter in every stride. The repeats are now left out and her 36 different poses share the same 1.8 s
+//   stride evenly (20 a second at her starting pace), so each pose stays on screen the same time.
+// - her leap's pictures begin with her push-off on the floor (2.0 to 2.42 s of the clip, 6 of its 15 pictures);
+//   they filled the whole rise, so she went up with her legs still pushing at the floor: the move came late. Now
+//   the push-off passes in the first tenth of a second and her flight (from 2.46 s, when her feet are off the
+//   floor) fills the arc; coming down, the last pictures are timed to the brick she will land on, so her landing
+//   pose meets the brick on a higher or lower brick too, not only on a level one.
+// - every change from one kind of move to another (walk to leap, leap to landing, landing to walk) was an 80 ms
+//   cross-fade that drew both pictures at once: three short double-exposures in every jump, which read as blur.
+//   Now the change is a clean switch, at frames chosen to match (her landing's last pose into the walk's
+//   matching pose, as before); the extra canvas drawn for the cross-fade every frame of it is gone too.
+// - a landing a few units under a brick's top (her grace) popped her up in one frame; now she eases up in ~0.1 s.
+// - the canvas is drawn at up to 3 device pixels per px (was 2): on an iPhone (3) the browser no longer stretches
+//   a 2x picture of her by half again, a second blur on top of the first.
+// - sounds for her moves: a soft jump, a muted landing, a barely-there footfall; coins in a row climb a step each;
+//   every third coin in a row adds 10 MM✦ with a little sparkle and a pink "+10" by her (aomWorld.js, sound.js).
 
 const INSTRUCTIONS = "Keep moving. Jump between platforms and collect pink coins. One fall ends the run.";
 const PINK = "#F600A9";
 const BEST_KEY = "mm-art-of-moving-best";
 // 11 Nov (her MM-G04-04 Desktop_Score: 23 coins, 150 MM✦STARS): 10 MM✦ a coin, at most 150 a run (question for Marta).
 const COIN_STARS = 10;
-const runStars = (n) => Math.min(ROUND_STARS, n * COIN_STARS);
+// 15 Nov (Marta): plus the bonus of her coins in a row (10 MM✦ for every third in a row), under the same cap
+const runStars = (n, bonus = 0) => Math.min(ROUND_STARS, n * COIN_STARS + bonus);
 const STAR_RAIN = 28; // pink stars falling over the panel when a run ends (12 Nov)
 
 const MIN_VIEW_W = 560; // on tall phone frames the world is scaled to show at least this much ahead
@@ -55,10 +76,19 @@ const STAR_K = (COIN_R * 2 * 0.7) / 24;
 // a canvas an empty or black picture from a video it plays off screen, which came out as her missing or a dark
 // flash for a frame. Now the same frames are cut ahead of time, the same way, into six small pictures (0.5 MB, kept
 // by the browser's cache); each is fully decoded before the game counts down, and only then does she appear.
-const WALK_FPS = 30;
+// 15 Nov (Marta: "it looks like it's being chopped"): her walk is one stride of 1.8 s of her clip (54 pictures at
+// 30 a second in scripts/make-aom-poses.mjs), played by its length, not by a picture count, so leaving out the
+// pictures that repeat keeps her feet at the ground's pace.
+const WALK_LOOP = 1.8;
 const START_FPS = 24;
 const SETTLE = 0.22; // landing (s)
-const XFADE = 0.08; // cross-fade between two kinds of move (s)
+// 15 Nov (Marta: "delayed"): in her leap's pictures (2.0 to 3.17 s of the clip) her feet leave the floor at 2.46 s,
+// this share of the way through them; her push-off before it passes in the first PUSH of a jump's arc (~0.1 s).
+const AIR_LIFT = (59 - 48) / (76 - 48);
+const PUSH = 0.13;
+const LAND_EASE = 0.035; // 15 Nov: a landing under a brick's top eases up (s, time constant)
+const STEP_SOUND = true; // 15 Nov: a barely-there tap at each footfall of her walk (false: none)
+const POP_PX = 26; // 15 Nov: the "+10" of a bonus, Inter, in world units (about 16 px on a phone, 25 on a computer)
 
 let poses = null;
 let posesLoading = null;
@@ -92,7 +122,21 @@ function loadPoses() {
           return { ...f, cx: 0.5 * f.cx + 0.5 * (s / m - f.left) };
         });
       };
-      const walk = even(out.walk, true);
+      // 15 Nov (Marta: "chopped"): a picture that repeats the one before it (the same cut, the same measures) is
+      // left out, so no pose is held twice as long as the next; the walk's last picture too if it repeats its first
+      const same = (a, b) => a.w === b.w && a.h === b.h && a.sole === b.sole && a.fl === b.fl && a.fr === b.fr && Math.abs(a.cx - b.cx) < 0.1;
+      const once = (list, round) => {
+        const l = list.filter((f, i) => i === 0 || !same(f, list[i - 1]));
+        return round && l.length > 2 && same(l[l.length - 1], l[0]) ? l.slice(0, -1) : l;
+      };
+      const walk = even(once(out.walk, true), true);
+      // her footfalls: the pictures where her feet are furthest apart (the front heel meets the floor), each the
+      // widest of its neighbours around the loop, for the step's sound
+      const r = Math.max(2, Math.round(walk.length / 8));
+      const feet = walk.map((f, i) => {
+        for (let j = 1; j <= r; j++) if (walk[(i - j + walk.length) % walk.length].w >= f.w || walk[(i + j) % walk.length].w > f.w) return -1;
+        return i;
+      }).filter((i) => i >= 0);
       // where her walk takes over: the walk frame whose feet are where they are in the frame before it (front foot
       // and back foot from her middle), and the walk goes on from the frame after that one
       const next = (f) => {
@@ -104,7 +148,7 @@ function loadPoses() {
         return (best + 1) % walk.length;
       };
       const start = even(out.start, false);
-      poses = { stand: out.stand[0], start, startTo: next(start[start.length - 1]), walk, air: even(out.air, false), land: out.land, landTo: next(out.land[out.land.length - 1]), fall: out.fall };
+      poses = { stand: out.stand[0], start, startTo: next(start[start.length - 1]), walk, feet, air: even(out.air, false), land: out.land, landTo: next(out.land[out.land.length - 1]), fall: out.fall };
       return poses;
     })
     .catch(() => null)
@@ -118,7 +162,7 @@ function loadPoses() {
 function fitCanvas(canvas, frame, v) {
   const w = frame.clientWidth, h = frame.clientHeight;
   if (!w || !h) return false;
-  v.dpr = Math.min(2, window.devicePixelRatio || 1);
+  v.dpr = Math.min(3, window.devicePixelRatio || 1); // 15 Nov: 3, not 2 (an iPhone's screen; see the top)
   const cw = Math.round(w * v.dpr), ch = Math.round(h * v.dpr);
   if (canvas.width !== cw) canvas.width = cw;
   if (canvas.height !== ch) canvas.height = ch;
@@ -148,9 +192,39 @@ function putFrame(c, f, X, Y, a) {
   c.restore();
 }
 
-// The world as it is: her bricks, her coins, her. fig = { f, from, k, off }: her frame, and while one kind of move
-// turns into another the frame before it, k of the way (their darkness added up on a small canvas of their own,
-// so the cross-fade never shows her paler than she is).
+// 15 Nov (Marta): the "+10" of a bonus (every third coin in a row), pink Inter and her star, at the height of the
+// coin just in front of her (on the white, never over her); it comes in quickly, stays, rises a little and fades
+// out softly (with reduced motion it doesn't rise).
+function drawPops(ctx, g, v, X) {
+  if (!g.pops.length || !STAR) return;
+  const label = `+${STREAK_BONUS}`;
+  ctx.font = `400 ${POP_PX}px Inter, ui-sans-serif, system-ui, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  const tw = ctx.measureText(label).width, sw = POP_PX * 0.8, gap = POP_PX * 0.2, w = tw + gap + sw;
+  ctx.fillStyle = PINK;
+  for (const pp of g.pops) {
+    const t = (g.clock - pp.at) / POP_T;
+    if (t < 0 || t >= 1) continue;
+    const ease = (k) => k * k * (3 - 2 * k);
+    const a = ease(clamp(t / 0.12, 0, 1)) * (1 - ease(clamp((t - 0.5) / 0.5, 0, 1)));
+    const rise = v.still ? 0 : 30 * (1 - (1 - t) * (1 - t));
+    const x = clamp(X + 80, 10, v.viewW - 10 - w);
+    const y = Math.max(POP_PX, pp.y - rise);
+    ctx.globalAlpha = a;
+    ctx.fillText(label, x, y);
+    ctx.save();
+    ctx.translate(x + tw + gap, y - sw / 2);
+    ctx.scale(sw / 24, sw / 24);
+    ctx.fill(STAR);
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+// The world as it is: her bricks, her coins, her. fig = { f, dy }: her frame, and how far under her feet's place
+// it is drawn just after a landing (15 Nov: the cross-fade between two kinds of move, two of her pictures drawn
+// at once, is gone; see the top).
 function drawWorld(ctx, canvas, g, v, fig) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
@@ -189,30 +263,14 @@ function drawWorld(ctx, canvas, g, v, fig) {
     }
   }
   ctx.globalAlpha = 1;
-  if (!fig || g.fade <= 0) return;
-  const X = g.p.x - camX, Y = g.p.y;
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "medium";
-  if (!fig.from || fig.k >= 1) { putFrame(ctx, fig.f, X, Y, g.fade); ctx.globalAlpha = 1; return; }
-  // the box around her (600 x 600 units, her feet 40 from its bottom) on its own canvas
-  const BOX = 600, K = v.dpr * v.s, n = Math.ceil(BOX * K);
-  const off = fig.off;
-  if (off.width !== n) { off.width = n; off.height = n; }
-  const o = off.getContext("2d");
-  o.setTransform(1, 0, 0, 1, 0, 0);
-  o.globalCompositeOperation = "source-over";
-  o.globalAlpha = 1;
-  o.clearRect(0, 0, n, n);
-  o.setTransform(K, 0, 0, K, -(X - BOX / 2) * K, -(Y + 40 - BOX) * K);
-  o.imageSmoothingEnabled = true;
-  o.imageSmoothingQuality = "medium";
-  o.globalCompositeOperation = "lighter";
-  putFrame(o, fig.from, X, Y, 1 - fig.k);
-  putFrame(o, fig.f, X, Y, fig.k);
-  o.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = g.fade;
-  ctx.drawImage(off, X - BOX / 2, Y + 40 - BOX, BOX, BOX);
-  ctx.globalAlpha = 1;
+  const X = g.p.x - camX;
+  if (fig && g.fade > 0) {
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high"; // 15 Nov: "high", not "medium" (her pictures are scaled down or up to fit)
+    putFrame(ctx, fig.f, X, g.p.y + (fig.dy || 0), g.fade);
+    ctx.globalAlpha = 1;
+  }
+  drawPops(ctx, g, v, X);
 }
 
 const coinLabel = (n) => `${n} ${n > 1 ? "coins" : "coin"}`; // Figma: "0 coin", "3 coins"
@@ -222,6 +280,7 @@ export default function ArtOfMoving({ open, onClose }) {
   const [runId, setRunId] = useState(0);
   const [count, setCount] = useState(null);
   const [coins, setCoins] = useState(0);
+  const [bonus, setBonus] = useState(0); // 15 Nov: MM✦ from her coins in a row
   const [result, setResult] = useState(null);
   const [quote, setQuote] = useState(null);
   const [finish, setFinish] = useState(null); // null | "fade" | the falling stars
@@ -243,6 +302,7 @@ export default function ArtOfMoving({ open, onClose }) {
     setRunId(0);
     setCount(null);
     setCoins(0);
+    setBonus(0);
     setResult(null);
     setQuote(null);
     setFinish(null);
@@ -271,6 +331,7 @@ export default function ArtOfMoving({ open, onClose }) {
   const start = useCallback(() => {
     clearTimers();
     setCoins(0);
+    setBonus(0);
     setResult(null);
     setFinish(null);
     setPhase("countdown");
@@ -281,12 +342,12 @@ export default function ArtOfMoving({ open, onClose }) {
     }
   }, []);
 
-  const endRun = useCallback((n) => {
+  const endRun = useCallback((n, b = 0) => {
     const best = readBest();
     const isBest = n > best;
     if (isBest) writeBest(n);
-    setResult({ coins: n, isBest });
-    recordStars("art-of-moving", runStars(n));
+    setResult({ coins: n, bonus: b, isBest }); // 15 Nov: with the bonus of her coins in a row
+    recordStars("art-of-moving", runStars(n, b));
     sound("win");
     // 12 Nov (Marta): pink stars rain over the panel, then the score screen (reduced motion: the panel fades)
     if (prefersReducedMotion()) {
@@ -320,8 +381,7 @@ export default function ArtOfMoving({ open, onClose }) {
     if (!canvas || !frame) return;
     const ctx = canvas.getContext("2d");
     const g = newWorld();
-    const v = { s: 1, offY: 0, viewW: 660, dpr: 1 };
-    const off = document.createElement("canvas");
+    const v = { s: 1, offY: 0, viewW: 660, dpr: 1, still: prefersReducedMotion() };
     let lastFig = null;
     const resize = () => {
       if (!fitCanvas(canvas, frame, v)) return;
@@ -331,17 +391,28 @@ export default function ArtOfMoving({ open, onClose }) {
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(frame);
-    jumpRef.current = () => pressJump(g);
-
     // her moves: mode = start (her first steps after GO) | walk | land; ph = where she is in her first steps,
-    // walkPh = in her walk (frames); kind/last/from/at = the cross-fade between two kinds of move
-    const m = { mode: "start", ph: 0, walkPh: 0, kind: null, last: null, from: null, at: -9, low: null };
+    // walkPh = in her walk (pictures); dy = how far under a brick's top she landed (eased away, 15 Nov);
+    // jumps = jumps heard; airK/airFor = how far through her flight's pictures she is, never going back (15 Nov)
+    const m = { mode: "start", ph: 0, walkPh: 0, low: null, dy: 0, jumps: 0, airK: 0, airFor: -1 };
+
+    // 15 Nov (Marta: "sounds for the jump"): a jump's sound the moment it begins, from a press or from a press
+    // remembered for the landing
+    const hear = () => { if (g.jumps !== m.jumps) { m.jumps = g.jumps; sound("jump"); } };
+    jumpRef.current = () => { pressJump(g); hear(); };
 
     const step = (h) => {
-      const { ev, got } = runStep(g, h, v.viewW);
-      if (got) { setCoins(g.coinsTaken); sound("coin"); }
-      if (ev === "over") endRun(g.coinsTaken);
-      if (ev === "land") m.mode = "land";
+      const { ev, got, bonus } = runStep(g, h, v.viewW);
+      // 15 Nov (Marta): each coin in a row a step higher; every third in a row its bonus, with a sparkle
+      if (got) { setCoins(g.coinsTaken); sound("coin", g.streak); }
+      if (bonus) { setBonus(g.bonus); sound("bonus"); }
+      if (ev === "over") endRun(g.coinsTaken, g.bonus);
+      if (ev === "land") {
+        m.mode = "land";
+        m.dy = g.p.sink || 0;
+        if (g.p.ground) sound("land"); // not when a remembered press takes her straight up again
+      }
+      hear();
       // her steps keep pace with the ground: at the starting speed her clips' own pace, faster as she speeds up
       const P = poses;
       if (P && g.mode === "play" && g.p.ground) {
@@ -351,8 +422,33 @@ export default function ArtOfMoving({ open, onClose }) {
           if (m.ph >= P.start.length) { m.mode = "walk"; m.walkPh = P.startTo; }
         } else if (m.mode === "land") {
           if (g.clock - g.p.landAt >= SETTLE) { m.mode = "walk"; m.walkPh = P.landTo; }
-        } else m.walkPh += h * WALK_FPS * rate;
+        } else {
+          // 15 Nov: her stride by its length (see WALK_LOOP), and a soft tap at each footfall
+          const before = Math.floor(m.walkPh);
+          m.walkPh += (h * rate * P.walk.length) / WALK_LOOP;
+          if (STEP_SOUND) for (let i = before + 1; i <= Math.floor(m.walkPh); i++) if (P.feet.includes(i % P.walk.length)) sound("step");
+        }
       }
+    };
+
+    // 15 Nov (Marta: "delayed"): how long until she comes down on a brick from where she is (s), or null over a gap
+    const toLand = () => {
+      const p = g.p;
+      let best = null;
+      for (const q of g.plats) {
+        const d = q.y - p.y;
+        if (d < 0) continue;
+        const t = (-p.vy + Math.sqrt(p.vy * p.vy + 2 * G * d)) / G;
+        const x = p.x + g.speed * t;
+        if (x + FOOT_FRONT >= q.x && x - FOOT_BACK <= q.x + q.w && (best == null || t < best)) best = t;
+      }
+      return best;
+    };
+    // coming down, the share of the way from the top of her arc to the brick she will land on (by the clock)
+    const downK = () => {
+      const t = toLand(), ta = Math.max(0, g.p.vy) / G;
+      if (t == null) return null;
+      return ta + t > 1e-6 ? ta / (ta + t) : 1;
     };
 
     // the highest a brick near her lets her stand: below it (and the grace) she has missed
@@ -364,30 +460,46 @@ export default function ArtOfMoving({ open, onClose }) {
     // Her pose for this moment, from her own frames: standing until GO, her first steps, then walking; in the air
     // by where she is on the arc (push-off and tuck rising, the leg reaching for the brick coming down); her
     // landing; her stumble once she has missed.
+    // 15 Nov (Marta: "delayed"): a jump's push-off pictures pass in its first PUSH, her flight's fill the rest, and
+    // coming down they are timed to the brick she lands on, so the last of them meets the brick (see the top).
     const pose = () => {
       const P = poses;
       if (!P) return null;
       const p = g.p;
       const pick = (list, k) => list[clamp(Math.floor(k * list.length), 0, list.length - 1)];
-      if (g.mode === "countdown") return [P.stand, "stand"];
+      if (g.mode === "countdown") return P.stand;
+      if (g.mode === "play" && p.ground) { m.low = null; m.airFor = -1; }
       if (g.mode !== "play" || (!p.ground && p.vy > 0 && p.y > lowTop() + GRACE)) {
         if (m.low == null) m.low = lowTop();
-        return [pick(P.fall, (p.y - m.low - GRACE) / 160), "fall"];
+        return pick(P.fall, (p.y - m.low - GRACE) / 160);
       }
-      if (!p.ground) return [pick(P.air, p.jumped ? (p.vy + V0) / (2 * V0) : 0.6 + 0.4 * clamp(p.vy / V0, 0, 1)), "air"];
-      if (m.mode === "start") return [P.start[Math.min(P.start.length - 1, Math.floor(m.ph))], "start"];
-      if (m.mode === "land") return [pick(P.land, (g.clock - p.landAt) / SETTLE), "land"];
-      return [P.walk[Math.floor(m.walkPh) % P.walk.length], "walk"];
+      if (!p.ground) {
+        const flight = g.jumps * 2 + (p.jumped ? 1 : 0);
+        if (m.airFor !== flight) { m.airFor = flight; m.airK = 0; }
+        if (p.jumped) {
+          const dk = p.vy > 0 ? downK() : null;
+          m.airK = Math.max(m.airK, dk == null ? (p.vy + V0) / (2 * V0) : 0.5 + 0.5 * dk);
+          const n = P.air.length, lift = Math.ceil(AIR_LIFT * (n - 1) - 1e-9), k = m.airK;
+          const i = k < PUSH ? (k / PUSH) * lift : lift + ((k - PUSH) / (1 - PUSH)) * (n - lift);
+          return P.air[clamp(Math.floor(i), 0, n - 1)];
+        }
+        // off a brick's edge without a jump: the second half of her flight, as before, timed to the brick ahead
+        const dk = downK();
+        m.airK = Math.max(m.airK, dk == null ? clamp(p.vy / V0, 0, 1) : dk);
+        return pick(P.air, 0.6 + 0.4 * m.airK);
+      }
+      if (m.mode === "start") return P.start[Math.min(P.start.length - 1, Math.floor(m.ph))];
+      if (m.mode === "land") return pick(P.land, (g.clock - p.landAt) / SETTLE);
+      return P.walk[Math.floor(m.walkPh) % P.walk.length];
     };
+    // 15 Nov: one picture of her, never two at once (the cross-fade is gone); just after a landing under a brick's
+    // top she is drawn that little lower and eases up onto it
     const figure = () => {
-      const ps = pose();
-      if (!ps) return null;
-      const [f, kind] = ps;
-      if (kind !== m.kind) { if (m.last && m.kind) { m.from = m.last; m.at = g.clock; } m.kind = kind; }
-      m.last = f;
-      const k = m.from ? (g.clock - m.at) / XFADE : 1;
-      if (k >= 1) m.from = null;
-      return { f, from: m.from, k, off };
+      const f = pose();
+      if (!f) return null;
+      const p = g.p;
+      const dy = p.ground && m.dy > 0 ? m.dy * Math.exp(-(g.clock - p.landAt) / LAND_EASE) : 0;
+      return { f, dy: dy > 0.05 ? dy : 0 };
     };
 
     // Countdown 3, 2, 1, GO (~1 s each); no input until GO. If her poses are still loading, GO waits for them
@@ -463,14 +575,14 @@ export default function ArtOfMoving({ open, onClose }) {
       stage={phase !== "done"}
       instructions={ended ? null : INSTRUCTIONS}
       counter={counter}
-      stars={ended ? null : runStars(coins)}
+      stars={ended ? null : runStars(coins, bonus)}
       hud={!ended}
       confirm={ended ? "completed" : running ? "game" : null}
     >
       {phase === "done" && quote ? (
         <Completion quote={quote} onPlayAgain={reset} />
       ) : phase === "score" && result ? (
-        <ScoreScreen badge={result.isBest ? "New personal best" : null} label="Coins" value={String(result.coins)} stars={runStars(result.coins)} onDone={toQuote} />
+        <ScoreScreen badge={result.isBest ? "New personal best" : null} label="Coins" value={String(result.coins)} stars={runStars(result.coins, result.bonus)} onDone={toQuote} />
       ) : (
         <div
           onPointerDown={onAreaDown}

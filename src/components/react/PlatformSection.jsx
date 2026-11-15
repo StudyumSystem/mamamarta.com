@@ -17,30 +17,36 @@ const SHAPES = [
 // the order they move in, 1.8 s apart (global.css .mm-shape: each slide 2.6 s, a loop 32.4 s)
 const ORDER = [4, 0, 8, 2, 6, 1, 7, 3, 5];
 
-function PlatformShapes() {
+// 14 Nov (Marta: "так вона має виглядати я її повернула на 90 градусів і вона вертикально виглядає"): her phone frame
+// 917:206 (13 Nov 22:17 UTC) has the picture turned a quarter left and standing, 333 x 370 at 28, 355, its left edge on
+// the square's edge and the right 72 of 720 cut off; turned draws that, the computer keeps the square as it was.
+function PlatformShapes({ turned = false, className = "" }) {
+  const id = turned ? "mm-shape-turned" : "mm-shape-cell";
   return (
-    <svg viewBox="0 0 720 720" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Moving objects" className="absolute inset-0 block h-full w-full bg-white sm:scale-[1.18]">
+    <svg viewBox="0 0 720 720" preserveAspectRatio={turned ? "xMinYMid slice" : "xMidYMid slice"} role="img" aria-label="Moving objects" className={`absolute inset-0 h-full w-full bg-white ${className}`}>
       <defs>
         {SHAPES.map(([c, r], i) => (
           // 1 unit wider on every side: two cut circles meeting on a cell line (her double circle on the left) join
           // with no hairline of white between them
-          <clipPath id={`mm-shape-cell-${i}`} key={i}>
+          <clipPath id={`${id}-${i}`} key={i}>
             <rect x={c * 240 - 1} y={r * 240 - 1} width="242" height="242" />
           </clipPath>
         ))}
       </defs>
-      {SHAPES.map(([c, r, axis, side], i) => (
-        <g clipPath={`url(#mm-shape-cell-${i})`} key={i}>
-          <circle
-            className={`mm-shape mm-shape-${axis}${side > 0 ? "p" : "n"}`}
-            cx={120 + 240 * c}
-            cy={120 + 240 * r}
-            r="71"
-            fill="#111111"
-            style={{ transform: axis === "x" ? `translateX(${92 * side}px)` : `translateY(${92 * side}px)`, animationDelay: `${ORDER.indexOf(i) * 1.8}s` }}
-          />
-        </g>
-      ))}
+      <g transform={turned ? "rotate(-90 360 360)" : undefined}>
+        {SHAPES.map(([c, r, axis, side], i) => (
+          <g clipPath={`url(#${id}-${i})`} key={i}>
+            <circle
+              className={`mm-shape mm-shape-${axis}${side > 0 ? "p" : "n"}`}
+              cx={120 + 240 * c}
+              cy={120 + 240 * r}
+              r="71"
+              fill="#111111"
+              style={{ transform: axis === "x" ? `translateX(${92 * side}px)` : `translateY(${92 * side}px)`, animationDelay: `${ORDER.indexOf(i) * 1.8}s` }}
+            />
+          </g>
+        ))}
+      </g>
     </svg>
   );
 }
@@ -70,7 +76,7 @@ export default function PlatformSection() {
               the computer keeps her desktop line */}
           <div data-reveal className="ml-[calc(var(--q)*6)] w-[calc(var(--q)*192)] sm:ml-[0.677vw] sm:w-[29.64vw]">
             <p className="text-[14px] leading-[20px] text-black/70 max-sm:tracking-[-0.04em] max-sm:text-black/60 sm:hidden">A product is never truly finished. It evolves through real use, thoughtful decisions, and a system built to grow with it.</p>
-            <p className="hidden text-black/70 sm:block sm:text-[max(1.146vw,13px)] sm:leading-[max(1.615vw,18px)] sm:tracking-[-0.04em]">A product is never finished. It grows through real use, and <br />a system built to hold it.</p>
+            <p className="hidden text-black/[.69] sm:block sm:text-[max(1.146vw,13px)] sm:leading-[max(1.615vw,18px)] sm:tracking-[-0.04em]">A product is never finished. It grows through real use, and <br />a system built to hold it.</p>
           </div>
           <div className="mt-auto hidden sm:ml-[0.677vw] sm:mb-[0.417vw] sm:block">
             <div className="mb-[0.9vw] h-[2px] w-[9.8vw] bg-[#f48fcf]"></div>
@@ -78,19 +84,21 @@ export default function PlatformSection() {
             <p className="text-[max(1.146vw,12px)] uppercase leading-[max(1.094vw,13px)] tracking-[-0.017em] text-black/50">Platform layer</p>
           </div>
         </div>
-        {/* phone: her picture 388 x 349 at the screen's left edge, at 380 of her frame (14 Nov: it sat 20 higher);
-            14 Nov later: her phone text is 4 lines (80) now, so 80 under it keeps the shapes at 380 */}
-        <div className="order-2 mt-[calc(var(--q)*80)] w-[calc(var(--q)*388)] sm:order-1 sm:mt-0 sm:w-auto sm:px-0">
+        {/* phone: her picture standing, 333 x 370 at 28, 355 of her frame 917:206 (14 Nov: was the older lying
+            388 x 349 at 0, 380), 55 under the text's 4 lines (220 + 80) */}
+        <div className="order-2 ml-[calc(var(--q)*28)] mt-[calc(var(--q)*55)] w-[calc(var(--q)*333)] sm:order-1 sm:ml-0 sm:mt-0 sm:w-auto sm:px-0">
           {/* Marta, 12 Nov (her iPhone: "the background is grey") and 14 Nov ("фон все одно далі сірий... там де пише
               Mindset"): every screen plays the copy whose background is pure #FFFFFF in the pixels
               (scripts/make-phone-videos.mjs) on a white box, no blend or filter. On the phone the shapes are at her
               picture's own size (her frame shows them smaller, no zoom); the computer keeps its zoom. */}
-          <div data-reveal className="relative aspect-[388/349] w-full overflow-hidden bg-white sm:aspect-auto sm:h-[34.01vw] sm:w-[34.95vw]">
-            <PlatformShapes />
+          <div data-reveal className="relative aspect-[333/370] w-full overflow-hidden bg-white sm:aspect-auto sm:h-[34.01vw] sm:w-[34.95vw]">
+            <PlatformShapes turned className="block sm:hidden" />
+            <PlatformShapes className="hidden sm:block sm:scale-[1.18]" />
           </div>
         </div>
-        <div className="order-3 mt-[calc(var(--q)*50)] block pl-[calc(var(--q)*20)] sm:hidden">
-          <div className="mb-[calc(var(--q)*9)] h-[1px] w-[calc(var(--q)*119)] bg-[#f48fcf]"></div>
+        {/* her line at 20, 779 (54 under the picture's 725): 119 wide, 1 px #F600A9 as her frame (was #f48fcf) */}
+        <div className="order-3 mt-[calc(var(--q)*54)] block pl-[calc(var(--q)*20)] sm:hidden">
+          <div className="mb-[calc(var(--q)*9)] h-[1px] w-[calc(var(--q)*119)] bg-[#F600A9]"></div>
           {/* Phone: MM-HOME-002 1050:3 "Platform layer" has textCase UPPER, Inter 400 14/20, -0.56 px (-0.04em), black 60%. */}
           <p className="text-[length:calc(var(--q)*14)] uppercase leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/60">Platform layer</p>
         </div>

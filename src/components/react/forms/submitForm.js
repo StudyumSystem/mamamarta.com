@@ -139,6 +139,10 @@ export async function submitForm(type, data, submissionId) {
           reply_subject: (REPLIES[type] || REPLIES.contact).subject,
           reply_heading: (REPLIES[type] || REPLIES.contact).heading,
           reply_body: (REPLIES[type] || REPLIES.contact).body.map((t) => `<p ${P}>${t}</p>`).join(""),
+          // 14 Nov (Marta: the fur banner didn't load in her Gmail, mamamarta.com isn't live yet): the letter's
+          // banner comes from the site the form was sent from (the preview now, mamamarta.com after the launch)
+          banner_desktop: `${location.origin}/assets/email/banner-desktop.png`,
+          banner_mobile: `${location.origin}/assets/email/banner-mobile.png`,
         },
       }),
     });

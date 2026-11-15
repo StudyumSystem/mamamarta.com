@@ -23,9 +23,11 @@ export const navLinks = [
 // 14 px on the phone (21 / 24 px; its line height is left to the place it stands in, so nothing around it moves).
 // Never below 0.6 px (14 Nov): on a tablet it was 0.4 px, a 9 px Back.
 const backUnit = { "--bu": "max(0.6px, min(calc(100vw / 1920), calc(100dvh / 1080)))" };
+// 15 Nov, her MM-METHOD and MM-BIO: Inter 400 everywhere (the computer was light 300), -0.04em on the phone and
+// -0.017em on the computer; black 60% on the phone and 50% on the computer, white 60% / 50% on the black block.
 const backText =
-  "underline underline-offset-4 tracking-normal text-[14px] font-normal md:font-light md:text-[length:calc(var(--bu)*22)] transition-colors duration-300 hover:text-[#F600A9]";
-const backColour = (light) => (light ? "text-[#b0b0b0]" : "text-[#555] md:text-[#7e7e7e]");
+  "underline underline-offset-4 tracking-[-0.04em] md:tracking-[-0.017em] text-[14px] font-normal md:text-[length:calc(var(--bu)*22)] transition-colors duration-300 hover:text-[#F600A9]";
+const backColour = (light) => (light ? "text-white/60 md:text-white/50" : "text-black/60 md:text-black/50");
 // The top-left place on the computer
 const backTopDesktop = "md:absolute md:left-[calc(var(--bu)*170)] md:top-[calc(var(--bu)*123)] md:z-20 md:leading-[calc(var(--bu)*26)]";
 

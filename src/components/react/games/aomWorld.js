@@ -40,6 +40,12 @@ export const GRACE = 14;
 export const EASY = 5;
 const GAP_MIN = 70;
 export const FALL_T = 0.6; // the last fall until the score (s)
+// 15 Nov (Marta: "when the figure collects many coins in a row … you collected three coins in a row, so you get
+// extra MM-stars because you collected them quickly in a row and didn't miss one"): coins in a row without missing
+// one; a coin is missed once her back has passed it untaken. Every third coin in a row adds a bonus.
+export const STREAK = 3;
+export const STREAK_BONUS = 10; // MM✦ added by every third coin in a row
+export const POP_T = 1.6; // how long the bonus's "+10" stays near her (s)
 
 export const rand = (a, b) => a + Math.random() * (b - a);
 export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -98,6 +104,9 @@ export function move(g, h, speed) {
     for (const plat of g.plats) {
       // feet at or just under the top (within the grace), coming down, a foot over the brick
       if (p.y >= plat.y && (prevY <= plat.y || p.y - plat.y <= o.grace) && p.x + FOOT_FRONT >= plat.x && p.x - back <= plat.x + plat.w) {
+        // 15 Nov (Marta: smoother): how far under the top her feet were, so the game can ease her up those few
+        // units instead of popping her up in one frame (only the drawing; she stands on the top straight away)
+        p.sink = p.y - plat.y;
         p.y = plat.y; p.vy = 0; p.ground = plat; p.jumped = false;
         return "land";
       }
@@ -120,7 +129,7 @@ export function newWorld(opt) {
     genT: 1.6,
     easyT: 1.6,
     made: 0,
-    p: { x: 0, y: Y_START, vy: 0, ground: first, offAt: -9, jumped: false, landAt: -9 },
+    p: { x: 0, y: Y_START, vy: 0, ground: first, offAt: -9, jumped: false, landAt: -9, sink: 0 },
     mode: "countdown", // countdown | play | fall | over
     t: 0, // running time
     clock: 0,
@@ -130,6 +139,12 @@ export function newWorld(opt) {
     fallT: 0,
     buffer: -9,
     coinsTaken: 0,
+    // 15 Nov (Marta): jumps = jumps begun (a press, or one remembered for the landing), for the jump's sound;
+    // streak = coins in a row without a miss; bonus = MM✦ from every third in a row; pops = the "+10" shown for it
+    jumps: 0,
+    streak: 0,
+    bonus: 0,
+    pops: [],
   };
   for (let i = 0; i < 6; i++) addPlatform(g);
   return g;
@@ -142,15 +157,17 @@ export function pressJump(g) {
   const coyote = !p.ground && !p.jumped && g.clock - p.offAt < COYOTE;
   if (!p.ground && !coyote) { g.buffer = g.clock; return false; }
   p.vy = -V0; p.ground = null; p.jumped = true; g.buffer = -9;
+  g.jumps += 1;
   return true;
 }
 
 // One step of the run (h s); viewW = how much of the world the frame shows. Returns
-// { ev: "land" | "off" | "fall" | "over" | null, got: coins taken in this step }.
+// { ev: "land" | "off" | "fall" | "over" | null, got: coins taken in this step, missed: coins she passed untaken,
+// bonus: bonuses earned (15 Nov) }.
 export function runStep(g, h, viewW) {
   g.clock += h;
   const p = g.p;
-  let ev = null, got = 0;
+  let ev = null, got = 0, missed = 0, bonus = 0;
   if (g.mode === "play") {
     g.t += h;
     const speed = speedAt(g.t);
@@ -162,13 +179,23 @@ export function runStep(g, h, viewW) {
       if (g.clock - g.buffer < BUFFER) pressJump(g); // pressed just before landing: still counts
     } else if (ev === "fall") { g.mode = "fall"; g.fallT = 0; }
     for (const c of g.coins) {
-      if (c.taken) continue;
+      if (c.taken || c.missed) continue;
+      // 15 Nov (Marta): a coin wholly behind her, not taken, is missed and ends the coins in a row
+      if (c.x + COIN_R < p.x - BODY_W / 2) { c.missed = true; missed += 1; g.streak = 0; continue; }
       if (Math.abs(c.x - p.x) < BODY_W / 2 + COIN_R && c.y + COIN_R > p.y - BODY_H && c.y - COIN_R < p.y) {
         c.taken = g.clock;
         g.coinsTaken += 1;
         got += 1;
+        g.streak += 1;
+        if (g.streak % STREAK === 0) {
+          // every third coin in a row: the bonus, and its "+10" at the coin's height, beside her
+          g.bonus += STREAK_BONUS;
+          bonus += 1;
+          g.pops.push({ at: g.clock, y: c.y });
+        }
       }
     }
+    if (g.pops.length && g.clock - g.pops[0].at > POP_T) g.pops.shift();
     const camX = p.x - g.anchor * viewW;
     while (g.plats[g.plats.length - 1].x < camX + viewW + 600) addPlatform(g);
     while (g.plats.length > 2 && g.plats[0].x + g.plats[0].w < camX - 300) g.plats.shift();
@@ -180,5 +207,5 @@ export function runStep(g, h, viewW) {
     g.fade = Math.max(0, 1 - g.fallT / (FALL_T - 0.05));
     if (g.fallT >= FALL_T) { g.mode = "over"; ev = "over"; }
   }
-  return { ev, got };
+  return { ev, got, missed, bonus };
 }

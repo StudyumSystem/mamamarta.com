@@ -188,7 +188,7 @@ export default function Hero({ initialMenuOpen = false }) {
             <p className="lg:mt-[calc(var(--h)*35.4)] mt-4 text-[18px] font-normal tracking-[-0.01em] lg:text-[clamp(28px,2.24vw,43px)] lg:leading-[1.28] lg:tracking-[-0.04em] text-white">
               {TAGLINE}
             </p>
-            <p className="mt-2 lg:mt-[calc(var(--h)*58)] text-[13px] font-normal text-white lg:font-medium lg:text-[clamp(18px,1.458vw,28px)] lg:leading-[1.357] lg:tracking-[-0.0134em]">
+            <p className="mt-2 lg:mt-[calc(var(--h)*58)] text-[13px] font-normal text-white lg:font-medium lg:text-[clamp(18px,1.458vw,28px)] lg:leading-[1.357] lg:tracking-[-0.0134em] lg:[text-shadow:0_0_9.1px_rgba(66,31,54,0.52)]">
               {FOR_WHOM}
               <br />
               {WHAT}

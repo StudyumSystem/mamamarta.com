@@ -43,7 +43,7 @@ export default function BrandSection() {
           <p className="text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em]">
             {WHAT_WE_DO.replace("products. ", "products.\n").split("\n").map((l) => <span key={l} className="block whitespace-nowrap">{l}</span>)}
           </p>
-          <p className="mt-[calc(var(--q)*30)] w-[calc(var(--q)*250)] text-[length:calc(var(--q)*12)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-white/85">
+          <p className="mt-[calc(var(--q)*30)] w-[calc(var(--q)*250)] text-[length:calc(var(--q)*12)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-white">
             {CALL_LINE}
           </p>
           <a
@@ -110,7 +110,7 @@ export default function BrandSection() {
                 </a>
               ))}
             </div>
-            <p className="text-[13px] opacity-[0.84] md:mt-[0.47vw] md:text-[max(0.9375vw,11px)] md:leading-[max(1.98vw,16px)] md:tracking-[-0.04em]">© Mamamarta 2026</p>
+            <p className="text-[13px] text-[#F5F5F5]/[.84] md:mt-[0.47vw] md:text-[max(0.9375vw,11px)] md:leading-[max(1.98vw,16px)] md:tracking-[-0.04em]">© Mamamarta 2026</p>
           </div>
         </div>
       </div>

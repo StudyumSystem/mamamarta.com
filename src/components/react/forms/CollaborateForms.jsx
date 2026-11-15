@@ -43,10 +43,10 @@ const newId = () =>
 
 // Phone sizes from her MM-C06 phone frames (1200:1745, kept copy, 13 Nov): labels Inter 12/15 black 69%, fields
 // 310 x 41 five px under their label, 12 apart, placeholder 16/19 black 40%, boxes 18 x 18. The computer keeps its own.
-const labelCls = "block text-[12px] lg:text-[clamp(12px,0.68vw,13px)] font-normal leading-[15px] lg:leading-[1.3] text-black/[0.69] lg:text-black/80";
+const labelCls = "block text-[12px] lg:text-[clamp(12px,0.68vw,13px)] font-normal leading-[15px] lg:leading-[1.3] lg:tracking-[-0.04em] text-black/[0.69]";
 const inputCls =
   "mt-[5px] lg:mt-[4px] block w-full h-[41px] lg:h-[clamp(44px,2.76vw,53px)] border border-black/20 bg-white px-[12px] lg:px-[clamp(14px,1.15vw,22px)] " +
-  "text-[16px] lg:text-[clamp(15px,1.1vw,21px)] font-normal lg:font-light text-black placeholder:text-black/40 lg:placeholder:text-black/45 outline-none transition-colors focus:border-black";
+  "text-[16px] lg:text-[clamp(15px,1.1vw,21px)] font-normal lg:tracking-[-0.04em] text-black placeholder:text-black/40 outline-none transition-colors focus:border-black";
 const errorCls = "mt-1 text-[12px] lg:text-[clamp(12px,0.73vw,14px)] text-[#c2006f]";
 // Checked boxes are filled with the pink glow from the frames.
 const boxCls =
@@ -143,7 +143,7 @@ function Form({ flow, onDone }) {
                   onChange={() => toggle(o)}
                   data-invalid={i === 0 && errors.options ? "true" : undefined}
                 />
-                <span className="text-[16px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[19px] lg:leading-[1.2] text-black/[0.69] lg:text-black/80">{o}</span>
+                <span className="text-[16px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[19px] lg:leading-[1.2] lg:tracking-[-0.04em] text-black/[0.69]">{o}</span>
               </label>
             ))}
           </div>
@@ -166,7 +166,7 @@ function Form({ flow, onDone }) {
       <div className="mt-[17px] flex flex-col gap-[24px] lg:mt-[clamp(20px,1.72vw,33px)] lg:flex-row lg:items-center lg:justify-between lg:gap-[2vw]">
         <label className="flex min-h-[44px] cursor-pointer items-center gap-[14px] lg:min-h-0 lg:gap-[clamp(8px,0.6vw,12px)]">
           <input type="checkbox" className={`${boxCls} rounded-full`} checked={values.marketing} onChange={set("marketing")} />
-          <span className="text-[12px] lg:text-[clamp(12px,0.7vw,13.5px)] lg:whitespace-nowrap font-normal lg:font-light leading-[15px] lg:leading-[1.35] text-black/[0.69] lg:text-black/80">
+          <span className="text-[12px] lg:text-[clamp(12px,0.7vw,13.5px)] lg:whitespace-nowrap font-normal leading-[15px] lg:leading-[1.35] lg:tracking-[-0.04em] text-black/[0.69]">
             I'd like to receive occasional updates and creative insights from Mamamarta.
           </span>
         </label>
@@ -193,7 +193,7 @@ function Success({ flow, onExplore }) {
       {/* phone, her MM-C06 sent frames (13 Nov): title 24/29, text 12/20 black 60% 8 below, both -0.04em in a 293
           column; Explore the games 300 x 46 with 16 px type, 22 below */}
       <h2 className="max-lg:mx-auto max-lg:max-w-[293px] text-[24px] lg:mt-[1.3vw] lg:text-[clamp(32px,2.4vw,46px)] font-normal leading-[29px] lg:leading-[1.15] tracking-[-0.01em] max-lg:tracking-[-0.04em] text-black">{f.successTitle}</h2>
-      <p className="mt-[8px] lg:mt-[clamp(14px,1.5vw,28px)] max-lg:mx-auto max-lg:max-w-[293px] lg:max-w-[29.5vw] text-[12px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[20px] lg:leading-[1.5] max-lg:tracking-[-0.04em] text-black/60 lg:text-black/70">
+      <p className="mt-[8px] lg:mt-[clamp(14px,1.5vw,28px)] max-lg:mx-auto max-lg:max-w-[293px] lg:max-w-[29.5vw] text-[12px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[20px] lg:leading-[1.5] tracking-[-0.04em] text-black/60 lg:text-black/[.69]">
         {f.successText[0]}<br />{f.successText[1]}
       </p>
       <button
@@ -245,7 +245,7 @@ export default function CollaborateForms({ initialFlow = null, initialSent = fal
             {/* phone (her MM-C06 phone frames): title 24/29 at -0.04em on one line, intro 12/17 black 60% 8 below in a
                 293 column */}
             <h2 className="text-[24px] lg:mt-[1.3vw] lg:text-[clamp(32px,2.4vw,46px)] font-normal leading-[29px] lg:leading-[1.15] tracking-[-0.01em] max-lg:tracking-[-0.04em] text-black">{f.title}</h2>
-            <p className="mt-[8px] lg:mt-[clamp(14px,1.5vw,28px)] max-lg:max-w-[293px] lg:max-w-[31.5vw] text-[12px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[17px] lg:leading-[1.5] text-black/60 lg:text-black/70">{f.intro}</p>
+            <p className="mt-[8px] lg:mt-[clamp(14px,1.5vw,28px)] max-lg:max-w-[293px] lg:max-w-[31.5vw] text-[12px] lg:text-[clamp(15px,1.04vw,20px)] font-normal leading-[17px] lg:leading-[1.5] lg:tracking-[-0.04em] text-black/60 lg:text-black/[.69]">{f.intro}</p>
             <Form key={flow} flow={flow} onDone={() => setSent(true)} />
           </>
         )}

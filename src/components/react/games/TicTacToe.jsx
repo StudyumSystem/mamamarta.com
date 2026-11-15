@@ -141,14 +141,15 @@ function preload() {
   }
 }
 
-// hop: a winning symbol jumps (12 Nov). The jump is on the video itself, so it still melts into the square.
 // 12 Nov 02:39 (Marta: "the square white and the figure dark") and 04:02 ("the figures have a background again!
 // a white square with the figure on it, that's all, no greyish shades"): the videos' near-white background is
 // lifted to pure white first (the mm-ttt-dark filter below), so it vanishes on the white square, and only then
 // the figure's mid-tones are deepened. (The first try only deepened, which turned that near-white grey.)
 // 13 Nov (Marta, voice: pure white #FFFFFF everywhere, animations on pure white too): the computer now plays the
 // same white-baked copies as the phone (no blend or filter, which Safari on a Mac doesn't apply to a video either).
-const Symbol = ({ who, hop = null }) => {
+// 15 Nov (Marta: only the picture's rectangle jumped, which showed it was a separate picture): the whole square
+// jumps now (the button, see the board below) and the symbol stays flat on it.
+const Symbol = ({ who }) => {
   const s = who === "X" ? PHONE_X : PHONE_APPLE;
   const [src] = useState(() => loaded[s.video] || s.video); // never changes while the symbol is on the board
   const [live, setLive] = useState(false);
@@ -165,8 +166,8 @@ const Symbol = ({ who, hop = null }) => {
   const fit = "absolute inset-0 h-full w-full object-contain";
   return (
     <span
-      className={`${hop ? "mm-hop" : "mm-symbol"} relative block ${who === "X" ? "h-[80%] w-[80%]" : "h-full w-full"}`}
-      style={{ clipPath: "inset(3%)", ...(hop ? { "--delay": hop } : null) }}
+      className={`mm-symbol relative block ${who === "X" ? "h-[80%] w-[80%]" : "h-full w-full"}`}
+      style={{ clipPath: "inset(3%)" }}
       role="img"
       aria-label={who === "X" ? "X" : "Apple"}
     >
@@ -353,11 +354,12 @@ export default function TicTacToe({ open, onClose }) {
                   aria-label={v ? (v === "X" ? "X" : "Apple") : `Empty square ${i + 1}`}
                   // her MM-G03-02 Desktop / Active (1161:862) and phone frame: empty squares the panel's #F0F0F0,
                   // a played square white #FFFFFF, so the X and the apple sit on white with no edge (13 Nov 22:30)
-                  className={`flex min-h-0 min-w-0 items-center justify-center ${k >= 0 ? "overflow-visible" : "overflow-hidden"} ${v ? "bg-white" : "bg-[#F0F0F0]"} ${
+                  className={`${k >= 0 ? "mm-hop" : ""} flex min-h-0 min-w-0 items-center justify-center overflow-hidden ${v ? "bg-white" : "bg-[#F0F0F0]"} ${
                     !v && !busy ? "cursor-pointer" : "cursor-default"
                   }`}
+                  style={k >= 0 ? { "--delay": `${k * 80}ms` } : undefined}
                 >
-                  {v && <Symbol who={v} hop={k >= 0 ? `${k * 80}ms` : null} />}
+                  {v && <Symbol who={v} />}
                 </button>
               );
             })}

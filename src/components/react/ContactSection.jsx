@@ -17,7 +17,7 @@ const newId = () =>
 // Phone, her frame: labels 12/15 -0.04em black 69%, fields 5 px under them, email 41 tall, message 160, text 16/19
 // -0.04em (16 px also keeps iPhone Safari from zooming in when a field is tapped), placeholders black 40%.
 // 14 Nov, tablet (768): labels were 5-6 px and the text 7-9 px; px floors below about 1150 wide, laptop and desktop unchanged.
-const labelCls = "block text-[12px] md:text-[max(0.729vw,10px)] font-normal leading-[15px] md:leading-[max(0.882vw,12px)] tracking-[-0.04em] md:tracking-[-0.04em] text-black/[.69] md:text-black/70";
+const labelCls = "block text-[12px] md:text-[max(0.729vw,10px)] font-normal leading-[15px] md:leading-[max(0.882vw,12px)] tracking-[-0.04em] md:tracking-[-0.04em] text-black/[.69]";
 const inputCls =
   "mt-[5px] md:mt-[0.26vw] block w-full border border-[#D4D4D4] md:border-black/20 bg-white px-[12px] md:px-[1.094vw] " +
   "text-[16px] md:text-[max(1.146vw,13px)] tracking-[-0.04em] md:tracking-[-0.04em] font-normal md:font-normal text-black placeholder:text-black/40 md:placeholder:text-black/40 outline-none transition-colors focus:border-black";
@@ -83,7 +83,7 @@ export default function ContactSection() {
           <p className="w-[calc(var(--q)*238)] text-[length:calc(var(--q)*14)] font-normal leading-[calc(var(--q)*20)] tracking-[-0.04em] text-black/60 md:hidden">
             We work with people who value thoughtful design and bold decisions.
           </p>
-          <p className="hidden font-normal text-black/70 md:block md:text-[max(0.9375vw,12px)] md:leading-[max(1.77vw,18px)] md:tracking-[-0.04em]">
+          <p className="hidden font-normal text-black/[.69] md:block md:text-[max(0.9375vw,12px)] md:leading-[max(1.77vw,18px)] md:tracking-[-0.04em]">
             We work with funded founders who would rather be understood than liked.
           </p>
 

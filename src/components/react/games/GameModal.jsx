@@ -34,12 +34,13 @@ export function emitModal(open) {
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("mm-modal", { detail: { open } }));
 }
 
+// 15 Nov, her game and form frames: Back is Inter 400, black 50% at -0.017em on the computer, 60% at -0.04em on the phone
 function BackLink({ onClick, className = "", game = false }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`${game ? "text-[14px] font-normal text-black/60" : "text-[17px] font-light text-black/55"} lg:text-[clamp(16px,1.15vw,22px)] lg:font-light lg:text-black/55 underline underline-offset-[6px] decoration-1 transition-colors hover:text-black ${className}`}
+      className={`${game ? "text-[14px] font-normal tracking-[-0.04em] text-black/60" : "text-[17px] font-light text-black/55"} lg:text-[clamp(16px,1.15vw,22px)] lg:font-normal lg:tracking-[-0.017em] lg:text-black/50 underline underline-offset-[6px] decoration-1 transition-colors hover:text-black ${className}`}
     >
       Back
     </button>

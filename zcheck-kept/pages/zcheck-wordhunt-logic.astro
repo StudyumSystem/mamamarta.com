@@ -1,0 +1,116 @@
+---
+// TEMPORARY check page (14 Nov, Word Hunt): the swipe helpers of WordHunt.jsx (steady, pickWord) on 60 real rounds,
+// every straight swipe of each grid against the old exact rule, and the named cases (one on, one early, two on...).
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <style>body { margin: 0; padding: 8px; font: 11px/1.3 monospace; background: #fff; } pre { margin: 0; white-space: pre-wrap; }</style>
+  </head>
+  <body>
+    <pre id="out">running…</pre>
+    <script>
+      import src from "../components/react/games/WordHunt.jsx?raw";
+      const out = document.getElementById("out")!;
+      const lines: string[] = [];
+      try {
+        const body = src.slice(src.indexOf("const SIZE"), src.indexOf("export default function")).replace(/function Firework\(\) \{[\s\S]*?\n\}\n/, "");
+        const shuffle = (a: any[]) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+        const H: any = new Function("shuffle", body + "\nreturn { SIZE, DEAD, straight, steady, pickWord, newRound };")(shuffle);
+        const { SIZE, DEAD, straight, steady, pickWord, newRound } = H;
+        let fails = 0, checks = 0;
+        const ok = (cond: any, msg: string) => { checks++; if (!cond) { fails++; if (fails < 25) lines.push("FAIL " + msg); } };
+        // 1. steady: dead 0 is exactly the old floor (the mouse); 0.3 a dead zone with hysteresis
+        for (let n = 0; n < 20000; n++) {
+          const f = Math.random() * 12 - 1, cur = Math.floor(Math.random() * SIZE);
+          ok(steady(f, cur, 0) === Math.min(SIZE - 1, Math.max(0, Math.floor(f))), `dead 0 f=${f} cur=${cur}`);
+        }
+        const T = [[3, 4.2, 3], [3, 4.29, 3], [3, 4.31, 4], [3, 4.9, 4], [3, 5.1, 4], [3, 5.31, 5], [3, 2.75, 3], [3, 2.71, 3], [3, 2.69, 2],
+          [4, 3.8, 4], [4, 3.71, 4], [4, 3.69, 3], [4, 1.5, 1], [4, 1.75, 2], [9, 11, 9], [0, -2, 0], [3, 3.5, 3]];
+        for (const [cur, f, want] of T) ok(steady(f, cur, DEAD) === want, `steady(${f}, ${cur}) = ${steady(f, cur, DEAD)}, want ${want}`);
+        { let c = 4; const seen = new Set(); for (const f of [4.6, 4.95, 5.2, 5.05, 5.25, 4.98, 5.1]) { c = steady(f, c, DEAD); seen.add(c); } ok(seen.size === 1 && c === 4, `wobble on a border`); }
+        { let c = 2; for (const f of [3.5, 4.5, 5.5, 6.5, 6.75]) c = steady(f, c, DEAD); ok(c === 6, `roll 0.25 on as it lifts: ${c}`); }
+        { let c = 2; for (const f of [3.5, 4.5, 5.5, 6.5, 7.2]) c = steady(f, c, DEAD); ok(c === 6, `touch 0.2 into the next letter: ${c}`); }
+        { let c = 2; for (const f of [3.5, 4.5, 5.5, 6.5, 7.2]) c = steady(f, c, 0); ok(c === 7, `mouse 0.2 into the next letter: ${c}`); }
+        // 2. every straight swipe of 60 real rounds, against the old exact rule
+        const old = (sel: number[], round: any, found: string[]) => {
+          const word = sel.map((i) => round.grid[i]).join(""), back = [...word].reverse().join("");
+          return round.placed.find((p: any) => !found.includes(p.word) && sel.length === p.word.length && (p.word === word || p.word === back)) || null;
+        };
+        let oldHits = 0, newHits = 0, extraHits = 0, swipes = 0;
+        const kinds: any = { exact: 0, oneOn: 0, oneEarly: 0, both: 0 };
+        let named = 0;
+        for (let n = 0; n < 60; n++) {
+          const round = newRound();
+          const found = n % 2 ? round.placed.slice(0, 3).map((p: any) => p.word) : [];
+          for (let a = 0; a < SIZE * SIZE; a++)
+            for (let b = 0; b < SIZE * SIZE; b++) {
+              if (Math.floor(a / SIZE) !== Math.floor(b / SIZE) && a % SIZE !== b % SIZE) continue;
+              swipes++;
+              const sel = straight(a, b);
+              const o = old(sel, round, found), w = pickWord(sel, round.placed, found);
+              if (o) { oldHits++; ok(w === o, `exact ${o.word} gave ${w && w.word}`); }
+              if (!w) {
+                for (const p of round.placed) {
+                  if (found.includes(p.word)) continue;
+                  const at = p.cells.map((i: number) => sel.indexOf(i));
+                  ok(at.includes(-1) || Math.min(...at) > 1 || sel.length - 1 - Math.max(...at) > 1, `missed ${p.word}`);
+                }
+                continue;
+              }
+              newHits++;
+              ok(!found.includes(w.word), `${w.word} counted again`);
+              ok(sel.length >= w.word.length && sel.length <= w.word.length + 2, `${w.word} from ${sel.length} letters`);
+              const at = w.cells.map((i: number) => sel.indexOf(i));
+              ok(!at.includes(-1), `${w.word} not inside`);
+              const lo = Math.min(...at), hiX = sel.length - 1 - Math.max(...at);
+              ok(lo <= 1 && hiX <= 1 && Math.max(...at) - lo === w.word.length - 1, `${w.word} extra ${lo}/${hiX}`);
+              if (!o) extraHits++;
+              const fwd = sel.indexOf(w.cells[0]) < sel.indexOf(w.cells[w.cells.length - 1]);
+              const early = fwd ? lo : hiX, on = fwd ? hiX : lo;
+              kinds[early && on ? "both" : early ? "oneEarly" : on ? "oneOn" : "exact"]++;
+            }
+          for (const p of round.placed) {
+            if (found.includes(p.word)) continue;
+            const first = p.cells[0], last = p.cells[p.cells.length - 1], step = p.cells[1] - p.cells[0];
+            const across = step === 1, pos = (i: number) => (across ? i % SIZE : Math.floor(i / SIZE));
+            const after = (k: number) => pos(last) + k <= SIZE - 1, before = (k: number) => pos(first) - k >= 0;
+            const pick = (a: number, b: number, f = found) => pickWord(straight(a, b), round.placed, f);
+            named++;
+            if (after(1)) { ok(pick(first, last + step) === p, `${p.word}+1 on`); ok(pick(last + step, first) === p, `${p.word}+1, backwards`); }
+            if (before(1)) ok(pick(first - step, last) === p, `${p.word} one early`);
+            if (after(1) && before(1)) ok(pick(first - step, last + step) === p, `${p.word} one each end`);
+            if (after(2)) ok(pick(first, last + 2 * step) !== p, `${p.word}+2 counted`);
+            if (before(2)) ok(pick(first - 2 * step, last) !== p, `${p.word} two early counted`);
+            ok(pick(first, last - step) !== p, `${p.word} one short counted`);
+            ok(pick(first + step, last) !== p, `${p.word} without its first counted`);
+            const ls = across ? first - pos(first) : first % SIZE, le = across ? ls + SIZE - 1 : ls + (SIZE - 1) * SIZE;
+            if (p.word.length + 2 < SIZE) ok(pick(ls, le) !== p, `${p.word} whole line counted`);
+            ok(pick(first, last, [...found, p.word]) !== p, `${p.word} counted twice`);
+            if (after(1)) ok(pick(first, last + step, [...found, p.word]) !== p, `${p.word}+1 counted twice`);
+          }
+        }
+        // 3. two words in one swipe: the longer (made up; a real grid never has two)
+        const placed = [{ word: "TONE", cells: [2, 3, 4, 5] }, { word: "PAINT", cells: [1, 2, 3, 4, 5] }];
+        ok(pickWord(straight(1, 6), placed, [])?.word === "PAINT", "longest of two");
+        ok(pickWord(straight(6, 1), placed, [])?.word === "PAINT", "longest of two, backwards");
+        ok(pickWord(straight(2, 6), placed, [])?.word === "TONE", "the one that fits");
+        ok(pickWord(straight(1, 6), placed, ["PAINT"])?.word === "TONE", "the found one skipped");
+        ok(pickWord(straight(0, 7), placed, ["PAINT"]) === null, "TONE with two extra at each end");
+        ok(pickWord([33], placed, []) === null && pickWord([], placed, []) === null, "a tap or nothing");
+        lines.unshift(
+          `${fails ? "FAILED" : "ALL PASS"}: ${checks} checks, ${fails} failed`,
+          `60 rounds, ${swipes} straight swipes:`,
+          `  hit by the old exact rule: ${oldHits} (all still hit, same word)`,
+          `  hit now: ${newHits}, only with the new rule: ${extraHits}`,
+          `  kinds: exact ${kinds.exact}, one on ${kinds.oneOn}, one early ${kinds.oneEarly}, both ${kinds.both}`,
+          `  named cases on ${named} words (+1, -1 early, +2, short, whole line, twice)`,
+        );
+      } catch (e: any) {
+        lines.push("ERROR " + (e && e.stack || e));
+      }
+      out.textContent = lines.join("\n");
+    </script>
+  </body>
+</html>

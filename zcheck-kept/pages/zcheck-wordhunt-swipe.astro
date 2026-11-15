@@ -1,0 +1,164 @@
+---
+// TEMPORARY check page (14 Nov, Word Hunt): the real game, swiped with pointer events (touch and mouse) the way
+// Marta's video shows (one letter on, a roll on lift, one early), an exact swipe and wrong swipes; results at the bottom.
+import Layout from '../layouts/Layout.astro';
+import GamePreview from '../components/react/games/GamePreview.jsx';
+---
+
+<Layout themeColor="#ffffff" title="zcheck Word Hunt" description="temporary check">
+	<main class="min-h-screen bg-white">
+		<GamePreview game="word-hunt" client:load />
+	</main>
+	<pre id="zc-out" style="position:fixed;left:0;right:0;bottom:0;z-index:2147483647;margin:0;padding:5px;max-height:40vh;overflow:hidden;font:10px/1.22 monospace;background:rgba(255,255,255,.94);color:#000;white-space:pre-wrap;pointer-events:none;border-top:2px solid #000">running…</pre>
+</Layout>
+
+<script>
+	import src from "../components/react/games/WordHunt.jsx?raw";
+	const out = document.getElementById("zc-out")!;
+	const L: string[] = [];
+	const say = (s: string) => { L.push(s); out.textContent = L.join("\n"); };
+	const SIZE = 10;
+	const p0 = src.indexOf("const POOL = [");
+	const POOL = [...src.slice(p0, src.indexOf("];", p0)).matchAll(/"([A-Z]+)"/g)].map((m) => m[1]);
+	const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+	// synthetic pointers have no real capture; the game's setPointerCapture must not throw on them (test only)
+	const cap = Element.prototype.setPointerCapture;
+	Element.prototype.setPointerCapture = function (id: number) { try { cap.call(this, id); } catch { /* synthetic */ } };
+
+	async function main() {
+		let grid: any = null;
+		for (let k = 0; k < 300; k++) {
+			grid = document.querySelector('[role="grid"]');
+			if (grid && grid.querySelectorAll('[role="gridcell"]').length === 100) break;
+			await wait(5);
+		}
+		await wait(10);
+		const cells = () => [...grid.querySelectorAll('[role="gridcell"]')] as HTMLElement[];
+		const letters = cells().map((c) => c.textContent!.trim());
+		const placed: { word: string; cells: number[] }[] = [];
+		for (const w of POOL)
+			for (let r = 0; r < SIZE; r++)
+				for (let c = 0; c < SIZE; c++)
+					for (const [dr, dc] of [[0, 1], [1, 0], [0, -1], [-1, 0]]) {
+						const ids = [...w].map((_, k) => [r + dr * k, c + dc * k]);
+						if (ids.some(([rr, cc]) => rr < 0 || rr >= SIZE || cc < 0 || cc >= SIZE)) continue;
+						if (ids.every(([rr, cc], k) => letters[rr * SIZE + cc] === w[k])) placed.push({ word: w, cells: ids.map(([rr, cc]) => rr * SIZE + cc) });
+					}
+		const W = innerWidth;
+		const g0 = grid.getBoundingClientRect();
+		say(`${W}x${innerHeight} ${navigator.userAgent.includes("Chrome") ? "chromium" : "webkit"}; grid ${Math.round(g0.width)} px, cell ${(g0.width / SIZE).toFixed(1)}; ${placed.length} words: ${placed.map((p) => p.word).join(" ")}`);
+		const pink = () => cells().map((c, i) => (c.className.includes("text-[#F600A9]") ? i : -1)).filter((i) => i >= 0);
+		const counter = () => ([...document.querySelectorAll("span,div,p")] as HTMLElement[])
+			.filter((e) => !e.children.length && /^(0|\d\d) \/ 10$/.test(e.textContent!.trim()) && e.getClientRects().length)
+			.map((e) => e.textContent!.trim()).join(",") || "?";
+		const foundWords = () => { const m = (grid.getAttribute("aria-label") || "").match(/: (.*)$/); return m ? m[1].split(", ") : []; };
+		const at = (s: number, dir: number[], t: number) => {
+			const g = grid.getBoundingClientRect(), cw = g.width / SIZE, ch = g.height / SIZE;
+			return { x: g.left + ((s % SIZE) + 0.5 + dir[1] * t) * cw, y: g.top + (Math.floor(s / SIZE) + 0.5 + dir[0] * t) * ch };
+		};
+		const fire = (type: string, target: Element, x: number, y: number, pointerType: string) =>
+			target.dispatchEvent(new PointerEvent(type, {
+				bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 1, pointerType, isPrimary: true,
+				button: type === "pointermove" ? -1 : 0, buttons: type === "pointerup" ? 0 : 1, width: pointerType === "touch" ? 20 : 1, height: pointerType === "touch" ? 20 : 1,
+			}));
+		// React paints the swipe a moment later: wait until the grid has changed and then held still (at most 300 ms)
+		const state = () => pink().join(",") + "|" + grid.getAttribute("aria-label");
+		const changed = async (prev: string) => { let last = ""; for (let k = 0; k < 60; k++) { await wait(5); const now = state(); if (now !== prev && now === last) return; last = now; } };
+		// a swipe from t=from to t=to (in letters from the start letter's middle), 0.2 of a letter per move, then extra moves, then lift
+		async function swipe(s: number, dir: number[], from: number, to: number, type: string, extra: number[] = []) {
+			const a = at(s, dir, from);
+			const target = cells()[s];
+			fire("pointerdown", target, a.x, a.y, type);
+			await wait(3);
+			const ts: number[] = [];
+			for (let t = from + 0.2; t < to; t += 0.2) ts.push(t);
+			ts.push(to, ...extra);
+			const s0 = state();
+			for (const t of ts) { const p = at(s, dir, t); fire("pointermove", target, p.x, p.y, type); }
+			await changed(s0);
+			const lit = pink();
+			const e = at(s, dir, ts[ts.length - 1]);
+			const s1 = state();
+			fire("pointerup", target, e.x, e.y, type);
+			await changed(s1);
+			return lit;
+		}
+		const plan = (p: any, before: number, after: number) => {
+			for (const fwd of [true, false]) {
+				const cs = fwd ? p.cells : [...p.cells].reverse();
+				const s = cs[0], e = cs[cs.length - 1];
+				const dir = [Math.sign(Math.floor(e / SIZE) - Math.floor(s / SIZE)), Math.sign((e % SIZE) - (s % SIZE))];
+				const ok = (cell: number, k: number) => { const r = Math.floor(cell / SIZE) + dir[0] * k, c = (cell % SIZE) + dir[1] * k; return r >= 0 && r < SIZE && c >= 0 && c < SIZE; };
+				if (ok(s, -before) && ok(e, after)) return { s, dir, len: cs.length };
+			}
+			return null;
+		};
+		const used = new Set<string>();
+		const take = (before: number, after: number) => {
+			for (const p of placed) { if (used.has(p.word)) continue; const pl = plan(p, before, after); if (pl) { used.add(p.word); return { p, ...pl }; } }
+			return null;
+		};
+		let pass = 0, fail = 0;
+		const expectPink = () => new Set(placed.filter((p) => foundWords().includes(p.word)).flatMap((p) => p.cells));
+		async function test(name: string, before: number, after: number, from: (len: number) => number, to: (len: number) => number,
+			type: string, litWant: (len: number) => number, accept: boolean, extra: (len: number) => number[] = () => []) {
+			const t = take(before, after);
+			if (!t) { say(`SKIP ${name}: no word with room`); return; }
+			const n0 = foundWords().length;
+			const lit = await swipe(t.s, t.dir, from(t.len), to(t.len), type, extra(t.len));
+			// the selection the finger should show just before the lift: litWant letters from the start, and not one more
+			const k0 = Math.round(from(t.len)), n = litWant(t.len);
+			const cellAt = (k: number) => { const r = Math.floor(t.s / SIZE) + t.dir[0] * k, c = (t.s % SIZE) + t.dir[1] * k; return r >= 0 && r < SIZE && c >= 0 && c < SIZE ? r * SIZE + c : -1; };
+			const sel = Array.from({ length: n }, (_, k) => cellAt(k0 + k));
+			const beyond = cellAt(k0 + n);
+			const selOk = sel.every((i) => lit.includes(i)) && (beyond < 0 || !lit.includes(beyond) || expectPinkBefore.has(beyond));
+			const n1 = foundWords().length;
+			const got = foundWords().includes(t.p.word);
+			const pk = pink(), want = expectPink();
+			const pinkOk = pk.length === want.size && pk.every((i) => want.has(i)) && (!got || t.p.cells.every((i) => pk.includes(i)));
+			const extraOff = sel.filter((i) => !t.p.cells.includes(i) && !want.has(i)).every((i) => !pk.includes(i));
+			const good = got === accept && n1 === n0 + (accept ? 1 : 0) && selOk && pinkOk && extraOff;
+			good ? pass++ : fail++;
+			say(`${good ? "ok  " : "FAIL"} ${type} ${name}: ${t.p.word}, lit before lift ${sel.map((i) => letters[i]).join("")}: ${selOk ? "yes" : "NO"}, ${got ? "counted" : "not counted"}, counter ${counter()}, pink after = found words' cells only: ${pinkOk && extraOff ? "yes" : `NO (${pk.length} vs ${want.size})`}`);
+			expectPinkBefore = new Set(pk);
+		}
+		let expectPinkBefore = new Set<number>();
+		const touch = "touch", mouse = "mouse";
+		// ?only=4,5,9: just those (WebKit is slow; its picture comes before a whole run)
+		const only = (new URLSearchParams(location.search).get("only") || "").split(",").filter(Boolean).map(Number);
+		const want = (k: number) => !only.length || only.includes(k);
+		say(`start: counter ${counter()}${only.length ? `, only ${only}` : ""}`);
+		// as in her video (PATTERN -> PATTERNU): the finger ends in the middle of the letter after the word
+		// strict (14 Nov, "frame" with a "k" counted): only exactly the word's letters count
+		if (want(1)) await test("one letter on (finger mid next letter), not counted", 0, 1, () => 0, (n) => n, touch, (n) => n + 1, false);
+		if (want(2)) await test("exact", 0, 0, () => 0, (n) => n - 1, touch, (n) => n, true);
+		if (want(3)) await test("rolls 0.2 into the next letter on lift", 0, 1, () => 0, (n) => n - 1, touch, (n) => n, true, (n) => [n - 1 + 0.6, n - 1 + 0.7]);
+		if (want(4)) await test("finger 0.3 into the next letter still ends on the word", 0, 1, () => 0, (n) => n - 0.2, touch, (n) => n, true);
+		if (want(5)) await test("starts one letter early, not counted", 1, 0, () => -1, (n) => n - 1, touch, (n) => n + 1, false);
+		if (want(6)) await test("two letters on (mid 2nd extra)", 0, 2, () => 0, (n) => n + 1, touch, (n) => n + 2, false);
+		if (want(7)) await test("mouse exact", 0, 0, () => 0, (n) => n - 1, mouse, (n) => n, true);
+		if (want(8)) await test("mouse 0.2 into the next letter, not counted", 0, 1, () => 0, (n) => n - 0.3, mouse, (n) => n + 1, false);
+		if (want(11)) await test("one short, not counted", 0, 0, () => 0, (n) => n - 2, touch, (n) => n - 1, false);
+		// wrong swipes: four letters across that hold no word not found yet
+		for (const type of [touch, mouse].filter((_, k) => want(9 + k))) {
+			const fw = foundWords();
+			let seg: number[] | null = null;
+			for (let s = 0; s < SIZE * SIZE && !seg; s++) {
+				if (s % SIZE > SIZE - 4) continue;
+				const cs = [s, s + 1, s + 2, s + 3];
+				if (placed.some((p) => !fw.includes(p.word) && p.cells.filter((i) => cs.includes(i)).length >= 2)) continue;
+				if (cs.some((i) => expectPinkBefore.has(i))) continue;
+				seg = cs;
+			}
+			if (!seg) { say(`SKIP ${type} wrong swipe`); continue; }
+			const n0 = fw.length;
+			const lit = await swipe(seg[0], [0, 1], 0, 3, type);
+			const pk = pink(), want = expectPink();
+			const good = foundWords().length === n0 && lit.length - expectPinkBefore.size === 4 && pk.length === want.size;
+			good ? pass++ : fail++;
+			say(`${good ? "ok  " : "FAIL"} ${type} wrong swipe ${seg.map((i) => letters[i]).join("")}: lit ${lit.length - expectPinkBefore.size}, ${foundWords().length === n0 ? "not counted" : "COUNTED"}, counter ${counter()}`);
+		}
+		say(`${fail ? "FAILED" : "ALL PASS"}: ${pass} ok, ${fail} failed (${Math.round(performance.now())} ms after load); found ${foundWords().join(" ")}`);
+	}
+	main().catch((e) => say("ERROR " + (e && e.stack || e)));
+</script>

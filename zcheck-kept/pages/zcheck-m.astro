@@ -1,0 +1,42 @@
+---
+// check page only: the Platform shapes video (phone copy, top row; computer original, bottom row), frames every 1 s
+// drawn to canvases, with the mean brightness of each frame (0 black, 255 white)
+---
+<html><body style="margin:0;background:#888">
+<div id="g" style="display:grid;grid-template-columns:repeat(11,1fr);gap:3px;width:1920px"></div>
+<pre id="d" style="font:16px monospace;white-space:pre-wrap"></pre>
+<script>
+  const g = document.getElementById("g");
+  const d = document.getElementById("d");
+  const log = (s) => (d.textContent += s + "\n");
+  log("canPlay h264: " + document.createElement("video").canPlayType('video/mp4; codecs="avc1.640028"'));
+  async function run(src, label) {
+    const v = document.createElement("video");
+    v.src = URL.createObjectURL(await (await fetch(src)).blob()); v.muted = true; v.preload = "auto"; v.playsInline = true;
+    v.onerror = () => log(label + " error " + (v.error && v.error.code));
+    await new Promise((r) => { v.onloadeddata = r; setTimeout(r, 8000); });
+    log(label + " readyState " + v.readyState + " duration " + v.duration + " size " + v.videoWidth + "x" + v.videoHeight);
+    const out = [];
+    const q = new URLSearchParams(location.search);
+    const from = Number(q.get("s") || 0.05), step = Number(q.get("k") || 2);
+    for (let t = from; t < (v.duration || 0); t += step) {
+      await new Promise((r) => { v.onseeked = r; v.currentTime = t; setTimeout(r, 3000); });
+      const c = document.createElement("canvas");
+      c.width = 160; c.height = 160;
+      const x = c.getContext("2d");
+      x.drawImage(v, 0, 0, 160, 160);
+      const px = x.getImageData(0, 0, 160, 160).data;
+      let s = 0, dark = 0;
+      for (let i = 0; i < px.length; i += 4) { const l = (px[i] + px[i + 1] + px[i + 2]) / 3; s += l; if (l < 60) dark++; }
+      out.push(`${v.currentTime.toFixed(1)}s ${Math.round(s / 25600)} d${Math.round(dark / 256)}%`);
+      c.style.width = "100%"; c.title = label; c.style.outline = label === "PHONE" ? "4px solid red" : "4px solid blue";
+      g.appendChild(c);
+    }
+    log(label + ": " + out.join(" | "));
+  }
+  (async () => {
+    await Promise.all([run("/assets/moving-objects-loop-phone.mp4", "PHONE"), run("/assets/moving-objects-loop.mp4", "ORIGINAL")]);
+    log("DONE");
+  })();
+</script>
+</body></html>

@@ -1,0 +1,69 @@
+---
+// check page only: the home page with every key layer's numbers listed on top (compare with her MM-HOME-002, 1050:3)
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/react/Hero.jsx';
+import FoundersChallenge from '../components/react/FoundersChallenge.jsx';
+import WhatIsSection from '../components/react/WhatIsSection.jsx';
+import PlatformSection from '../components/react/PlatformSection.jsx';
+import BrandSection from '../components/react/BrandSection.jsx';
+import ContactSection from '../components/react/ContactSection.jsx';
+import CollaborateForms from '../components/react/forms/CollaborateForms.jsx';
+---
+<Layout>
+	<div id="site-shell" class="bg-white text-black">
+		<Hero client:load />
+		<WhatIsSection />
+		<FoundersChallenge client:load />
+		<PlatformSection />
+		<ContactSection client:visible />
+		<BrandSection client:load/>
+	</div>
+	<CollaborateForms client:load />
+</Layout>
+<style is:global>@media (min-width: 1000px) { #zm { font: 17px/19px monospace !important; } }</style>
+<pre id="zm" style="position:fixed;inset:0;z-index:99999;margin:0;padding:4px;background:#fff;color:#000;font:9px/11px monospace;white-space:pre-wrap;overflow:hidden"></pre>
+<script>
+	const keys = [
+		'menu', 'Your product works', 'Design for funded', 'Straight to Marta', 'It is never accidental', 'underneath',
+		'THE ART OF MOVING', 'Keep moving', 'A product is never', 'See if we click', 'Design house', '30 minutes', '© Mamamarta',
+		'The Method', 'Bio', 'Contact', 'A game lets', '01 / 05', 'Some things are hiding', 'Play', 'Platform layer', 'PLATFORM LAYER',
+		'We work with', 'Email', 'Your message', 'MEMORY GAME', 'Memory', 'A LITTLE TEST', 'Redefine', 'Learn more',
+	];
+	const r1 = (v) => Math.round(v);
+	function run() {
+		const out = [];
+		document.querySelectorAll('#site-shell section, #site-shell footer').forEach((s) => {
+			const b = s.getBoundingClientRect();
+			out.push(`SEC ${s.tagName.toLowerCase()}#${s.id || ''}.${String(s.className).slice(0, 20)} top${r1(b.top + scrollY)} h${r1(b.height)}`);
+		});
+		const seen = new Set();
+		const walker = document.createTreeWalker(document.getElementById('site-shell'), NodeFilter.SHOW_TEXT);
+		let n;
+		while ((n = walker.nextNode())) {
+			const t = n.textContent.trim();
+			if (!t) continue;
+			const k = keys.find((k) => t.startsWith(k) || (k.length > 6 && t.includes(k)));
+			if (!k) continue;
+			const el = n.parentElement;
+			const b = el.getBoundingClientRect();
+			if (b.width === 0) continue;
+			const cs = getComputedStyle(el);
+			if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+			const id = k + r1(b.top + scrollY);
+			if (seen.has(id)) continue;
+			seen.add(id);
+			const btn = el.closest('a,button');
+			const bb = btn ? btn.getBoundingClientRect() : null;
+			out.push(`${t.slice(0, 18).padEnd(18)} x${r1(b.left)} y${r1(b.top + scrollY)} ${r1(b.width)}x${r1(b.height)} ${cs.fontWeight} ${parseFloat(cs.fontSize)}/${cs.lineHeight === 'normal' ? 'n' : parseFloat(cs.lineHeight)} ls${cs.letterSpacing} ${cs.color.replace(/\s/g, '')}` + (bb ? ` BTN x${r1(bb.left)} y${r1(bb.top + scrollY)} ${r1(bb.width)}x${r1(bb.height)}` : ''));
+		}
+		document.querySelectorAll('#site-shell h1, #site-shell h2, #site-shell h3, #site-shell svg[aria-label], #site-shell img').forEach((el) => {
+			const b = el.getBoundingClientRect();
+			if (b.width === 0 || b.height < 20) return;
+			const cs = getComputedStyle(el);
+			out.push(`${el.tagName} ${(el.textContent || el.getAttribute('alt') || el.getAttribute('src') || '').trim().slice(0, 16).padEnd(16)} x${r1(b.left)} y${r1(b.top + scrollY)} ${r1(b.width)}x${r1(b.height)} ${cs.fontWeight} ${parseFloat(cs.fontSize)}/${parseFloat(cs.lineHeight) || 'n'} ls${cs.letterSpacing}`);
+		});
+		out.push('page h' +document.documentElement.scrollHeight + ' vw' + innerWidth + ' vh' + innerHeight);
+		document.getElementById('zm').textContent = out.join('\n');
+	}
+	setTimeout(run, 2500);
+</script>

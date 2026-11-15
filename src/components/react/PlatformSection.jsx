@@ -67,9 +67,12 @@ export default function PlatformSection() {
           {/* 14 Nov, phone to her MM-HOME-002 layer numbers: heading Inter 400 64/60 at 14, 65 (was medium 64/65 at 40),
               the text 35 under it, the shapes still at 380 */}
           <header className="mb-[calc(var(--q)*35)] sm:mb-[2.6vw]">
-            <h2 data-reveal-lines className="flex flex-col whitespace-nowrap text-[16.41vw] font-normal leading-[15.385vw] tracking-[-0.06em] text-black sm:text-[7.8125vw] sm:font-medium sm:leading-[7.344vw] sm:tracking-[-0.06em]">
-              <span className="relative">P<span className="font-normal text-[#F600A9] sm:font-medium sm:text-[#e3009c]">l</span>atform</span>
-              <span className="relative">Mind<span className="hidden translate-x-1 pr-[3px] sm:inline-block"><span className="block h-3 w-12 bg-[#e3009c] sm:h-[0.63vw] sm:w-[3.7vw]"></span></span><span className="font-normal text-[#F600A9] sm:hidden">_</span>set</span>
+            {/* 15 Nov (Marta: "Ти мав виправити цей шрифт і анімацію", her screenshot of the published heading in Medium):
+                every letter of this heading is Inter Regular 400 in her MM-HOME-001 1200:2927 (each overrides the text's
+                Medium base), the pink "l" 400 #F600A9 and the bar 71 x 12 #F600A9; the computer was medium #e3009c */}
+            <h2 data-reveal-lines className="flex flex-col whitespace-nowrap text-[16.41vw] font-normal leading-[15.385vw] tracking-[-0.06em] text-black sm:text-[7.8125vw] sm:leading-[7.344vw] sm:tracking-[-0.06em]">
+              <span className="relative">P<span className="font-normal text-[#F600A9]">l</span>atform</span>
+              <span className="relative">Mind<span className="hidden translate-x-1 pr-[3px] sm:inline-block"><span className="block h-3 w-12 bg-[#F600A9] sm:h-[0.63vw] sm:w-[3.7vw]"></span></span><span className="font-normal text-[#F600A9] sm:hidden">_</span>set</span>
             </h2>
           </header>
           {/* 14 Nov (her rule: her newest frame is the spec): the phone takes her MM-HOME-002 text, 192 wide at 20, 5719;
@@ -79,7 +82,8 @@ export default function PlatformSection() {
             <p className="hidden text-black/[.69] sm:block sm:text-[max(1.146vw,13px)] sm:leading-[max(1.615vw,18px)] sm:tracking-[-0.04em]">A product is never finished. It grows through real use, and <br />a system built to hold it.</p>
           </div>
           <div className="mt-auto hidden sm:ml-[0.677vw] sm:mb-[0.417vw] sm:block">
-            <div className="mb-[0.9vw] h-[2px] w-[9.8vw] bg-[#f48fcf]"></div>
+            {/* her line 188 x 1 px #F600A9, 19 above PLATFORM LAYER (15 Nov: was 2 px #f48fcf) */}
+            <div className="mb-[0.99vw] h-px w-[9.8vw] bg-[#F600A9]"></div>
             {/* 14 Nov: on a tablet (768) these were 8-9 px; the px floors only reach below 1150 wide, so laptop and desktop keep her vw */}
             <p className="text-[max(1.146vw,12px)] uppercase leading-[max(1.094vw,13px)] tracking-[-0.017em] text-black/50">Platform layer</p>
           </div>
@@ -92,8 +96,10 @@ export default function PlatformSection() {
               (scripts/make-phone-videos.mjs) on a white box, no blend or filter. On the phone the shapes are at her
               picture's own size (her frame shows them smaller, no zoom); the computer keeps its zoom. */}
           <div data-reveal className="relative aspect-[333/370] w-full overflow-hidden bg-white sm:aspect-auto sm:h-[34.01vw] sm:w-[34.95vw]">
-            <PlatformShapes turned className="block sm:hidden" />
-            <PlatformShapes className="hidden sm:block sm:scale-[1.18]" />
+            {/* 15 Nov (Marta: "оригінальна анімація має бути", "Ти мав виправити цей шрифт і анімацію"): her own video
+                again on every screen, not the circles drawn in code. On the phone it stands as in her frame 917:206: the
+                square 370 tall turned a quarter left, its left edge on the box's, the right 37 (72 of 720) cut off */}
+            <video data-lazy-video data-src={'/assets/moving-objects-loop-phone.mp4'} poster={'/assets/moving-objects-loop-phone-poster.webp'} preload="none" muted loop playsInline aria-label="Moving objects" className="absolute left-0 top-0 h-full w-[111.12%] -rotate-90 bg-white object-cover sm:inset-0 sm:w-full sm:rotate-0 sm:scale-[1.18]" />
           </div>
         </div>
         {/* her line at 20, 779 (54 under the picture's 725): 119 wide, 1 px #F600A9 as her frame (was #f48fcf) */}

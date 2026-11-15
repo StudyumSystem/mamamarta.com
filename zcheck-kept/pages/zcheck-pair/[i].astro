@@ -1,0 +1,29 @@
+---
+// check page only: one screen of her phone home MM-HOME-002 (1050:3) next to the same place of the site
+import her from "../../../../../figma/Pc2G2suH2aQvXj0BuFkYWS-1050-3.png";
+export function getStaticPaths() {
+  return Array.from({ length: 10 }, (_, i) => ({ params: { i: String(i) } }));
+}
+const i = Number(Astro.params.i);
+---
+<html><head><meta name="viewport" content="width=790" /></head><body style="margin:0;background:#ccc">
+  <div id="pair" style="display:flex;gap:10px;width:790px;height:844px">
+    <div style={`width:390px;height:844px;flex:none;background:url(${her.src}) 0 -${i * 844}px / 390px 8122px no-repeat #fff`}></div>
+    <iframe id="site" data-i={i} src="/" style="width:390px;height:844px;border:0;flex:none;background:#fff"></iframe>
+  </div>
+<script>
+  // games aligned on their start (hers at 1688), the lower part aligned on the page's end
+  const f = document.getElementById("site");
+  f.addEventListener("load", () => {
+    const i = +f.dataset.i, w = f.contentWindow, d = f.contentDocument;
+    const go = () => {
+      const games = d.getElementById("my-system").getBoundingClientRect().top + w.scrollY;
+      const end = d.documentElement.scrollHeight;
+      const y = i <= 1 ? i * 844 : i <= 5 ? games + (i * 844 - 1688) : end - (8122 - i * 844);
+      w.scrollTo(0, y);
+    };
+    go();
+    setTimeout(go, 800);
+  });
+</script>
+</body></html>

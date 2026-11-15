@@ -1,0 +1,48 @@
+---
+// Test page only (remove before launch): one of Marta's frames next to our page, cut to the same window,
+// so the check picture is sharp enough to measure type.
+// ?f= frame file in /assets, ?p= our page, ?w= page width (390 phone, 1920 computer),
+// ?y= window top and ?x= window left in page px, ?off= our page's own vertical shift.
+// Phone pages are shown at 2x, computer pages at 1x; each window is 780 px wide and 900 px high.
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <style>
+      body { margin: 0; background: #ddd; display: flex; gap: 20px; }
+      .win { width: 780px; height: 900px; overflow: hidden; position: relative; background: #fff; }
+      .win img { position: absolute; max-width: none; }
+      .win iframe { position: absolute; left: 0; top: 0; height: 8000px; border: 0; transform-origin: 0 0; }
+    </style>
+  </head>
+  <body>
+    <div class="win"><img id="frame" alt="" /></div>
+    <div class="win"><iframe id="page" scrolling="no"></iframe></div>
+    <script is:inline>
+      const q = new URLSearchParams(location.search);
+      const n = (k, d) => Number(q.get(k) || d);
+      const w = n("w", 390), y = n("y", 0), x = n("x", 0), off = n("off", 0);
+      const s = w <= 400 ? 2 : 1;
+      const img = document.getElementById("frame");
+      img.src = "/assets/" + (q.get("f") || "frame-method-phone.png");
+      img.style.width = `${w * s}px`;
+      img.style.left = `${-x * s}px`;
+      img.style.top = `${-y * s}px`;
+      const page = document.getElementById("page");
+      page.src = q.get("p") || "/what-is";
+      page.style.width = `${w}px`;
+      // ?h= a real screen height (e.g. 844): pages with full-screen blocks then keep their size, and the
+      // page is scrolled inside the frame instead of moved.
+      const h = n("h", 0);
+      if (h) {
+        page.style.height = `${h}px`;
+        page.style.transform = `scale(${s}) translate(${-x}px, 0)`;
+        const go = () => page.contentWindow.scrollTo(0, y + off);
+        page.addEventListener("load", () => { go(); setTimeout(go, 600); setTimeout(go, 1500); });
+      } else {
+        page.style.transform = `scale(${s}) translate(${-x}px, ${-(y + off)}px)`;
+      }
+    </script>
+  </body>
+</html>

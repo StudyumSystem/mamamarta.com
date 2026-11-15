@@ -1,0 +1,11 @@
+---
+// check page only: her phone home MM-HOME-002 (1050:3), screens 3 to 9 side by side at 0.62 scale
+import her from "../../../../figma/Pc2G2suH2aQvXj0BuFkYWS-1050-3.png";
+const cuts = [2, 3, 4, 5];
+const k = 1.15;
+---
+<html><body style="margin:0;background:#888;display:flex;gap:6px;width:1920px">
+{cuts.map((i) => (
+  <div style={`width:${390 * k}px;height:${844 * k}px;background:url(${her.src}) 0 -${i * 844 * k}px / ${390 * k}px ${8122 * k}px no-repeat #fff`}></div>
+))}
+</body></html>

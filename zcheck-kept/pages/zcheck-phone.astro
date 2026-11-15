@@ -1,0 +1,10 @@
+---
+// check page only: her phone home MM-HOME-002 (1050:3) cut into screens (pairs with the site: /zcheck-pair/<n>)
+import her from "../../../../figma/Pc2G2suH2aQvXj0BuFkYWS-1050-3.png";
+const cuts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+---
+<html><head><meta name="viewport" content="width=390" /></head><body style="margin:0;background:#ccc">
+{cuts.map((i) => (
+  <div id={`c${i}`} style={`width:390px;height:844px;margin:0 0 10px;background:url(${her.src}) 0 -${i * 844}px / 390px 8122px no-repeat #fff`}></div>
+))}
+</body></html>

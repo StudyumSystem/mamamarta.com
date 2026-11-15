@@ -1,0 +1,38 @@
+---
+// Check page (not linked): her Figma's own picture of MM-BIO-01 (crops at 1:1) next to the site's text at her numbers.
+import fig from '../../../../figma/Pc2G2suH2aQvXj0BuFkYWS-959-105.png?url';
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/400-italic.css';
+---
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+@font-face { font-family: "I319"; src: url("https://cdn.jsdelivr.net/gh/rsms/inter@v3.19/docs/font-files/Inter-Regular.woff2") format("woff2"); font-weight: 400; }
+html { -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: #fff; font-family: Inter; }
+.row { display: flex; gap: 20px; padding: 6px 10px; }
+.crop { background-repeat: no-repeat; flex: none; }
+.t { width: 682px; flex: none; }
+.h { font-size: 50px; line-height: 59px; letter-spacing: -0.04em; text-align: center; width: 320px; }
+.s { font-size: 18px; line-height: 34px; letter-spacing: -0.04em; color: rgba(0,0,0,.69); text-align: center; width: 320px; }
+.b { font-size: 22px; line-height: 34px; letter-spacing: -0.04em; color: rgba(0,0,0,.69); margin: 0; }
+.c319 { font-family: I319; }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="crop" style={`width:320px;height:107px;background-image:url(${fig});background-position:-800px -1220px`}></div>
+  <div><div class="h">M’s Lens</div><div class="s">A story shaped by light, art, and intuition.</div></div>
+  <div class="c319"><div class="h">M’s Lens</div><div class="s">A story shaped by light, art, and intuition.</div></div>
+</div>
+<div class="row">
+  <div class="crop" style={`width:682px;height:136px;background-image:url(${fig});background-position:-634px -1377px`}></div>
+  <div class="t"><p class="b">A dark room. Her mother switches on an old projector, and a square<br/>of light appears on the wall. It felt like light itself could tell stories.</p><p class="b" style="margin-top:34px">She grew up in Lviv, in a family of artists. Painting, photography,</p></div>
+</div>
+<div class="row">
+  <div class="t c319" style="margin-left:702px"><p class="b">A dark room. Her mother switches on an old projector, and a square<br/>of light appears on the wall. It felt like light itself could tell stories.</p><p class="b" style="margin-top:34px">She grew up in Lviv, in a family of artists. Painting, photography,</p></div>
+</div>
+</body>
+</html>

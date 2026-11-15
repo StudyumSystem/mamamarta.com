@@ -1,0 +1,99 @@
+---
+// TEMPORARY check page (12 Nov, The Art of Moving): her run's rules played out without drawing, many routes,
+// to see where a press can end a run (the rules before 12 Nov next to the new ones).
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <style>body { margin: 0; padding: 10px; font: 13px/1.35 monospace; background: #fff; } pre { margin: 0; }</style>
+  </head>
+  <body>
+    <pre id="out">running…</pre>
+    <script>
+      import { newWorld, runStep, pressJump } from "../components/react/games/aomWorld.js";
+      const out = document.getElementById("out");
+      const lines: string[] = [];
+      const seeded = (seed: number) => { let s = seed >>> 0; return () => { s = (s + 0x6d2b79f5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+      const H = 1 / 120, VIEW = 660;
+      const OLD = { easy: 0, grace: 0, back: 0 };
+      const NEW = {};
+      // policy(g, plats0) → true to press this step. Ends when she is well onto brick `until` or falls.
+      function run(opt: any, seed: number, policy: (g: any, P: any[]) => boolean, until: number, maxT = 20) {
+        Math.random = seeded(seed);
+        const g: any = newWorld(opt);
+        const P = g.plats.slice(); // the route, kept (the world drops bricks behind her)
+        const keep = () => { for (const q of g.plats) if (!P.includes(q)) P.push(q); };
+        g.mode = "play";
+        let presses = 0;
+        while (g.clock < maxT) {
+          keep();
+          if (policy(g, P)) { presses++; pressJump(g); }
+          const { ev } = runStep(g, H, VIEW);
+          if (ev === "fall") {
+            const k = P.findIndex((q) => q.x > g.p.x) - 1;
+            return { lost: true, at: k, t: g.t, x: g.p.x, P, presses };
+          }
+          if (P[until] && g.p.ground === P[until] && g.p.x > P[until].x + 40) return { lost: false, t: g.t, P, presses };
+        }
+        return { lost: false, timeout: true, P, presses };
+      }
+      // a good player: presses 40 units before a brick's end
+      const good = (g: any) => !!g.p.ground && g.p.x >= g.p.ground.x + g.p.ground.w - 40;
+      for (const [name, opt] of [["before 12 Nov", OLD], ["now", NEW]] as const) {
+        lines.push(`== ${name} ==`);
+        // A: one press at every point of brick i (a good player before and after)
+        for (let i = 0; i < 5; i++) {
+          let lost = 0, n = 0;
+          const bad: string[] = [];
+          for (let seed = 1; seed <= 30; seed++) {
+            const route = run(opt, seed, () => false, 0, 0).P; // the route for this seed
+            const b = route[i];
+            const x0 = i === 0 ? 0 : b.x;
+            for (let x = x0; x <= b.x + b.w; x += 4) {
+              let pressed = false;
+              const r = run(opt, seed, (g, P) => {
+                if (g.p.ground === P[i] && !pressed) { if (g.p.x >= x) { pressed = true; return true; } return false; }
+                return !!g.p.ground && good(g);
+              }, i + 1);
+              n++;
+              if (r.lost) { lost++; if (bad.length < 4) bad.push(`seed ${seed} press at ${Math.round(x - b.x)} of ${Math.round(b.w)} (gap ${Math.round(route[i + 1].x - b.x - b.w)}, step ${Math.round(route[i + 1].y - b.y)}, t ${r.t.toFixed(2)})`); }
+            }
+          }
+          lines.push(`brick ${i} -> ${i + 1}: lost ${lost} of ${n} presses${bad.length ? "; e.g. " + bad.join("; ") : ""}`);
+        }
+        // B: never pressing; C: pressing every 0.2 s / 0.35 s / 0.5 s from GO
+        for (const [label, pol] of [
+          ["never presses", () => false],
+          ["presses every 0.2 s", (g: any) => Math.floor(g.clock / 0.2) !== Math.floor((g.clock - H) / 0.2)],
+          ["presses every 0.35 s", (g: any) => Math.floor(g.clock / 0.35) !== Math.floor((g.clock - H) / 0.35)],
+          ["presses every 0.5 s", (g: any) => Math.floor(g.clock / 0.5) !== Math.floor((g.clock - H) / 0.5)],
+        ] as const) {
+          let lost = 0;
+          const where: number[] = [];
+          for (let seed = 1; seed <= 200; seed++) {
+            const r = run(opt, seed, pol as any, 5, 30);
+            if (r.lost) { lost++; where.push(r.t); }
+          }
+          where.sort((a, b) => a - b);
+          lines.push(`${label}: lost before brick 5 in ${lost} of 200 routes${where.length ? `, after ${where[0].toFixed(2)}..${where[where.length - 1].toFixed(2)} s (median ${where[where.length >> 1].toFixed(2)})` : ""}`);
+        }
+        // D: the first press at time T after GO, then a good player
+        const firsts: string[] = [];
+        for (let T = 0.2; T <= 2.0; T += 0.1) {
+          let lost = 0;
+          for (let seed = 1; seed <= 100; seed++) {
+            let done = false;
+            const r = run(opt, seed, (g) => { if (!done) { if (g.t >= T) { done = true; return true; } return false; } return good(g); }, 3, 30);
+            if (r.lost) lost++;
+          }
+          firsts.push(`${T.toFixed(1)}s:${lost}`);
+        }
+        lines.push(`first press at T after GO, runs lost of 100: ${firsts.join(" ")}`);
+        lines.push("");
+      }
+      lines.push("done");
+      out.textContent = lines.join("\n");
+    </script>
+  </body>
+</html>

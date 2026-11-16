@@ -5,13 +5,9 @@ import ArrowIcon from "./ArrowIcon";
 // Behind it her M, faded to pink, and her black cable running across. Desktop (1920 frame, px / 19.2 = vw):
 // heading 150/141 from 150 px down at 1012 px, "experience" in italic with her pink "?" lying on its side,
 // body 22/31 black 70% at 621 px, the gradient button 312x68 at 767 px (it still opens The Method).
-// The M and the cable are her own pictures (m-letter, wire): the M mirrored, its greys turned to her light pink
-// (the picture over a pink square with "lighten": black becomes the pink, white stays white); the cable twice,
-// laid over the page with "multiply" so its white disappears; the two cables meet behind the button.
+// The cable is her own exported Figma layers (16 Nov), in two pieces; the M is unchanged.
 // Phone (390 frame, --q): the same copy and order on white, her phone type (heading in three lines, 65 px
 // apart), body 252 wide, button 46 tall; behind them her own phone layers (her pink M and two cable pieces).
-
-const PINK = "#fcd2f0";
 
 // Her pink "?" on its side (12 Nov: her own 4x picture, 271 x 152, drawn at her 68 x 38 of the 150 px heading).
 // Marta, 12 Nov: the "?" must JOIN the last letter of "experience" on every screen, so it is placed on the word
@@ -49,12 +45,11 @@ const Heading = ({ className = "" }) => (
   </h2>
 );
 
-const BODY = "It is never accidental. It is the decisions people never notice, but always feel.";
-
-// The M, mirrored, in pink: her M picture's shape as a mask over a pink that fades to white towards the
-// text, as in her picture (strongest on the left).
+// The M stays as it was live (Marta, 15 Nov 19:57: "Там треба поправити шнур в блоці … Біше нічого не змінювати"):
+// her M picture, mirrored, as a mask over a pink that fades to white towards the text (strongest on the left).
+const PINK = "#fcd2f0";
 const PinkM = ({ className = "", style }) => (
-  <div className={`pointer-events-none absolute [transform:scaleX(-1)] ${className}`} aria-hidden="true" style={style}>
+  <div className={`absolute [transform:scaleX(-1)] ${className}`} style={style}>
     <div
       className="h-full w-full"
       style={{
@@ -68,45 +63,53 @@ const PinkM = ({ className = "", style }) => (
   </div>
 );
 
-// Her cable (12 Nov, Marta: it moved as two halves and looked split; it must move as ONE piece, a single gentle
-// sway, both ends fixed, the pink light still running along it, no appearing, nothing else). One picture, one
-// motion (global.css .mm-wire-sway); the pink light runs inside it, so it moves with it.
-const Cable = () => (
-  <div className="mm-wire-part mm-wire-sway absolute inset-0">
-    <img src="/assets/what-is-line.webp" alt="" className="block h-full w-full max-w-none" />
-    <div className="mm-wire-sheen absolute inset-0" />
-  </div>
-);
-
-// Phone (Marta, 14 Nov: her MM-HOME-002 What is screen, frame 1224:184): her own two cable pieces, exported at 3x
-// with their shadows (1224:185 the loop at the top right, 1224:190 the S with two loops down to the bottom left),
-// placed at her frame's numbers (390 frame, --q). They meet behind the button, as on the computer. Each sways
-// like the computer's cable: every point moves up or down by 2.2% of its distance from the line joining the
-// piece's two ends, so both ends stay where they are (origin = the end behind the button, --sk = the skew that
-// keeps the far end on that line). The pink light runs along each piece.
-const PhoneCable = ({ src, box, origin, sk }) => (
-  <div className="pointer-events-none absolute" aria-hidden="true" style={box}>
-    <div className="mm-wire-part mm-wire-sway-v absolute inset-0" style={{ transformOrigin: origin, "--sk": sk }}>
-      <img src={src} alt="" className="block h-full w-full max-w-none" />
-      <div
-        className="mm-wire-sheen absolute inset-0"
-        style={{ WebkitMaskImage: `url(${src})`, maskImage: `url(${src})` }}
-      />
-    </div>
+// Her Figma update (16 Nov, file changed 00:32 UTC; Marta: "Зроби так для десктопу і мобільної версії"): only
+// the cable changes. It is her own exported layers, placed at her numbers from the block's top. The cable is two pieces with
+// her shadow (#000 11%, 32/19, blur 14.9) and its right loop hangs below the block, over the white gap above
+// Founder's blind spot, as in her frame.
+// Marta, 12 Nov: the cable moves as ONE piece, a single gentle sway with both ends fixed, the pink light running
+// along it. So every cable piece sits in a wrapper the size of the whole layer box with the same origin and skew
+// (global.css .mm-wire-sway-v): the pieces move as one and never split. The pink light runs over the whole box too,
+// masked by each piece's picture, so it travels along the cable in one run.
+const CablePiece = ({ src, box, origin, sk }) => (
+  <div className="mm-wire-part mm-wire-sway-v absolute inset-0" style={{ transformOrigin: origin, "--sk": sk }}>
+    <img src={src} alt="" className="absolute block max-w-none" style={box} />
+    <div
+      className="mm-wire-sheen absolute inset-0"
+      style={{
+        WebkitMaskImage: `url(${src})`,
+        maskImage: `url(${src})`,
+        WebkitMaskPosition: `${box.left} ${box.top}`,
+        maskPosition: `${box.left} ${box.top}`,
+        WebkitMaskSize: `${box.width} ${box.height}`,
+        maskSize: `${box.width} ${box.height}`,
+      }}
+    />
   </div>
 );
 const q = (n) => `calc(var(--q) * ${n})`;
 
 export default function WhatIsSection() {
   return (
-    <section id="what-is" className="mm-phone-w relative overflow-hidden bg-white text-black">
+    <section id="what-is" className="mm-phone-w relative z-[1] overflow-x-clip bg-white text-black">
       {/* Computer */}
       <div className="relative hidden h-[56.25vw] sm:block">
-        <PinkM style={{ left: "-2.08vw", top: "-2.08vw", width: "62.24vw", height: "57.29vw" }} />
-        {/* Her cable layer (Line.png, 11 Nov 17:44): the whole 1920x1080 frame at 2x, cable and its grey slabs on
-            transparent, so it lies over the frame exactly as in her design */}
-        <div className="pointer-events-none absolute left-0 top-0 h-[56.25vw] w-[100vw]" aria-hidden="true">
-          <Cable />
+        {/* Desktop - 39 (16 Nov), px / 19.2 from the block's top, export boxes with blur and shadow. Her layer
+            order: right cable, M, left cable, text. The box reaches 1623.5 px down for the hanging loop. */}
+        <div className="pointer-events-none absolute left-0 top-0 h-[84.56vw] w-full overflow-hidden" aria-hidden="true">
+          <CablePiece
+            src="/assets/what-is-cable-right.webp"
+            box={{ left: "57.135vw", top: "20.625vw", width: "86.172vw", height: "63.932vw" }}
+            origin="-7.969vw 27.344vw"
+            sk="-0.2474deg"
+          />
+          <PinkM style={{ left: "-2.08vw", top: "-2.08vw", width: "62.24vw", height: "57.29vw" }} />
+          <CablePiece
+            src="/assets/what-is-cable-left.webp"
+            box={{ left: "-11.771vw", top: "7.708vw", width: "80.156vw", height: "60.417vw" }}
+            origin="-7.969vw 27.344vw"
+            sk="-0.2474deg"
+          />
         </div>
 
         <div className="absolute left-[52.7vw] top-[7.71vw] z-10">
@@ -124,28 +127,30 @@ export default function WhatIsSection() {
       </div>
 
       {/* Phone */}
-      <div className="relative h-[calc(var(--q)*844)] overflow-hidden sm:hidden">
-        {/* Her layer order: the top cable, her soft pink M over it, the lower cable, then the text. */}
-        <PhoneCable
-          src="/assets/what-is-cable-top-phone.png"
-          box={{ left: q(145.88), top: q(92), width: q(476.33), height: q(439) }}
-          origin="26.68% 69.02%"
-          sk="1.3256deg"
-        />
-        {/* her pink M (Mask group 1224:186, its blur and fade already in the picture), 28 px of blur round her box */}
-        <img
-          src="/assets/what-is-m-phone.png"
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute max-w-none"
-          style={{ left: q(-131), top: q(252), width: q(561), height: q(645.67) }}
-        />
-        <PhoneCable
-          src="/assets/what-is-cable-bottom-phone.png"
-          box={{ left: q(-106.55), top: q(336.32), width: q(588.33), height: q(645) }}
-          origin="65.15% 11.63%"
-          sk="2.1636deg"
-        />
+      <div className="relative h-[calc(var(--q)*844)] sm:hidden">
+        {/* MM-HOME-002 (16 Nov): the pink M as it was live (unchanged), under both cable pieces
+            (Group 94: 1248:823 top, 1248:824 bottom, boxes with her shadow). The box reaches 977 down, so the
+            lower piece hangs below the screen as in her frame. */}
+        <div className="pointer-events-none absolute left-0 top-0 h-[calc(var(--q)*977)] w-full overflow-hidden" aria-hidden="true">
+          <img
+            src="/assets/what-is-m-phone.png"
+            alt=""
+            className="absolute block max-w-none"
+            style={{ left: q(-131), top: q(252), width: q(561), height: q(645.67) }}
+          />
+          <CablePiece
+            src="/assets/what-is-cable-top-phone-2.webp"
+            box={{ left: q(163.21), top: q(97.86), width: q(479), height: q(450) }}
+            origin="calc(var(--q) * -8) calc(var(--q) * 831)"
+            sk="1.556deg"
+          />
+          <CablePiece
+            src="/assets/what-is-cable-bottom-phone-2.webp"
+            box={{ left: q(-127.95), top: q(328.55), width: q(611), height: q(647.5) }}
+            origin="calc(var(--q) * -8) calc(var(--q) * 831)"
+            sk="1.556deg"
+          />
+        </div>
         {/* MM-HOME-002, 13 Nov 21:46 UTC (iPhone 16 & 17 Pro - 8, one 844 screen, right after the first screen):
             heading Inter Medium 64/65 -0.06em at 14, 65 ("experience" stays her italic 400); body 14/20 -0.04em
             black 70% at 20, 280 in her three lines; button the full 350 x 46 at 20, 375, 16 semibold -0.023em */}

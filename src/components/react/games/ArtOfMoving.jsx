@@ -54,6 +54,9 @@ const sound = (name, level) => playSound(name, "art-of-moving", level);
 const INSTRUCTIONS = "Keep moving. Jump between platforms and collect pink coins. One fall ends the run.";
 const PINK = "#F600A9";
 const BEST_KEY = "mm-art-of-moving-best";
+// 15 Nov (Marta: after a fall "nothing happens, it freezes"): these two were missing, so the end of every run stopped
+const readBest = () => { try { return Number(localStorage.getItem(BEST_KEY) || 0); } catch { return 0; } };
+const writeBest = (n) => { try { localStorage.setItem(BEST_KEY, String(n)); } catch { /* this visit only */ } };
 // 11 Nov (her MM-G04-04 Desktop_Score: 23 coins, 150 MM✦STARS): 10 MM✦ a coin, at most 150 a run (question for Marta).
 const COIN_STARS = 10;
 // 15 Nov (Marta): plus the bonus of her coins in a row (10 MM✦ for every third in a row), under the same cap
@@ -611,7 +614,7 @@ export default function ArtOfMoving({ open, onClose }) {
             )}
 
             {phase === "default" && (
-              <div className="mm-fade-in absolute inset-0 flex flex-col items-center justify-center px-6 pt-[18%] text-center">
+              <div className="mm-fade-in absolute inset-0 flex flex-col items-center justify-center px-6 pt-[18%] text-center [container-type:inline-size]">
                 <p className="text-[17px] leading-[1.45] lg:leading-[1.41] lg:text-[clamp(15px,1.146vw,22px)] font-normal text-black/70">
                   {/* her MM-G04-01 (11 Nov): "Press Space to jump. Ready?"; on the computer two lines at 22 px as her frame (14 Nov) */}
                   {touch ? "Tap anywhere to jump. Ready?" : <>Press Space to jump.<br className="max-lg:hidden" /> Ready?</>}
@@ -619,8 +622,10 @@ export default function ArtOfMoving({ open, onClose }) {
                 <button
                   type="button"
                   onClick={start}
-                  // phone: her phone buttons are 199 x 46, Inter 600 16 (MM-G04 Mobile, Marta 13 Nov 22:07 "the button is the wrong size")
-                  className="mm-gradient mt-8 inline-flex h-[46px] w-[199px] items-center justify-center gap-2 text-[16px] font-semibold tracking-[-0.023em] text-white lg:tracking-normal lg:mt-[clamp(28px,4.4vw,84px)] lg:h-[clamp(54px,3.7vw,71px)] lg:w-[clamp(240px,16.9vw,325px)] lg:text-[clamp(16px,1.146vw,22px)]"
+                  // phone: her phone buttons are 199 x 46, Inter 600 16 (MM-G04 Mobile, Marta 13 Nov 22:07 "the button is the wrong size");
+                  // 15 Nov (Marta, Threads' browser: the card shrank to ~214 wide and the button nearly filled it): on a
+                  // smaller card it shrinks with it, 199/311 of the card's width, never more than her 199 x 46
+                  className="mm-gradient mt-8 inline-flex aspect-[199/46] w-[min(199px,64cqw)] items-center justify-center gap-2 text-[min(16px,5.15cqw)] font-semibold tracking-[-0.023em] text-white lg:aspect-auto lg:tracking-normal lg:mt-[clamp(28px,4.4vw,84px)] lg:h-[clamp(54px,3.7vw,71px)] lg:w-[clamp(240px,16.9vw,325px)] lg:text-[clamp(16px,1.146vw,22px)]"
                 >
                   Start <span aria-hidden="true">→</span>
                 </button>

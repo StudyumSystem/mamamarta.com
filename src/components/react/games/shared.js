@@ -73,11 +73,18 @@ export const prefersReducedMotion = () =>
 export const pad2 = (n) => String(n).padStart(2, "0");
 
 // MM✦STARS (her 11 Nov frames): "Play all 5 games to earn MM✦STARS. Save them with your email and unlock a design discount."
-// A round is worth at most 150 (every score frame shows 150). Each game keeps its best round, so the total
-// grows by playing all five, not by replaying one. Kept on this device until saved with an email.
+// A round is worth at most 150 (every score frame shows 150). Kept on this device until saved with an email.
+// 17 Nov (Marta: the call discount in under half an hour of play, the full design discount in about a week):
+// every round now adds to the total (before, each game kept only its best round, 750 in all). Play earns about
+// 2,000 MM✦ an hour: the first round counts in full, after that the room for stars refills at that pace, never
+// holding more than one round, so 750 MM✦ ($75 off the call) take about 20 min. A day adds at most 3,000 MM✦,
+// so 20,000 MM✦ ($2,000 off design) take a week.
 export const ROUND_STARS = 150;
+export const STARS_PER_HOUR = 2000;
+export const DAILY_STARS = 3000;
 const STARS_KEY = "mm-stars";
 const SAVED_KEY = "mm-stars-saved";
+const PACE_KEY = "mm-stars-pace";
 const read = (key, fallback) => {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
 };
@@ -85,10 +92,20 @@ const write = (key, value) => {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode: lasts this visit */ }
 };
 
-export function recordStars(gameId, n) {
-  const all = read(STARS_KEY, {});
-  if (!(all[gameId] >= n)) all[gameId] = n;
-  write(STARS_KEY, all);
+export function recordStars(gameId, n, now = Date.now()) {
+  const want = Math.max(0, Math.round(Number(n) || 0));
+  const day = new Date(now).toDateString(); // the visitor's own day
+  const pace = read(PACE_KEY, null) || { day, today: 0, room: ROUND_STARS, at: now };
+  const today = pace.day === day ? Number(pace.today) || 0 : 0;
+  const waited = Math.max(0, now - (Number(pace.at) || now));
+  const room = Math.min(ROUND_STARS, (Number(pace.room) || 0) + (waited * STARS_PER_HOUR) / 3600000);
+  const add = Math.max(0, Math.min(want, Math.floor(room), DAILY_STARS - today));
+  write(PACE_KEY, { day, today: today + add, room: room - add, at: now });
+  if (add) {
+    const all = read(STARS_KEY, {});
+    all[gameId] = (Number(all[gameId]) || 0) + add;
+    write(STARS_KEY, all);
+  }
   return totalStars();
 }
 export function totalStars() {

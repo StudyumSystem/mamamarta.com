@@ -1,6 +1,5 @@
 import React from "react";
 import InnerNav, { PhoneBack } from "./InnerNav";
-import { WHATSAPP_URL } from "./games/shared";
 
 // Library page, from Marta's frames "Library" (1920x1080) and "iPhone Library" (390x844), 26 Oct 2026.
 // The brush hangs from the top edge (on the computer its handle runs behind the menu); positions are
@@ -27,11 +26,9 @@ export default function LibraryPage() {
         For private inquiries or early access, contact directly.
       </p>
 
-      {/* "Ask Marta" opens the same WhatsApp chat as the Homepage (spec MM-LIBRARY) */}
+      {/* "Ask Marta" opens the paid call, as on the Homepage (17 Nov, Marta: every contact button leads there) */}
       <a
-        href={WHATSAPP_URL}
-        target="_blank"
-        rel="noreferrer"
+        href="#book-call"
         className="mm-gradient group absolute left-1/2 -translate-x-1/2 flex items-center justify-center gap-[0.3em] font-semibold text-white top-[calc(var(--u)*655)] h-[calc(var(--u)*46)] w-[calc(var(--u)*148)] text-[length:calc(var(--u)*15)] md:top-[calc(var(--u)*804)] md:h-[calc(var(--u)*68)] md:w-[calc(var(--u)*208)] md:text-[length:calc(var(--u)*22)]"
       >
         {/* Short, heavy arrow as in her frames (the plain → character drew long and thin) */}

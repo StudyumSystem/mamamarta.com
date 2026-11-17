@@ -1,6 +1,7 @@
 import React from "react";
-import { WHATSAPP_URL } from "./games/shared";
 import ArrowIcon from "./ArrowIcon";
+// 17 Nov (Marta): "Straight to Marta" opens the paid call (CallBooking), no longer WhatsApp.
+import { CALL_HASH } from "./CallBooking";
 
 // Footer to Marta's MM-HOME-001 / 002 (Desktop - 38, 1920x540): her darkened fur, the big white MAMA / MARTA
 // logo on the left, copy + Book a Discovery Call on the right, icons and © Mamamarta 2026 on the bottom row.
@@ -47,9 +48,7 @@ export default function BrandSection() {
             {CALL_LINE}
           </p>
           <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noreferrer"
+            href={CALL_HASH}
             className="mt-[calc(var(--q)*25)] flex h-[calc(var(--q)*46)] w-[calc(var(--q)*350)] items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[length:calc(var(--q)*16)] font-semibold tracking-[-0.023em] whitespace-nowrap backdrop-blur-md"
             style={{ background: buttonOff }}
           >
@@ -91,9 +90,7 @@ export default function BrandSection() {
           </p>
 
           <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noreferrer"
+            href={CALL_HASH}
             className="group mt-6 inline-flex w-fit items-center justify-center gap-1.5 rounded-xs border border-white/20 px-4 py-3 text-[15px] font-semibold backdrop-blur-md transition-all duration-300 md:mt-[1.5625vw] md:min-h-[clamp(44px,3.54vw,68px)] md:min-w-[clamp(200px,16.25vw,312px)] md:px-6 md:py-0 md:text-[clamp(14px,1.146vw,22px)] md:tracking-[-0.017em]"
             onMouseEnter={(e) => (e.currentTarget.style.background = buttonOn)}
             onMouseLeave={(e) => (e.currentTarget.style.background = buttonOff)}

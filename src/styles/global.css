@@ -121,7 +121,9 @@ html {
 
 /* A game or form open: the page behind it never scrolls or bounces (14 Nov, Marta: no scrolling while playing) */
 html.mm-modal-open,
-html.mm-modal-open body {
+html.mm-modal-open body,
+html.mm-call-open,
+html.mm-call-open body {
 	overflow: hidden;
 	overscroll-behavior: none;
 }

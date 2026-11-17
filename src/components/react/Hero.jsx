@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import MenuEyeIcon from "./MenuEyeIcon";
 import { WHATSAPP_URL } from "./games/shared";
 import ArrowIcon from "./ArrowIcon";
+// 17 Nov (Marta): "Straight to Marta" opens the paid call; the round button at the side stays WhatsApp.
+import { CALL_HASH } from "./CallBooking";
 
 // Marta's new home frames (9 Nov): three items only. The Method is the /what-is page; Contact scrolls to
 // "We are not for everyone.".
@@ -143,9 +145,7 @@ export default function Hero({ initialMenuOpen = false }) {
               {FOR_WHOM} {WHAT}
             </p>
             <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noreferrer"
+              href={CALL_HASH}
               className="mt-[calc(var(--p)*26)] flex h-[46px] w-[350px] max-w-full items-center justify-center gap-[0.3em] rounded-xs border border-white/20 text-[16px] font-semibold tracking-[-0.023em] whitespace-nowrap text-white backdrop-blur-md"
               style={{ background: 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)' }}
             >
@@ -198,9 +198,7 @@ export default function Hero({ initialMenuOpen = false }) {
           <div className="w-full max-w-2xl p-[5em] lg:p-0 lg:mt-[calc(var(--h)*55)] lg:max-w-none">
             <div className="flex flex-wrap justify-center">
               <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noreferrer"
+                href={CALL_HASH}
                 className="px-4 py-3 lg:px-6 lg:py-0 lg:justify-center lg:min-w-[clamp(220px,16.25vw,312px)] lg:min-h-[clamp(50px,3.54vw,68px)] lg:text-[clamp(16px,1.146vw,22px)] lg:font-semibold group flex items-center rounded-xs border border-white/20 font-medium backdrop-blur-md transition-all duration-300"
                 onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, #000000 -8.79%, rgba(0, 0, 0, 0.5) 79.38%)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(88.11deg, rgba(0, 0, 0, 0.63) -8.79%, rgba(0, 0, 0, 0.315) 79.38%)'}

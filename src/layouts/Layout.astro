@@ -10,6 +10,8 @@ import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
+// The paid call (Marta, 17 Nov): every link to #book-call on any page opens it.
+import CallBooking from '../components/react/CallBooking.jsx';
 // Her "experience" font (global.css, .mm-exp), served with the site and asked for with the page (14 Nov, Marta:
 // "Слово experience скаче і міняє шрифт": fetched from jsDelivr after the page had loaded, it replaced the site's
 // italic on screen and moved the word). TODO on commit: move the file into public/fonts and point both here.
@@ -73,6 +75,7 @@ const canonical = new URL(Astro.url.pathname, site).href;
 	</head>
 	<body>
 		<slot />
+		<CallBooking client:idle />
 		<script>
 			import '../scripts/scroll-reveals.js';
 			import '../scripts/lazy-videos.js';

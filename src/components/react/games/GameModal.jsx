@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { WHATSAPP_URL, prefersReducedMotion, totalStars, savedStars, markStarsSaved, unsavedStars } from "./shared.js";
+import { prefersReducedMotion, totalStars, savedStars, markStarsSaved, unsavedStars } from "./shared.js";
 import { soundOn, setSound, play as playSound } from "./sound.js";
 import { sendStars } from "../forms/submitForm.js";
 
@@ -314,7 +314,8 @@ export function Completion({ quote, onPlayAgain }) {
           <button type="button" onClick={onPlayAgain} className={btnOutline}>
             Play again <RepeatIcon />
           </button>
-          <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className={btnGradient}>
+          {/* 17 Nov (Marta): Let's talk opens the paid call (CallBooking, over the game), no longer WhatsApp */}
+          <a href="#book-call" className={btnGradient}>
             Let's talk <ChatIcon />
           </a>
         </div>

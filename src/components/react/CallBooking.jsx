@@ -12,14 +12,17 @@ import { WHATSAPP_URL, STARS_PER_HOUR, totalStars, savedStars } from "./games/sh
 // buttons open WhatsApp with the call, her Stars and the price already written, so no request is lost.
 // Steps 4 and 5 come after a real payment only.
 export const PAYPAL_READY = false;
-export const CAL_URL = ""; // her Cal.com "30 min" event, e.g. https://cal.com/<her name>/30min
+export const CAL_URL = "https://cal.com/mamamarta/30min"; // her Cal.com "30 min" event (17 Nov)
 export const CALL_PRICE = 100;
 export const CALL_MAX_OFF = 75;
 const STARS_FOR_MAX = CALL_MAX_OFF * 10;
 export const CALL_HASH = "#book-call";
 
 export function openCall() {
-  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("mm-call"));
+  if (typeof window !== "undefined") {
+    window.gtag?.("event", "call_open");
+    window.dispatchEvent(new CustomEvent("mm-call"));
+  }
 }
 
 const fmt = (n) => Number(n).toLocaleString("en-US");
@@ -310,7 +313,7 @@ export default function CallBooking() {
     );
   } else if (step === "pay") {
     // Until the payment server is on, both buttons open WhatsApp with the call, the Stars and the price written.
-    const payProps = PAYPAL_READY ? {} : { href: waLink, target: "_blank", rel: "noreferrer" };
+    const payProps = PAYPAL_READY ? {} : { href: waLink, target: "_blank", rel: "noreferrer", onClick: () => window.gtag?.("event", "call_pay_click", { value: price, currency: "USD" }) };
     body = (
       <>
         <Top label="Payment · 2 of 4" />

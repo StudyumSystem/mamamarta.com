@@ -71,6 +71,19 @@ const canonical = new URL(Astro.url.pathname, site).href;
 		})} />
 		{preload.map((p) => <link rel="preload" as="image" href={p.href} media={p.media} fetchpriority="high" />)}
 		{italicWord && <link rel="preload" as="font" type="font/woff2" href={expItalic} crossorigin />}
+		{/* Google Analytics (Marta's G-4N0CLWH1FH, 17 Nov): only on mamamarta.com, never on the test copy */}
+		<script is:inline>
+			if (/(^|\.)mamamarta\.com$/.test(location.hostname)) {
+				window.dataLayer = window.dataLayer || [];
+				window.gtag = function () { dataLayer.push(arguments); };
+				gtag('js', new Date());
+				gtag('config', 'G-4N0CLWH1FH');
+				var s = document.createElement('script');
+				s.async = true;
+				s.src = 'https://www.googletagmanager.com/gtag/js?id=G-4N0CLWH1FH';
+				document.head.appendChild(s);
+			}
+		</script>
 		<ClientRouter />
 	</head>
 	<body>

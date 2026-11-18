@@ -58,6 +58,7 @@ const FORM_NAMES = {
 // "Save my Stars" (games' end screen, 11 Nov): the visitor's email and their MM✦STARS reach Marta's inbox
 // through Web3Forms only, so no auto-reply letter goes out (none is written for Stars yet).
 export async function sendStars(email, total, games) {
+  if (typeof window !== "undefined") window.gtag?.("event", "stars_saved", { value: total });
   if (!WEB3FORMS_KEY) {
     await new Promise((r) => setTimeout(r, 700));
     return { ok: true, preview: true };
